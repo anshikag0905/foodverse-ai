@@ -23,3 +23,11 @@ def init_db():
     with SessionLocal() as db:
         seed_demo_data_if_needed(db)
     yield
+
+@pytest.fixture
+def db_session():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

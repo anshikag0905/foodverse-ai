@@ -41,3 +41,5 @@ export function CardSkeleton() {
     </div>
   );
 }
+
+export default Loader;

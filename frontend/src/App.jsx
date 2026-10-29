@@ -13,6 +13,7 @@ import HygieneMonitor from './pages/HygieneMonitor';
 import CookingAssistant from './pages/CookingAssistant';
 import MealPlanner from './pages/MealPlanner';
 import FoodExplorer from './pages/FoodExplorer';
+import PantryTracker from './pages/PantryTracker';
 import { aboutConfig } from './config/about';
 
 // Placeholder view for remaining pages
@@ -106,7 +107,7 @@ export default function App() {
             <Route path="/cooking" element={<CookingAssistant />} />
             <Route path="/meal-planner" element={<MealPlanner />} />
             <Route path="/food-explorer" element={<FoodExplorer />} />
-            <Route path="/pantry" element={<GenericModulePage title={t('nav.pantry')} description="Inventory, Expiry Warnings & Food-Waste Tracking" icon={Package} />} />
+            <Route path="/pantry" element={<PantryTracker />} />
             <Route path="/did-you-know" element={<GenericModulePage title={t('nav.did_you_know')} description="Curated Food Science & Hygiene Fact Directory" icon={Lightbulb} />} />
             <Route path="/gym" element={<GenericModulePage title={t('nav.gym_mode')} description="BMR/TDEE Calculator & Protein Target Progress" icon={Dumbbell} accent="gym" />} />
             <Route path="/history" element={<GenericModulePage title={t('nav.history')} description="Multimodal Scan Archive & Export Center" icon={History} />} />
