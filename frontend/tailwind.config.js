@@ -44,10 +44,29 @@ export default {
           700: '#6d28d9',
           800: '#5b21b6',
           900: '#4c1d95',
+        },
+        blush: {
+          50: '#fff8fa',
+          100: '#ffedf3',
+          200: '#fed7e2',
+          300: '#fbb6ce',
+          400: '#f687b3',
+          500: '#ed64a6',
+          600: '#d53f8c',
+        },
+        pastel: {
+          pink: '#fff0f3',
+          rose: '#ffe4e6',
+          blush: '#fff5f7',
+          mint: '#e6fcf5',
+          peach: '#fff4e6',
+          cream: '#fffbf5',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Noto Sans Devanagari', 'sans-serif'],
+        sans: ['"Quicksand"', '"Nunito"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Nunito"', '"Quicksand"', 'sans-serif'],
+        cute: ['"Quicksand"', 'cursive', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',

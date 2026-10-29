@@ -23,7 +23,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#fff8fa] via-[#fff4f7] to-[#fff8fa] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
