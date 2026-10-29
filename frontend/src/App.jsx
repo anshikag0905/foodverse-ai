@@ -7,10 +7,15 @@ import {
 } from 'lucide-react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import FoodScan from './pages/FoodScan';
+import FreshnessCheck from './pages/FreshnessCheck';
+import HygieneMonitor from './pages/HygieneMonitor';
+import CookingAssistant from './pages/CookingAssistant';
+import MealPlanner from './pages/MealPlanner';
 import FoodExplorer from './pages/FoodExplorer';
 import { aboutConfig } from './config/about';
 
-// Initial Route Placeholder View
+// Placeholder view for remaining pages
 function GenericModulePage({ title, description, icon: Icon, accent = "emerald" }) {
   const isGym = accent === "gym";
   return (
@@ -95,13 +100,13 @@ export default function App() {
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/" element={<DashboardOverview />} />
-            <Route path="/food-scan" element={<GenericModulePage title={t('nav.food_scan')} description="Multimodal Dish Identification & Nutritional Analysis" icon={Utensils} />} />
-            <Route path="/freshness" element={<GenericModulePage title={t('nav.freshness')} description="Color, Texture & Spoilage Classification" icon={ShieldCheck} />} />
-            <Route path="/hygiene" element={<GenericModulePage title={t('nav.hygiene')} description="Commercial Kitchen Video Analysis & Compliance Reports" icon={Video} />} />
-            <Route path="/cooking" element={<GenericModulePage title={t('nav.cooking')} description="Contextual Cooking Assistant & Recipe Suggestion" icon={Sparkles} />} />
-            <Route path="/meal-planner" element={<GenericModulePage title={t('nav.meal_planner')} description="Personalized Adaptive Meal Regimens" icon={Calendar} />} />
-            <Route path="/pantry" element={<GenericModulePage title={t('nav.pantry')} description="Inventory, Expiry Warnings & Food-Waste Tracking" icon={Package} />} />
+            <Route path="/food-scan" element={<FoodScan />} />
+            <Route path="/freshness" element={<FreshnessCheck />} />
+            <Route path="/hygiene" element={<HygieneMonitor />} />
+            <Route path="/cooking" element={<CookingAssistant />} />
+            <Route path="/meal-planner" element={<MealPlanner />} />
             <Route path="/food-explorer" element={<FoodExplorer />} />
+            <Route path="/pantry" element={<GenericModulePage title={t('nav.pantry')} description="Inventory, Expiry Warnings & Food-Waste Tracking" icon={Package} />} />
             <Route path="/did-you-know" element={<GenericModulePage title={t('nav.did_you_know')} description="Curated Food Science & Hygiene Fact Directory" icon={Lightbulb} />} />
             <Route path="/gym" element={<GenericModulePage title={t('nav.gym_mode')} description="BMR/TDEE Calculator & Protein Target Progress" icon={Dumbbell} accent="gym" />} />
             <Route path="/history" element={<GenericModulePage title={t('nav.history')} description="Multimodal Scan Archive & Export Center" icon={History} />} />
