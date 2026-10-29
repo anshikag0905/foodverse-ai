@@ -16,6 +16,7 @@ import GymMode from './pages/GymMode';
 import History from './pages/History';
 import SettingsPrivacy from './pages/SettingsPrivacy';
 import About from './pages/About';
+import DesignSystemPreview from './pages/DesignSystemPreview';
 import { aboutConfig } from './config/about';
 
 export default function App() {
@@ -23,7 +24,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#fff8fa] via-[#fff4f7] to-[#fff8fa] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#BFE6FF] via-[#A5DEFF] to-[#8FD3FF] dark:from-[#0A1128] dark:via-[#131F42] dark:to-[#0A1128] text-[#0F1B3D] dark:text-[#F0F4FF] transition-colors duration-200 font-sans">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/history" element={<History />} />
             <Route path="/settings" element={<SettingsPrivacy />} />
             <Route path="/about" element={<About />} />
+            <Route path="/design" element={<DesignSystemPreview />} />
           </Routes>
         </main>
         <Footer />

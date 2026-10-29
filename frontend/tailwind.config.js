@@ -8,74 +8,96 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981', // Emerald primary
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
+        // Sky Blue Canvas
+        sky: {
+          50: '#F0F9FF',
+          100: '#E0F2FE',
+          200: '#BFE6FF', // Target reference sky blue
+          300: '#A5DEFF',
+          400: '#8FD3FF', // Target reference deep sky
+          500: '#38BDF8',
+          600: '#0284C7',
+          light: '#BFE6FF',
+          deep: '#8FD3FF',
+          soft: '#EAF6FF',
         },
-        accent: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b', // Amber accent
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
+        // Deep Navy Ink & Borders
+        ink: {
+          DEFAULT: '#0F1B3D',
+          navy: '#0F1B3D',
+          muted: '#4A5568',
+          light: '#718096',
         },
-        gym: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6', // Violet gym mode accent
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
+        // Card Surfaces
+        card: {
+          DEFAULT: '#FFFDF9',
+          cream: '#FFFDF9',
+          white: '#FFFFFF',
         },
-        blush: {
-          50: '#fff8fa',
-          100: '#ffedf3',
-          200: '#fed7e2',
-          300: '#fbb6ce',
-          400: '#f687b3',
-          500: '#ed64a6',
-          600: '#d53f8c',
+        // Playful Module Accents
+        tomato: {
+          DEFAULT: '#FF5A5F', // Food Recognition (Red)
+          light: '#FFEAEA',
+          dark: '#E0484D',
         },
-        pastel: {
-          pink: '#fff0f3',
-          rose: '#ffe4e6',
-          blush: '#fff5f7',
-          mint: '#e6fcf5',
-          peach: '#fff4e6',
-          cream: '#fffbf5',
-        }
+        mint: {
+          DEFAULT: '#3DDC97', // Freshness (Mint)
+          light: '#E8FBF2',
+          dark: '#2CB87C',
+        },
+        teal: {
+          DEFAULT: '#0284C7', // Hygiene (Teal/Ocean)
+          light: '#E0F2FE',
+          dark: '#0369A1',
+        },
+        sunny: {
+          DEFAULT: '#FFC93C', // Cooking (Sunny Yellow)
+          light: '#FFF8E6',
+          dark: '#E0AE2C',
+        },
+        grape: {
+          DEFAULT: '#8B5CF6', // Meal Planner (Grape)
+          light: '#F3E8FF',
+          dark: '#7C3AED',
+        },
+        peach: {
+          DEFAULT: '#FFB38A', // Pantry (Peach)
+          light: '#FFF1E8',
+          dark: '#E8986D',
+        },
+        // Friendly Deep Navy Dark Mode
+        dusk: {
+          bg: '#0A1128',
+          card: '#131F42',
+          surface: '#1C2B59',
+          border: '#2A3C72',
+          text: '#F0F4FF',
+          muted: '#94A3B8',
+        },
       },
       fontFamily: {
-        sans: ['"Quicksand"', '"Nunito"', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Nunito"', '"Quicksand"', 'sans-serif'],
-        cute: ['"Quicksand"', 'cursive', 'sans-serif'],
+        display: ['"Fredoka"', '"Baloo 2"', 'sans-serif'],
+        body: ['"Nunito"', 'sans-serif'],
+        sans: ['"Nunito"', 'sans-serif'],
+        hindi: ['"Baloo 2"', '"Noto Sans Devanagari"', 'sans-serif'],
+        cute: ['"Fredoka"', '"Quicksand"', 'cursive', 'sans-serif'],
       },
       borderRadius: {
-        '2xl': '1rem',
-        '3xl': '1.5rem',
+        'xl': '1rem',
+        '2xl': '1.25rem',
+        '3xl': '1.75rem',
+        '4xl': '2.25rem',
+        'pill': '9999px',
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-        'soft-dark': '0 4px 20px -2px rgba(0, 0, 0, 0.35)',
-        'glow-primary': '0 0 25px -5px rgba(16, 185, 129, 0.3)',
+        'sticker': '4px 4px 0px #0F1B3D',
+        'sticker-sm': '2px 2px 0px #0F1B3D',
+        'sticker-lg': '6px 6px 0px #0F1B3D',
+        'sticker-dark': '4px 4px 0px rgba(0, 0, 0, 0.8)',
+        'sticker-dark-sm': '2px 2px 0px rgba(0, 0, 0, 0.8)',
+      },
+      borderWidth: {
+        '3': '3px',
       }
     },
   },
