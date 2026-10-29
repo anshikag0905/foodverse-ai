@@ -515,7 +515,7 @@ export default function GymMode() {
               <p className="text-[11px] text-[var(--text-muted)]">Your daily calorie and protein totals are persistently recorded.</p>
             </div>
           </div>
-          <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-white dark:bg-neutral-800 border border-[var(--border-color)]">Logged</span>
+          <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">Logged</span>
         </div>
       )}
 
@@ -523,7 +523,7 @@ export default function GymMode() {
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={() => setActiveTab('tracker')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
+          className={` flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'tracker'
               ? 'bg-grape text-white shadow-xs'
               : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
@@ -534,7 +534,7 @@ export default function GymMode() {
         </button>
         <button
           onClick={() => setActiveTab('calculator')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
+          className={` flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'calculator'
               ? 'bg-grape text-white shadow-xs'
               : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
@@ -545,7 +545,7 @@ export default function GymMode() {
         </button>
         <button
           onClick={() => setActiveTab('protein-foods')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
+          className={` flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'protein-foods'
               ? 'bg-grape text-white shadow-xs'
               : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
@@ -556,7 +556,7 @@ export default function GymMode() {
         </button>
         <button
           onClick={() => setActiveTab('supplements')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
+          className={` flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'supplements'
               ? 'bg-grape text-white shadow-xs'
               : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
@@ -586,7 +586,7 @@ export default function GymMode() {
               </div>
 
               {/* Date Selector */}
-              <div className="flex items-center gap-2 bg-sky-50 dark:bg-[var(--bg-card-subtle)] px-3 py-1.5 rounded-2xl border-2 border-[var(--border-color)] shadow-xs">
+              <div className="flex items-center gap-2 bg-sky-50 dark:bg-[var(--bg-card-subtle)] px-3 py-1.5 rounded-2xl border border-[var(--border-color)] shadow-xs">
                 <Calendar className="w-4 h-4 text-grape" />
                 <input
                   type="date"
@@ -721,13 +721,13 @@ export default function GymMode() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Type e.g. 'banana', 'egg', 'chicken', 'oats'..."
-                    className="w-full pl-9 pr-4 py-2 text-xs font-bold rounded-2xl border-2 border-[var(--border-color)] bg-sky-50 dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] focus:outline-none focus:border-grape placeholder:text-[var(--text-muted)]"
+                    className="w-full pl-9 pr-4 py-2 text-xs font-bold rounded-2xl border border-[var(--border-color)] bg-sky-50 dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] focus:outline-none focus:border-grape placeholder:text-[var(--text-muted)]"
                   />
                 </div>
 
                 {/* Autocomplete Dropdown */}
                 {autocompleteResults.length > 0 && (
-                  <div className="absolute z-20 left-0 right-0 mt-1 bg-[var(--bg-card)] rounded-2xl border-2 border-[var(--border-color)] shadow-xs max-h-56 overflow-y-auto divide-y-2 divide-ink/10">
+                  <div className="absolute z-20 left-0 right-0 mt-1 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-xs max-h-56 overflow-y-auto divide-y-2 divide-ink/10">
                     {autocompleteResults.map((item) => (
                       <button
                         key={item.id}
@@ -756,7 +756,7 @@ export default function GymMode() {
 
               {/* Selected Preset Food Card with Portion Stepper */}
               {selectedFoodPreset && (
-                <div className="p-3.5 rounded-2xl bg-grape/15 border-2 border-[var(--border-color)] space-y-2.5">
+                <div className="p-3.5 rounded-2xl bg-grape/15 border border-[var(--border-color)] space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-display font-black text-xs text-[var(--text-primary)] flex items-center gap-1">
@@ -769,7 +769,7 @@ export default function GymMode() {
                     </div>
 
                     {/* Quantity Stepper */}
-                    <div className="flex items-center gap-1.5 bg-white dark:bg-[var(--bg-card-subtle)] px-2 py-1 rounded-xl border-1.5 border-[var(--border-color)] shadow-xs">
+                    <div className="flex items-center gap-1.5 bg-[var(--bg-card-subtle)] px-2 py-1 rounded-xl border border-[var(--border-color)] shadow-xs">
                       <button
                         type="button"
                         onClick={() => handleChangeMultiplier(-1)}
@@ -793,7 +793,7 @@ export default function GymMode() {
                   </div>
 
                   {/* Calculated Stats Grid */}
-                  <div className="grid grid-cols-4 gap-1 text-center bg-white dark:bg-[var(--bg-card-subtle)] p-2 rounded-xl border border-[var(--border-color)]">
+                  <div className="grid grid-cols-4 gap-1 text-center bg-[var(--bg-card-subtle)] p-2 rounded-xl border border-[var(--border-color)]">
                     <div>
                       <span className="text-[9px] text-[var(--text-muted)] font-black block">CALORIES</span>
                       <strong className="text-xs text-tomato font-black">
@@ -868,7 +868,7 @@ export default function GymMode() {
                       value={newLog.water_ml}
                       onChange={(e) => setNewLog({ ...newLog, water_ml: e.target.value })}
                       placeholder="e.g. 500"
-                      className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                      className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                     />
                   </div>
                 ) : (
@@ -884,7 +884,7 @@ export default function GymMode() {
                           value={newLog.calories}
                           onChange={(e) => setNewLog({ ...newLog, calories: e.target.value })}
                           placeholder="e.g. 105"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-tomato"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-tomato"
                         />
                       </div>
                       <div>
@@ -897,7 +897,7 @@ export default function GymMode() {
                           value={newLog.protein_g}
                           onChange={(e) => setNewLog({ ...newLog, protein_g: e.target.value })}
                           placeholder="e.g. 1.3"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-grape"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-grape"
                         />
                       </div>
                     </div>
@@ -913,7 +913,7 @@ export default function GymMode() {
                           value={newLog.carbs_g}
                           onChange={(e) => setNewLog({ ...newLog, carbs_g: e.target.value })}
                           placeholder="e.g. 27"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-amber-600"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-amber-600"
                         />
                       </div>
                       <div>
@@ -926,7 +926,7 @@ export default function GymMode() {
                           value={newLog.fat_g}
                           onChange={(e) => setNewLog({ ...newLog, fat_g: e.target.value })}
                           placeholder="e.g. 0.3"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-orange-600"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-orange-600"
                         />
                       </div>
                     </div>
@@ -935,7 +935,7 @@ export default function GymMode() {
 
                 <button
                   type="submit"
-                  className="btn-squish w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border-2 border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs flex items-center justify-center gap-2"
+                  className=" w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs flex items-center justify-center gap-2"
                 >
                   <Dumbbell className="w-4 h-4" />
                   <span>Save Log & Update Macros</span>
@@ -996,7 +996,7 @@ export default function GymMode() {
 
                       <button
                         onClick={() => handleDeleteLog(log.id)}
-                        className="btn-squish p-2 rounded-xl text-[var(--text-muted)] hover:text-tomato hover:bg-tomato/15 transition cursor-pointer"
+                        className=" p-2 rounded-xl text-[var(--text-muted)] hover:text-tomato hover:bg-tomato/15 transition cursor-pointer"
                         title="Delete entry"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1028,7 +1028,7 @@ export default function GymMode() {
                     type="number"
                     value={calcForm.age}
                     onChange={(e) => setCalcForm({ ...calcForm, age: parseInt(e.target.value) || 25 })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   />
                 </div>
                 <div>
@@ -1038,7 +1038,7 @@ export default function GymMode() {
                   <select
                     value={calcForm.sex}
                     onChange={(e) => setCalcForm({ ...calcForm, sex: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   >
                     <option value="male">Male (+5 offset)</option>
                     <option value="female">Female (-161 offset)</option>
@@ -1056,7 +1056,7 @@ export default function GymMode() {
                     step="0.5"
                     value={calcForm.height_cm}
                     onChange={(e) => setCalcForm({ ...calcForm, height_cm: parseFloat(e.target.value) || 170 })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   />
                 </div>
                 <div>
@@ -1068,7 +1068,7 @@ export default function GymMode() {
                     step="0.5"
                     value={calcForm.weight_kg}
                     onChange={(e) => setCalcForm({ ...calcForm, weight_kg: parseFloat(e.target.value) || 70 })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   />
                 </div>
               </div>
@@ -1080,7 +1080,7 @@ export default function GymMode() {
                 <select
                   value={calcForm.activity_level}
                   onChange={(e) => setCalcForm({ ...calcForm, activity_level: e.target.value })}
-                  className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                  className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                 >
                   <option value="sedentary">Sedentary (desk job, minimal exercise × 1.2)</option>
                   <option value="light">Lightly Active (1-3 days exercise × 1.375)</option>
@@ -1098,7 +1098,7 @@ export default function GymMode() {
                   <select
                     value={calcForm.goal}
                     onChange={(e) => setCalcForm({ ...calcForm, goal: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   >
                     <option value="cut">Cut (-500 kcal fat loss)</option>
                     <option value="bulk">Lean Bulk (+350 kcal muscle gain)</option>
@@ -1113,7 +1113,7 @@ export default function GymMode() {
                   <select
                     value={calcForm.diet_type}
                     onChange={(e) => setCalcForm({ ...calcForm, diet_type: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   >
                     <option value="omnivore">Balanced Omnivore</option>
                     <option value="vegetarian">Vegetarian (Lacto/Ovo)</option>
@@ -1125,7 +1125,7 @@ export default function GymMode() {
 
               <button
                 type="submit"
-                className="btn-squish w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border-2 border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs"
+                className=" w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs"
               >
                 Calculate & Update Active Targets
               </button>
@@ -1140,13 +1140,13 @@ export default function GymMode() {
               </h3>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)]">
+                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                   <span className="text-[11px] font-black text-[var(--text-muted)] uppercase">Basal Metabolic Rate</span>
                   <p className="text-2xl font-display font-black text-[var(--text-primary)] mt-1">
                     {profile?.bmr || 1720} <span className="text-xs font-bold text-[var(--text-muted)]">kcal</span>
                   </p>
                 </div>
-                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)]">
+                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                   <span className="text-[11px] font-black text-[var(--text-muted)] uppercase">Total Daily Expenditure</span>
                   <p className="text-2xl font-display font-black text-[var(--text-primary)] mt-1">
                     {profile?.tdee || 2450} <span className="text-xs font-bold text-[var(--text-muted)]">kcal</span>
@@ -1154,30 +1154,30 @@ export default function GymMode() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-grape/15 border-2 border-[var(--border-color)] space-y-3">
+              <div className="p-5 rounded-2xl bg-grape/15 border border-[var(--border-color)] space-y-3">
                 <span className="text-xs font-black text-grape uppercase">
                   Daily Target Breakdown
                 </span>
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                     <span className="text-[10px] text-[var(--text-muted)] font-black block">CALORIES</span>
                     <strong className="text-sm text-tomato font-black">
                       {profile?.target_calories || 2300}
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                     <span className="text-[10px] text-[var(--text-muted)] font-black block">PROTEIN</span>
                     <strong className="text-sm text-grape font-black">
                       {profile?.target_protein_g || 140}g
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                     <span className="text-[10px] text-[var(--text-muted)] font-black block">CARBS</span>
                     <strong className="text-sm text-amber-600 font-black">
                       {profile?.target_carbs_g || 260}g
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                     <span className="text-[10px] text-[var(--text-muted)] font-black block">FAT</span>
                     <strong className="text-sm text-orange-600 font-black">
                       {profile?.target_fat_g || 70}g
@@ -1187,7 +1187,7 @@ export default function GymMode() {
               </div>
 
               {/* Personalized Indian Gym Diet Distribution Plan */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)] space-y-3">
+              <div className="p-5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-display font-black text-sm text-[var(--text-primary)] flex items-center gap-1.5">
                     <span>Tailored Indian Gym Meal Timing Plan</span>
@@ -1265,14 +1265,14 @@ export default function GymMode() {
                   value={leaderboardSearch}
                   onChange={(e) => setLeaderboardSearch(e.target.value)}
                   placeholder="Filter foods (e.g. Soya, Whey, Paneer, Chicken)..."
-                  className="pl-8 pr-3 py-1.5 rounded-full text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] w-48 sm:w-64"
+                  className="pl-8 pr-3 py-1.5 rounded-full text-xs font-bold border border-[var(--border-color)] bg-[var(--bg-card)] w-48 sm:w-64"
                 />
               </div>
 
               <select
                 value={dietFilter}
                 onChange={(e) => setDietFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] cursor-pointer"
+                className="px-3 py-1.5 rounded-full text-xs font-bold border border-[var(--border-color)] bg-[var(--bg-card)] cursor-pointer"
               >
                 <option value="all">All Diets</option>
                 <option value="veg">Vegetarian</option>
@@ -1282,7 +1282,7 @@ export default function GymMode() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] cursor-pointer"
+                className="px-3 py-1.5 rounded-full text-xs font-bold border border-[var(--border-color)] bg-[var(--bg-card)] cursor-pointer"
               >
                 <option value="protein_per_100g">Sort by Protein / 100g (Highest First)</option>
                 <option value="efficiency">Sort by Protein Ratio / 100 kcal</option>

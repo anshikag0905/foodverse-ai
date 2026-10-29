@@ -21,19 +21,29 @@ from app.schemas.ai import (
 )
 
 PREFERRED_MODELS = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-3.1-flash-lite-preview",
-    "gemini-3-flash-preview",
-    "gemini-3.5-flash"
+    "gemini-3.5-flash-lite",
+    "gemini-3.8-flash",
+    "gemini-3.5-flash",
+    "gemini-flash-latest"
 ]
+
+def _detect_mime_type(image_bytes: Optional[bytes]) -> str:
+    if not image_bytes:
+        return "image/jpeg"
+    if image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if image_bytes.startswith(b"RIFF") and b"WEBP" in image_bytes[:16]:
+        return "image/webp"
+    if image_bytes.startswith(b"\xff\xd8\xff"):
+        return "image/jpeg"
+    if image_bytes.startswith(b"GIF87a") or image_bytes.startswith(b"GIF89a"):
+        return "image/gif"
+    return "image/jpeg"
 
 class GeminiProvider(AIProvider):
     """
     Production AI Provider for Google Gemini API.
-    Uses active Gemini Flash models (gemini-3.5-flash, gemini-flash-latest)
+    Uses active Gemini Flash models (gemini-3.5-flash-lite, gemini-3.8-flash, etc.)
     with automatic model fallback and graceful offline fallback to MockAIProvider.
     """
     def __init__(self, api_key: Optional[str] = None):
@@ -44,7 +54,7 @@ class GeminiProvider(AIProvider):
         self,
         prompt: str,
         image_bytes: Optional[bytes] = None,
-        mime_type: str = "image/jpeg"
+        mime_type: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Executes a multimodal Gemini generateContent call requiring a JSON output.
@@ -53,12 +63,13 @@ class GeminiProvider(AIProvider):
         if not self.api_key:
             return None
 
+        effective_mime = mime_type or _detect_mime_type(image_bytes)
         parts: List[Dict[str, Any]] = [{"text": prompt}]
         if image_bytes:
             b64_data = base64.b64encode(image_bytes).decode("utf-8")
             parts.append({
                 "inline_data": {
-                    "mime_type": mime_type,
+                    "mime_type": effective_mime,
                     "data": b64_data
                 }
             })
@@ -104,7 +115,7 @@ class GeminiProvider(AIProvider):
         self,
         prompt: str,
         image_bytes: Optional[bytes] = None,
-        mime_type: str = "image/jpeg"
+        mime_type: Optional[str] = None
     ) -> Optional[str]:
         """
         Executes a free-form text Gemini generateContent call.
@@ -112,12 +123,13 @@ class GeminiProvider(AIProvider):
         if not self.api_key:
             return None
 
+        effective_mime = mime_type or _detect_mime_type(image_bytes)
         parts: List[Dict[str, Any]] = [{"text": prompt}]
         if image_bytes:
             b64_data = base64.b64encode(image_bytes).decode("utf-8")
             parts.append({
                 "inline_data": {
-                    "mime_type": mime_type,
+                    "mime_type": effective_mime,
                     "data": b64_data
                 }
             })

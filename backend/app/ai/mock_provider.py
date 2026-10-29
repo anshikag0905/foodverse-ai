@@ -41,14 +41,18 @@ def classify_image_features(image_bytes: Optional[bytes]) -> Dict[str, Any]:
 
         for r, g, b in food_pixels:
             tot = r + g + b
-            if r > 115 and g > 95 and (r + g) > 2.0 * (b + 1):
+            # Vibrant Yellow (Banana): high red and green, distinctly very low blue (< 85)
+            if r > 130 and g > 115 and (r + g) > 3.2 * (b + 1) and b < 85:
                 yellow_count += 1
-            elif r > 115 and r > 1.3 * g and r > 1.3 * b:
+            # Earthy Tan / Russet (Potatoes / Aloo / Tubers)
+            elif r > 70 and g > 55 and b > 40 and r > g > b and (r + g) < 3.2 * (b + 1):
+                brown_count += 1
+            # Red (Apple / Berry / Tomato)
+            elif r > 115 and r > 1.35 * g and r > 1.35 * b:
                 red_count += 1
+            # Green (Broccoli / Green Fruit / Salad)
             elif g > 90 and g > 1.15 * r and g > 1.15 * b:
                 green_count += 1
-            elif r > 100 and 50 <= g <= 135 and b < 80:
-                brown_count += 1
             if tot < 90:
                 dark_spots += 1
 
@@ -58,20 +62,21 @@ def classify_image_features(image_bytes: Optional[bytes]) -> Dict[str, Any]:
         b_r = brown_count / n
         spot_r = dark_spots / n
 
-        if y_r >= 0.10 or (y_r > r_r and y_r > g_r and y_r > 0.06):
+        if b_r >= 0.08 and b_r > y_r:
+            cat = "potato"
+        elif y_r >= 0.08 and y_r > b_r:
             cat = "banana"
-        elif r_r >= 0.12 or (r_r > y_r and r_r > g_r and r_r > 0.06):
+        elif r_r >= 0.10:
             cat = "apple"
-        elif g_r >= 0.12:
+        elif g_r >= 0.10:
             cat = "fruit"
-        elif b_r >= 0.14:
-            cat = "snack"
         else:
             cat = "thali"
 
         return {
             "category": cat,
             "banana_prob": y_r,
+            "potato_prob": b_r,
             "apple_prob": r_r,
             "green_prob": g_r,
             "brown_prob": b_r,
@@ -97,6 +102,8 @@ class MockAIProvider(AIProvider):
     ) -> MultiFoodDetectionResult:
         from app.core.config import settings
         path_str = (image_path or query or "").lower()
+        v_cues = classify_image_features(image_bytes)
+        v_cat = v_cues.get("category", "")
 
         # Check if text query is provided
         if query and not image_bytes:
@@ -295,12 +302,12 @@ class MockAIProvider(AIProvider):
         v_cues = classify_image_features(image_bytes)
         v_cat = v_cues.get("category", "thali")
 
-        is_banana = "banana" in path_str or "kela" in path_str or v_cat == "banana"
-        is_apple = ("apple" in path_str or "seb" in path_str or v_cat == "apple") and not is_banana
-        is_fruit = ("fruit" in path_str or "grapes" in path_str or v_cat == "fruit") and not is_banana and not is_apple
-        is_snack = ("snack" in path_str or "samosa" in path_str or v_cat == "snack") and not is_banana and not is_apple and not is_fruit
+        is_potato = "potato" in path_str or "aloo" in path_str or v_cat == "potato"
+        is_banana = ("banana" in path_str or "kela" in path_str or v_cat == "banana") and not is_potato
+        is_apple = ("apple" in path_str or "seb" in path_str or v_cat == "apple") and not is_banana and not is_potato
+        is_fruit = ("fruit" in path_str or "grapes" in path_str or v_cat == "fruit") and not is_banana and not is_apple and not is_potato
+        is_snack = ("snack" in path_str or "samosa" in path_str or v_cat == "snack") and not is_banana and not is_apple and not is_fruit and not is_potato
         is_gym = "gym" in path_str or "chicken" in path_str
-        is_potato = "potato" in path_str or "aloo" in path_str
         is_paneer = "paneer" in path_str
         is_soya = "soya" in path_str
         is_thali = ("thali" in path_str or v_cat == "thali") and not is_banana and not is_apple and not is_fruit and not is_snack and not is_gym and not is_potato and not is_paneer and not is_soya
@@ -579,18 +586,18 @@ class MockAIProvider(AIProvider):
             items = [
                 DetectedFoodItem(
                     id="box_potato_1",
-                    name="Aloo Gobi",
-                    name_hi="आलू गोभी",
-                    confidence=0.95,
-                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
-                    estimated_grams=180.0,
-                    category="Curry",
-                    cuisine="North Indian",
-                    calories=162.0,
-                    protein=4.8,
-                    carbs=26.0,
-                    fat=5.5,
-                    fiber=4.5,
+                    name="Fresh Potatoes",
+                    name_hi="आलू",
+                    confidence=0.96,
+                    box=FoodBox(ymin=0.12, xmin=0.12, ymax=0.88, xmax=0.88),
+                    estimated_grams=200.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global / Indian",
+                    calories=154.0,
+                    protein=4.0,
+                    carbs=35.0,
+                    fat=0.2,
+                    fiber=4.4,
                     allergens=[],
                     diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
                     data_source="database"
@@ -708,6 +715,8 @@ class MockAIProvider(AIProvider):
         lang: str = "en"
     ) -> FoodItemDetection:
         path_str = (image_path or query or "").lower()
+        v_cues = classify_image_features(image_bytes)
+        v_cat = v_cues.get("category", "")
 
         # 1. Paneer Tikka (Indian regional dish)
         if "paneer" in path_str or "tikka" in path_str:
@@ -799,35 +808,64 @@ class MockAIProvider(AIProvider):
                 data_source="database"
             )
 
-        # 4. Aloo Sabzi / Potato Curry (Accurate realistic macros: 138 kcal, 2.4g protein, NOT 16g!)
-        elif any(k in path_str for k in ["potato", "aloo", "sabzi", "jeera aloo", "batata"]):
-            return FoodItemDetection(
-                name="Aloo Sabzi (Potato Curry)",
-                name_hi="आलू की सब्जी",
-                confidence=0.95,
-                category="Indian Sabzi",
-                cuisine="North Indian",
-                macros=MacroNutrients(
-                    calories=138.0,
-                    protein=2.4, # Verified realistic IFCT/USDA protein for potato curry!
-                    carbs=24.5,
-                    fat=3.8,
-                    fiber=2.8,
-                    sugar=1.5,
-                    sodium_mg=380.0,
-                    servingSize="1 bowl (150g)"
-                ),
-                health_score=78,
-                health_explanation="Wholesome potassium and complex resistant starch cooked in turmeric and cumin; low natural protein typical of root vegetables.",
-                allergens=[],
-                diet_tags=["Vegan", "Vegetarian", "Halal", "Gluten-Free"],
-                cues_detected=[
-                    "Diced golden potato cubes in spiced gravy",
-                    "Cumin and mustard seed tempering",
-                    "Turmeric-yellow aromatic reduction"
-                ],
-                data_source="database"
-            )
+        # 4. Fresh Raw Potatoes or Aloo Sabzi / Potato Curry
+        elif any(k in path_str for k in ["potato", "aloo", "sabzi", "jeera aloo", "batata"]) or v_cat == "potato":
+            if any(k in path_str for k in ["sabzi", "curry", "jeera"]):
+                return FoodItemDetection(
+                    name="Aloo Sabzi (Potato Curry)",
+                    name_hi="आलू की सब्जी",
+                    confidence=0.95,
+                    category="Indian Sabzi",
+                    cuisine="North Indian",
+                    macros=MacroNutrients(
+                        calories=138.0,
+                        protein=2.4, # Verified realistic IFCT/USDA protein for potato curry!
+                        carbs=24.5,
+                        fat=3.8,
+                        fiber=2.8,
+                        sugar=1.5,
+                        sodium_mg=380.0,
+                        servingSize="1 bowl (150g)"
+                    ),
+                    health_score=78,
+                    health_explanation="Wholesome potassium and complex resistant starch cooked in turmeric and cumin; low natural protein typical of root vegetables.",
+                    allergens=[],
+                    diet_tags=["Vegan", "Vegetarian", "Halal", "Gluten-Free"],
+                    cues_detected=[
+                        "Diced golden potato cubes in spiced gravy",
+                        "Cumin and mustard seed tempering",
+                        "Turmeric-yellow aromatic reduction"
+                    ],
+                    data_source="database"
+                )
+            else:
+                return FoodItemDetection(
+                    name="Fresh Potatoes",
+                    name_hi="आलू",
+                    confidence=0.96,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global / Indian",
+                    macros=MacroNutrients(
+                        calories=154.0,
+                        protein=4.0,
+                        carbs=35.0,
+                        fat=0.2,
+                        fiber=4.4,
+                        sugar=1.6,
+                        sodium_mg=12.0,
+                        servingSize="1 medium potato (200g)"
+                    ),
+                    health_score=85,
+                    health_explanation="Wholesome potassium, vitamin C, and complex resistant starch; low fat and natural root staple.",
+                    allergens=[],
+                    diet_tags=["Vegan", "Vegetarian", "Jain", "Halal", "Gluten-Free"],
+                    cues_detected=[
+                        "Smooth russet/golden tuber skin",
+                        "Subtle natural earthy surface texture",
+                        "Firm oval tuber geometry with zero sprouting eyes"
+                    ],
+                    data_source="database"
+                )
 
         # 5. Soya Chunks (Vegetarian high-protein powerhouse: 26g protein per 50g!)
         elif "soya" in path_str or "nutrela" in path_str:
@@ -1062,7 +1100,7 @@ class MockAIProvider(AIProvider):
             )
 
         # Moderately Fresh / Ripe / Fresh Banana
-        elif "banana" in path_str or "ripe" in path_str or "kela" in path_str or v_cat == "banana":
+        elif ("banana" in path_str or "kela" in path_str or v_cat == "banana") and ("potato" not in path_str and v_cat != "potato"):
             is_speckled = spot_r > 0.08
             return FreshnessAnalysisResult(
                 item_name="Cavendish Banana",
@@ -1076,6 +1114,22 @@ class MockAIProvider(AIProvider):
                 ],
                 storage_advice="Peel has reached peak sweetness. Eat within 48 hours or peel and freeze for smoothies." if is_speckled else "Store at room temperature away from direct sunlight for up to 5 days.",
                 consumption_verdict="Safe and optimal for immediate eating or baking banana bread." if is_speckled else "Peak freshness. Excellent for raw consumption.",
+            )
+
+        # Fresh Farm Potatoes
+        elif "potato" in path_str or "aloo" in path_str or v_cat == "potato":
+            return FreshnessAnalysisResult(
+                item_name="Fresh Farm Potatoes",
+                status="fresh",
+                confidence=0.96,
+                freshness_score=94,
+                visual_indicators=[
+                    "Firm russet/golden skin with uniform natural earthy hue",
+                    "No green solanine discoloration or visible sprouting eyes",
+                    "Dry surface free from rot, soft spots, or moisture decay"
+                ],
+                storage_advice="Store in a cool, dark, well-ventilated dry place (away from onions and direct sunlight) for 2 to 4 weeks.",
+                consumption_verdict="Excellent quality. Perfect for boiling, roasting, curries, or air frying.",
             )
 
         # Fresh Apple / Default Fresh
