@@ -10,8 +10,11 @@ from app.core.config import settings
 
 class FreshnessService:
     def __init__(self):
-        self.ai = get_ai_provider()
         self.storage = get_storage()
+
+    @property
+    def ai(self):
+        return get_ai_provider()
 
     async def analyze_freshness(
         self,

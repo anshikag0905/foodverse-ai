@@ -23,7 +23,6 @@ from app.schemas.ai import (
 PREFERRED_MODELS = [
     "gemini-3.5-flash-lite",
     "gemini-3.8-flash",
-    "gemini-3.5-flash",
     "gemini-flash-latest"
 ]
 
@@ -39,6 +38,24 @@ def _detect_mime_type(image_bytes: Optional[bytes]) -> str:
     if image_bytes.startswith(b"GIF87a") or image_bytes.startswith(b"GIF89a"):
         return "image/gif"
     return "image/jpeg"
+
+def _normalize_coord(val: Any) -> float:
+    try:
+        f = float(val)
+        if f > 1.0:
+            f = f / 1000.0 if f <= 1000.0 else f / 10000.0
+        return max(0.0, min(1.0, f))
+    except (ValueError, TypeError):
+        return 0.0
+
+def _normalize_confidence(val: Any) -> float:
+    try:
+        f = float(val)
+        if f > 1.0:
+            f = f / 100.0
+        return max(0.0, min(1.0, f))
+    except (ValueError, TypeError):
+        return 0.95
 
 class GeminiProvider(AIProvider):
     """
@@ -268,14 +285,26 @@ class GeminiProvider(AIProvider):
                 for idx, raw_it in enumerate(parsed["items"]):
                     box_data = raw_it.get("box")
                     box_obj = None
-                    if box_data and len(box_data) == 4:
-                        box_obj = FoodBox(ymin=box_data[0], xmin=box_data[1], ymax=box_data[2], xmax=box_data[3])
+                    if isinstance(box_data, (list, tuple)) and len(box_data) == 4:
+                        try:
+                            box_obj = FoodBox(ymin=box_data[0], xmin=box_data[1], ymax=box_data[2], xmax=box_data[3])
+                        except Exception:
+                            box_obj = None
+                    elif isinstance(box_data, dict):
+                        try:
+                            ymin = box_data.get("ymin", box_data.get("top", 0.0))
+                            xmin = box_data.get("xmin", box_data.get("left", 0.0))
+                            ymax = box_data.get("ymax", box_data.get("bottom", 1.0))
+                            xmax = box_data.get("xmax", box_data.get("right", 1.0))
+                            box_obj = FoodBox(ymin=ymin, xmin=xmin, ymax=ymax, xmax=xmax)
+                        except Exception:
+                            box_obj = None
 
                     items.append(DetectedFoodItem(
                         id=f"gemini_item_{idx+1}",
                         name=raw_it.get("name", "Food Item"),
                         name_hi=raw_it.get("name_hi"),
-                        confidence=float(raw_it.get("confidence", 0.92)),
+                        confidence=_normalize_confidence(raw_it.get("confidence", 0.92)),
                         box=box_obj,
                         estimated_grams=float(raw_it.get("estimated_grams", 120.0)),
                         category=raw_it.get("category", "Prepared Food"),

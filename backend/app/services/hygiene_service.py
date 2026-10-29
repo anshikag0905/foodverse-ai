@@ -105,8 +105,11 @@ def extract_video_frames(
 
 class HygieneService:
     def __init__(self):
-        self.ai = get_ai_provider()
         self.storage = get_storage()
+
+    @property
+    def ai(self):
+        return get_ai_provider()
 
     async def analyze_kitchen_photo(
         self,

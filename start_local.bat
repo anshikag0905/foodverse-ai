@@ -7,18 +7,24 @@ echo.
 
 cd /d "%~dp0"
 
-set "PY_CMD=python"
-if exist "%LOCALAPPDATA%\Programs\Python\Python311\python.exe" (
-    set "PY_CMD=%LOCALAPPDATA%\Programs\Python\Python311\python.exe"
+:: Detect Python executable
+set "PYTHON_EXE=python"
+if exist "C:\Users\Ashutoshpandey\AppData\Local\Programs\Python\Python311\python.exe" (
+    set "PYTHON_EXE=C:\Users\Ashutoshpandey\AppData\Local\Programs\Python\Python311\python.exe"
+) else (
+    where py >nul 2>&1
+    if not errorlevel 1 (
+        set "PYTHON_EXE=py -3"
+    )
 )
 
 echo [1/2] Launching Python FastAPI Backend on http://127.0.0.1:8000 ...
-start "FoodVerse AI - Backend Server" cmd /k "cd /d %~dp0backend && \"%PY_CMD%\" run_server.py"
+start "FoodVerse AI - Backend Server" cmd /k "cd /d %~dp0backend && "%PYTHON_EXE%" run_server.py"
 
 timeout /t 3 /nobreak >nul
 
 echo [2/2] Launching Vite Frontend on http://localhost:5173 ...
-start "FoodVerse AI - Frontend Dev Server" cmd /k "cd /d %~dp0frontend && npm run dev"
+start "FoodVerse AI - Frontend Dev Server" cmd /k "cd /d %~dp0frontend && npm run dev -- --host 127.0.0.1 --port 5173"
 
 timeout /t 4 /nobreak >nul
 

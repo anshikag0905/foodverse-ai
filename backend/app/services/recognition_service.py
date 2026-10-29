@@ -23,19 +23,31 @@ from app.core.config import settings
 def parse_serving_grams(serving_str: Optional[str]) -> float:
     if not serving_str:
         return 100.0
-    match = re.search(r"(\d+(?:\.\d+)?)\s*g", serving_str.lower())
-    if match:
+    s = serving_str.lower()
+    # Explicit grams: "120g", "120 g", "100 grams", "80gm"
+    m_g = re.search(r"(\d+(?:\.\d+)?)\s*(?:g|gm|gms|gram|grams)\b", s)
+    if m_g:
         try:
-            return float(match.group(1))
+            return max(5.0, float(m_g.group(1)))
+        except ValueError:
+            pass
+    # Liquid volume: "300ml", "250 ml"
+    m_ml = re.search(r"(\d+(?:\.\d+)?)\s*(?:ml|milliliter|milliliters)\b", s)
+    if m_ml:
+        try:
+            return max(5.0, float(m_ml.group(1)))
         except ValueError:
             pass
     return 100.0
 
 class RecognitionService:
     def __init__(self):
-        self.ai = get_ai_provider()
         self.storage = get_storage()
         self.food_db = FoodService()
+
+    @property
+    def ai(self):
+        return get_ai_provider()
 
     async def analyze_food(
         self,
@@ -89,16 +101,37 @@ class RecognitionService:
         for it in multi_res.items:
             # Search database for genuine matching entry
             db_hit = None
-            search_res = self.food_db.search_foods(query=it.name, limit=5)
+            search_res = self.food_db.search_foods(query=it.name, limit=8)
             if search_res and search_res.get("items"):
-                i_words = set(re.findall(r'\w+', it.name.lower()))
+                i_lower = it.name.lower()
+                i_words = set(re.findall(r'\w+', i_lower))
+                best_score = -1.0
+                best_cand = None
+
                 for candidate in search_res["items"]:
                     c_name = candidate["name"].lower()
                     c_words = set(re.findall(r'\w+', c_name))
-                    # Check substring or substantial word overlap
-                    if it.name.lower() in c_name or c_name in it.name.lower() or len(i_words.intersection(c_words)) >= 1:
-                        db_hit = candidate
-                        break
+                    overlap = len(i_words.intersection(c_words))
+                    if overlap == 0 and i_lower not in c_name and c_name not in i_lower:
+                        continue
+
+                    score = overlap * 2.0
+                    if i_lower == c_name:
+                        score += 10.0
+                    elif c_name.startswith(i_lower):
+                        score += 5.0
+
+                    # Penalize drinks / shakes / processed forms when item is a raw fruit/staple
+                    if any(w in i_words for w in ["mango", "banana", "apple", "potato", "orange", "grape"]):
+                        if any(w in c_words for w in ["shake", "milkshake", "smoothie", "juice", "powder", "ice cream"]):
+                            score -= 6.0
+
+                    if score > best_score:
+                        best_score = score
+                        best_cand = candidate
+
+                if best_score > 0 and best_cand:
+                    db_hit = best_cand
             # If no genuine database match was found, do NOT blindly use an unrelated item!
             # Keep the AI's detection and macros instead.
 

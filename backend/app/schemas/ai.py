@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
 
 class MacroNutrients(BaseModel):
@@ -12,16 +12,27 @@ class MacroNutrients(BaseModel):
     servingSize: str = Field(default="1 serving", description="Reference serving size")
 
 class FoodBox(BaseModel):
-    ymin: float = Field(..., ge=0.0, le=1.0, description="Top normalized coordinate [0, 1]")
-    xmin: float = Field(..., ge=0.0, le=1.0, description="Left normalized coordinate [0, 1]")
-    ymax: float = Field(..., ge=0.0, le=1.0, description="Bottom normalized coordinate [0, 1]")
-    xmax: float = Field(..., ge=0.0, le=1.0, description="Right normalized coordinate [0, 1]")
+    ymin: float = Field(default=0.0, ge=0.0, le=1.0, description="Top normalized coordinate [0, 1]")
+    xmin: float = Field(default=0.0, ge=0.0, le=1.0, description="Left normalized coordinate [0, 1]")
+    ymax: float = Field(default=1.0, ge=0.0, le=1.0, description="Bottom normalized coordinate [0, 1]")
+    xmax: float = Field(default=1.0, ge=0.0, le=1.0, description="Right normalized coordinate [0, 1]")
+
+    @field_validator('ymin', 'xmin', 'ymax', 'xmax', mode='before')
+    @classmethod
+    def normalize_coord(cls, v: Any) -> float:
+        try:
+            f = float(v)
+            if f > 1.0:
+                f = f / 1000.0 if f <= 1000.0 else f / 10000.0
+            return max(0.0, min(1.0, round(f, 4)))
+        except (ValueError, TypeError):
+            return 0.0
 
 class DetectedFoodItem(BaseModel):
     id: str = Field(..., description="Unique item identifier")
     name: str = Field(..., description="Detected food item name in English")
     name_hi: Optional[str] = Field(None, description="Food item name in Hindi")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence")
+    confidence: float = Field(default=0.92, ge=0.0, le=1.0, description="Detection confidence")
     box: Optional[FoodBox] = Field(None, description="Normalized bounding box coordinates")
     estimated_grams: float = Field(default=100.0, description="Estimated portion weight in grams")
     category: str = Field(default="Dish", description="Food category")
@@ -36,6 +47,17 @@ class DetectedFoodItem(BaseModel):
     diet_tags: List[str] = Field(default_factory=list, description="Diet flags")
     matched_food_id: Optional[int] = Field(None, description="ID of matched database entry")
     data_source: str = Field(default="database", description="'database' or 'ai_estimate'")
+
+    @field_validator('confidence', mode='before')
+    @classmethod
+    def normalize_conf(cls, v: Any) -> float:
+        try:
+            f = float(v)
+            if f > 1.0:
+                f = f / 100.0
+            return max(0.0, min(1.0, round(f, 3)))
+        except (ValueError, TypeError):
+            return 0.92
 
 class MultiFoodDetectionResult(BaseModel):
     items: List[DetectedFoodItem] = Field(default_factory=list, description="Detected items on plate")

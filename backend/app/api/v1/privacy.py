@@ -29,6 +29,7 @@ def get_current_user_id(db: Session = Depends(get_db)) -> int:
     return user.id if user else 1
 
 @router.get("/notice")
+@router.get("/policy")
 def get_privacy_notice():
     """Returns official privacy and data retention policy."""
     return {
