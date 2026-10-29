@@ -24,12 +24,12 @@ export default function FactCard({
   };
 
   return (
-    <div className={`rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card p-5 shadow-sticker hover:shadow-sticker-lg hover:-translate-y-1 transition-all flex flex-col justify-between ${className}`}>
+    <div className={`rounded-3xl border-3 border-[var(--border-color)] bg-[var(--bg-card)] p-5 shadow-xs hover:shadow-xs hover:-translate-y-1 transition-all flex flex-col justify-between ${className}`}>
       {/* Top Header */}
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-dusk-surface border border-ink text-ink dark:text-dusk-text">
+            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-primary)]">
               {fact.category || "Food Science"}
             </span>
             {fact.verified && (
@@ -44,10 +44,10 @@ export default function FactCard({
             <button
               onClick={handleFavoriteClick}
               type="button"
-              className={`p-1.5 rounded-xl border border-ink transition-colors cursor-pointer ${
+              className={`p-1.5 rounded-xl border border-[var(--border-color)] transition-colors cursor-pointer ${
                 isFav
                   ? 'text-tomato bg-tomato/20'
-                  : 'text-ink-muted hover:text-tomato bg-white dark:bg-dusk-surface'
+                  : 'text-[var(--text-muted)] hover:text-tomato bg-white dark:bg-[var(--bg-card-subtle)]'
               }`}
               title={isFav ? "Saved to favorites" : "Favorite this fact"}
             >
@@ -57,7 +57,7 @@ export default function FactCard({
               <button
                 onClick={onNextFact}
                 type="button"
-                className="p-1.5 rounded-xl border border-ink text-ink hover:bg-sunny bg-white dark:bg-dusk-surface transition-colors cursor-pointer"
+                className="p-1.5 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] hover:bg-sunny bg-white dark:bg-[var(--bg-card-subtle)] transition-colors cursor-pointer"
                 title="Next Fact"
               >
                 <Shuffle className="w-4 h-4" />
@@ -68,11 +68,11 @@ export default function FactCard({
 
         {/* Fact Body */}
         <div className="flex gap-3">
-          <div className="p-2 rounded-2xl bg-sunny/30 border border-ink text-amber-600 flex-shrink-0 self-start">
+          <div className="p-2 rounded-2xl bg-sunny/30 border border-[var(--border-color)] text-amber-600 flex-shrink-0 self-start">
             <Lightbulb className="w-5 h-5" />
           </div>
           <div className="space-y-2">
-            <p className="font-display font-bold text-sm text-ink dark:text-dusk-text leading-relaxed">
+            <p className="font-display font-bold text-sm text-[var(--text-primary)] leading-relaxed">
               "{fact.fact}"
             </p>
           </div>
@@ -80,9 +80,9 @@ export default function FactCard({
       </div>
 
       {fact.source_name && (
-        <div className="pt-3 mt-3 border-t-2 border-ink/10 text-[11px] text-ink-muted flex items-center justify-between">
+        <div className="pt-3 mt-3 border-t-2 border-[var(--border-color)]/10 text-[11px] text-[var(--text-muted)] flex items-center justify-between">
           <span className="truncate max-w-[85%]">
-            Source: <strong className="text-ink dark:text-dusk-text">{fact.source_name}</strong>
+            Source: <strong className="text-[var(--text-primary)]">{fact.source_name}</strong>
           </span>
         </div>
       )}

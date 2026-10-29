@@ -100,7 +100,7 @@ export default function History() {
       <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900">
-            <History className="w-5 h-5" strokeWidth={1.5} />
+            <HistoryIcon className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
             <h1 className="font-display font-bold text-xl sm:text-2xl text-[var(--text-primary)]">
@@ -118,40 +118,40 @@ export default function History() {
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setFilterType('all')}
-            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
               filterType === 'all'
-                ? 'bg-ink text-white dark:bg-white dark:text-ink shadow-sticker-xs'
-                : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-sky-100'
+                ? 'bg-ink text-white dark:bg-white dark:text-[var(--text-primary)] shadow-xs'
+                : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-sky-100'
             }`}
           >
             All Scans ({historyItems.length})
           </button>
           <button
             onClick={() => setFilterType('food_scan')}
-            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
               filterType === 'food_scan'
-                ? 'bg-tomato text-white shadow-sticker-xs'
-                : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-tomato/15'
+                ? 'bg-tomato text-white shadow-xs'
+                : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-tomato/15'
             }`}
           >
             Food Scans
           </button>
           <button
             onClick={() => setFilterType('freshness')}
-            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
               filterType === 'freshness'
-                ? 'bg-mint text-ink shadow-sticker-xs'
-                : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-mint/20'
+                ? 'bg-mint text-[var(--text-primary)] shadow-xs'
+                : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-mint/20'
             }`}
           >
             Freshness Checks
           </button>
           <button
             onClick={() => setFilterType('barcode')}
-            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+            className={`btn-squish px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
               filterType === 'barcode'
-                ? 'bg-grape text-white shadow-sticker-xs'
-                : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-grape/15'
+                ? 'bg-grape text-white shadow-xs'
+                : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/15'
             }`}
           >
             Barcodes
@@ -159,13 +159,13 @@ export default function History() {
         </div>
 
         <div className="relative sm:w-64">
-          <Search className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search scans..."
-            className="w-full pl-9 pr-4 py-2 rounded-2xl text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card text-ink dark:text-dusk-text placeholder:text-ink-muted shadow-sticker-xs focus:outline-none focus:border-tomato"
+            className="w-full pl-9 pr-4 py-2 rounded-2xl text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] shadow-xs focus:outline-none focus:border-tomato"
           />
         </div>
       </div>
@@ -175,17 +175,17 @@ export default function History() {
         <Loader message="Loading historical scan records..." />
       ) : filteredItems.length === 0 ? (
         <EmptyState
-          icon={History}
+          icon={HistoryIcon}
           title="No scan records found"
           description="Scan a meal or run a freshness check to build your nutritional history."
           actionLabel="Scan a Meal"
           onAction={() => window.location.href = '/food-scan'}
         />
       ) : (
-        <div className="bg-white dark:bg-dusk-card rounded-3xl border-3 border-ink shadow-sticker overflow-hidden">
+        <div className="bg-[var(--bg-card)] rounded-3xl border-3 border-[var(--border-color)] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-sky-100 dark:bg-dusk-surface text-ink dark:text-dusk-text uppercase tracking-wider font-display font-black border-b-2 border-ink">
+              <thead className="bg-sky-100 dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] uppercase tracking-wider font-display font-black border-b-2 border-[var(--border-color)]">
                 <tr>
                   <th className="px-6 py-4">Item & Type</th>
                   <th className="px-6 py-4">Confidence</th>
@@ -200,7 +200,7 @@ export default function History() {
                   <tr key={item.id} className="hover:bg-sky-50 dark:hover:bg-dusk-surface/40 transition">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-2xl bg-sky-100 dark:bg-dusk-surface border border-ink">
+                        <div className="p-2 rounded-2xl bg-sky-100 dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
                           {item.analysis_type === 'freshness' ? (
                             <ShieldCheck className="w-4 h-4 text-emerald-600" />
                           ) : item.analysis_type === 'barcode' ? (
@@ -210,38 +210,38 @@ export default function History() {
                           )}
                         </div>
                         <div>
-                          <strong className="block font-display font-black text-sm text-ink dark:text-dusk-text">
+                          <strong className="block font-display font-black text-sm text-[var(--text-primary)]">
                             {item.item_name || 'Food Scan'}
                           </strong>
-                          <span className="text-[10px] font-bold text-ink-muted uppercase">
+                          <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase">
                             {item.analysis_type?.replace('_', ' ')}
                           </span>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 font-bold text-ink dark:text-dusk-text">
+                    <td className="px-6 py-4 font-bold text-[var(--text-primary)]">
                       {item.confidence ? `${(item.confidence * 100).toFixed(0)}%` : '95%'}
                     </td>
 
                     <td className="px-6 py-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-mint/25 border border-ink font-black text-emerald-800 dark:text-mint">
+                      <span className="px-2.5 py-0.5 rounded-full bg-mint/25 border border-[var(--border-color)] font-black text-emerald-800 dark:text-mint">
                         {item.score || 90}/100
                       </span>
                     </td>
 
-                    <td className="px-6 py-4 text-ink-muted font-bold capitalize">
+                    <td className="px-6 py-4 text-[var(--text-muted)] font-bold capitalize">
                       {item.data_source || 'Database'}
                     </td>
 
-                    <td className="px-6 py-4 text-ink-muted font-semibold">
+                    <td className="px-6 py-4 text-[var(--text-muted)] font-semibold">
                       {new Date(item.created_at).toLocaleDateString()}
                     </td>
 
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="btn-squish p-2 rounded-xl text-ink-muted hover:text-tomato hover:bg-tomato/15 transition cursor-pointer"
+                        className="btn-squish p-2 rounded-xl text-[var(--text-muted)] hover:text-tomato hover:bg-tomato/15 transition cursor-pointer"
                         title="Delete record"
                       >
                         <Trash2 className="w-4 h-4" />

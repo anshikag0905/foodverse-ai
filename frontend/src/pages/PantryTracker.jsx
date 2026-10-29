@@ -517,7 +517,7 @@ export default function PantryTracker() {
           </button>
           <button
             onClick={handleSeedDemo}
-            className="btn-squish inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-display font-black bg-white dark:bg-dusk-surface border-2 border-ink text-ink dark:text-dusk-text shadow-sticker-xs cursor-pointer hover:border-peach"
+            className="btn-squish inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-display font-black bg-white dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)] text-[var(--text-primary)] shadow-xs cursor-pointer hover:border-peach"
             title="Populate demo items"
           >
             <RefreshCw className="w-3.5 h-3.5 text-peach" />
@@ -525,7 +525,7 @@ export default function PantryTracker() {
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="btn-squish inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-display font-black bg-peach text-ink border-2 border-ink shadow-sticker-xs cursor-pointer hover:shadow-sticker"
+            className="btn-squish inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-display font-black bg-peach text-[var(--text-primary)] border-2 border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Add Food</span>
@@ -536,21 +536,21 @@ export default function PantryTracker() {
       {/* =========================================================================
           3-STEP "HOW IT WORKS" STRIP
           ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-ink dark:text-dusk-text">
-        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-peach text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-[var(--text-primary)]">
+        <div className="p-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] shadow-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-peach text-[var(--text-primary)] border border-[var(--border-color)] flex items-center justify-center font-display font-black text-xs flex-shrink-0">
             1
           </span>
           <span>Log items manually, scan barcodes, or import from scans</span>
         </div>
-        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-sunny text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+        <div className="p-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] shadow-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-sunny text-[var(--text-primary)] border border-[var(--border-color)] flex items-center justify-center font-display font-black text-xs flex-shrink-0">
             2
           </span>
           <span>Automatic countdown alerts for Fridge, Freezer & Shelf</span>
         </div>
-        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-mint text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+        <div className="p-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] shadow-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-mint text-[var(--text-primary)] border border-[var(--border-color)] flex items-center justify-center font-display font-black text-xs flex-shrink-0">
             3
           </span>
           <span>Tap "Cook From Pantry" to turn expiring foods into meals</span>
@@ -559,26 +559,26 @@ export default function PantryTracker() {
 
       {/* Hero Expiring Banner */}
       {expiringItems.length > 0 && (
-        <div className="bg-amber-100 dark:bg-amber-950/60 border-2.5 border-ink rounded-3xl p-5 shadow-sticker-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="bg-amber-100 dark:bg-amber-950/60 border-2.5 border-[var(--border-color)] rounded-3xl p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-2xl bg-sunny border-2 border-ink shadow-xs">
-              <AlertTriangle className="w-5 h-5 text-ink" />
+            <div className="p-2.5 rounded-2xl bg-sunny border-2 border-[var(--border-color)] shadow-xs">
+              <AlertTriangle className="w-5 h-5 text-[var(--text-primary)]" />
             </div>
             <div>
-              <h3 className="font-display font-black text-base text-ink dark:text-amber-200 flex items-center gap-2">
+              <h3 className="font-display font-black text-base text-[var(--text-primary)] dark:text-amber-200 flex items-center gap-2">
                 <span>{expiringItems.length} item(s) expiring soon or expired</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-ink font-bold text-ink">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-[var(--border-color)] font-bold text-[var(--text-primary)]">
                   Urgent
                 </span>
               </h3>
-              <p className="text-xs font-semibold text-ink/80 dark:text-amber-300 mt-0.5">
+              <p className="text-xs font-semibold text-[var(--text-primary)]/80 dark:text-amber-300 mt-0.5">
                 Top items: <span className="font-bold text-amber-900 dark:text-amber-100">{expiringItems.slice(0, 3).map(i => i.name).join(', ')}</span>. Use first to prevent kitchen waste!
               </p>
             </div>
           </div>
           <button
             onClick={handleSuggestRecipes}
-            className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sunny text-ink font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer whitespace-nowrap"
+            className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sunny text-[var(--text-primary)] font-display font-black text-xs border-2 border-[var(--border-color)] shadow-xs cursor-pointer whitespace-nowrap"
           >
             <ChefHat className="w-4 h-4" />
             <span>View Recipes for Expiring Items</span>
@@ -590,10 +590,10 @@ export default function PantryTracker() {
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={() => setActiveTab('all')}
-          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'all'
-              ? 'bg-peach text-ink shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-peach/10'
+              ? 'bg-peach text-[var(--text-primary)] shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-peach/10'
           }`}
         >
           <Package className="w-4 h-4" />
@@ -601,10 +601,10 @@ export default function PantryTracker() {
         </button>
         <button
           onClick={() => setActiveTab('fridge')}
-          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'fridge'
-              ? 'bg-peach text-ink shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-peach/10'
+              ? 'bg-peach text-[var(--text-primary)] shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-peach/10'
           }`}
         >
           <Refrigerator className="w-4 h-4 text-sky-500" />
@@ -612,10 +612,10 @@ export default function PantryTracker() {
         </button>
         <button
           onClick={() => setActiveTab('freezer')}
-          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'freezer'
-              ? 'bg-peach text-ink shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-peach/10'
+              ? 'bg-peach text-[var(--text-primary)] shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-peach/10'
           }`}
         >
           <Snowflake className="w-4 h-4 text-blue-500" />
@@ -623,10 +623,10 @@ export default function PantryTracker() {
         </button>
         <button
           onClick={() => setActiveTab('shelf')}
-          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'shelf'
-              ? 'bg-peach text-ink shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-peach/10'
+              ? 'bg-peach text-[var(--text-primary)] shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-peach/10'
           }`}
         >
           <Archive className="w-4 h-4 text-amber-500" />
@@ -634,10 +634,10 @@ export default function PantryTracker() {
         </button>
         <button
           onClick={() => setActiveTab('grocery')}
-          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'grocery'
-              ? 'bg-peach text-ink shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-peach/10'
+              ? 'bg-peach text-[var(--text-primary)] shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-peach/10'
           }`}
         >
           <ShoppingCart className="w-4 h-4 text-grape" />
@@ -645,10 +645,10 @@ export default function PantryTracker() {
         </button>
         <button
           onClick={() => setActiveTab('waste')}
-          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-4 py-2 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'waste'
-              ? 'bg-peach text-ink shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-peach/10'
+              ? 'bg-peach text-[var(--text-primary)] shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-peach/10'
           }`}
         >
           <Flame className="w-4 h-4 text-tomato" />

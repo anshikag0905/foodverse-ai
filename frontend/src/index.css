@@ -158,3 +158,21 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.45);
 }
+
+/* Dark mode theme consistency overrides */
+.dark .border-ink,
+[data-theme="black"] .border-ink {
+  border-color: var(--border-color) !important;
+}
+.dark .text-ink,
+[data-theme="black"] .text-ink {
+  color: var(--text-primary) !important;
+}
+.dark .text-ink-muted,
+[data-theme="black"] .text-ink-muted {
+  color: var(--text-muted) !important;
+}
+.dark .bg-white:not([class*="dark:bg-"]),
+[data-theme="black"] .bg-white:not([class*="dark:bg-"]) {
+  background-color: var(--bg-card);
+}

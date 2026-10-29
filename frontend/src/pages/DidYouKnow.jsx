@@ -277,21 +277,21 @@ export default function DidYouKnow() {
 
       {/* Spotlight Fact Hero Card */}
       {randomFact && (
-        <div className="card-base p-6 space-y-3 bg-amber-50/40 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/40">
+        <div className="card-base p-6 space-y-3 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40">
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-sunny border-2 border-ink flex items-center justify-center flex-shrink-0 shadow-sticker-xs">
-              <Lightbulb className="w-6 h-6 text-ink" />
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+              <Lightbulb className="w-5 h-5" />
             </div>
             <div className="space-y-2 flex-1">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-sunny/30 border border-ink text-amber-900 dark:text-sunny">
+                <span className="text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200">
                   {randomFact.category}
                 </span>
-                <span className="text-[11px] font-bold text-ink-muted">
+                <span className="text-[11px] text-[var(--text-muted)]">
                   Source: {randomFact.source_name}
                 </span>
               </div>
-              <p className="font-display font-black text-base sm:text-lg text-ink dark:text-dusk-text leading-snug">
+              <p className="font-display font-semibold text-base sm:text-lg text-[var(--text-primary)] leading-snug">
                 "{randomFact.fact}"
               </p>
             </div>
@@ -308,37 +308,37 @@ export default function DidYouKnow() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search facts (e.g. banana, turmeric, soya, eggs, potatoes, ramen)..."
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold border-2.5 border-ink bg-white dark:bg-dusk-card text-ink dark:text-dusk-text placeholder:text-ink-muted shadow-sticker-xs focus:outline-none focus:border-sunny"
+              className="w-full pl-11 pr-4 py-2.5 rounded-full text-xs sm:text-sm border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           </div>
 
           <button
             onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-            className={`btn-squish inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+            className={`pill-btn-secondary py-2.5 px-4 text-xs cursor-pointer whitespace-nowrap ${
               showFavoritesOnly
-                ? 'bg-tomato text-white shadow-sticker-xs'
-                : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-tomato/10'
+                ? '!bg-red-500 !text-white !border-red-500'
+                : 'hover:border-red-300'
             }`}
           >
-            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-white' : 'text-tomato'}`} />
+            <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-white' : 'text-red-500'}`} />
             <span>Bookmarked ({favorites.length})</span>
           </button>
         </div>
 
         {/* Category Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-          <span className="font-black text-ink-muted flex items-center gap-1">
+          <span className="font-semibold text-[var(--text-muted)] flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" /> Category:
           </span>
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`btn-squish px-3.5 py-1 rounded-full whitespace-nowrap transition-all font-display font-black text-xs border-2 border-ink cursor-pointer ${
+              className={`px-3.5 py-1 rounded-full whitespace-nowrap transition-all text-xs border cursor-pointer font-medium ${
                 selectedCategory === cat
-                  ? 'bg-sunny text-ink shadow-sticker-xs'
-                  : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-sunny/10'
+                  ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+                  : 'bg-[var(--bg-card)] border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-amber-400'
               }`}
             >
               {cat}
@@ -354,29 +354,29 @@ export default function DidYouKnow() {
           return (
             <div
               key={fact.id}
-              className="p-5 rounded-3xl border-2.5 border-ink bg-white dark:bg-dusk-card shadow-sticker flex flex-col justify-between gap-4 hover:border-sunny transition-colors"
+              className="card-base p-5 flex flex-col justify-between gap-4 hover:border-amber-400 dark:hover:border-amber-500 transition-colors"
             >
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-sunny/20 border border-ink text-amber-900 dark:text-sunny">
+                  <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
                     {fact.category}
                   </span>
                   <button
                     onClick={() => handleFavoriteToggle(fact.id)}
-                    className="p-1 rounded-full text-tomato hover:scale-110 transition cursor-pointer"
+                    className="p-1 rounded-full text-red-500 hover:scale-110 transition cursor-pointer"
                     title={isFav ? "Remove bookmark" : "Bookmark fact"}
                   >
-                    <Heart className={`w-4 h-4 ${isFav ? 'fill-tomato text-tomato' : 'text-ink-muted'}`} />
+                    <Heart className={`w-4 h-4 ${isFav ? 'fill-red-500 text-red-500' : 'text-[var(--text-muted)]'}`} />
                   </button>
                 </div>
-                <p className="text-xs sm:text-sm font-semibold text-ink dark:text-dusk-text leading-relaxed">
+                <p className="text-xs sm:text-sm text-[var(--text-primary)] leading-relaxed">
                   {fact.fact}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-ink/10 flex items-center justify-between text-[11px] font-bold text-ink-muted">
+              <div className="pt-2 border-t border-[var(--border-color)] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
                 <span>{fact.source_name}</span>
-                <span className="text-emerald-600 dark:text-mint font-black">✓ Verified</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Verified</span>
               </div>
             </div>
           );

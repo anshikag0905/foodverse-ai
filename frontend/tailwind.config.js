@@ -25,6 +25,20 @@ export default {
           800: '#16244D',
           700: '#1E2F5D',
         },
+        dusk: {
+          bg: '#0A0A0A',
+          card: '#141414',
+          surface: '#1C1C1C',
+          text: '#F8FAFC',
+        },
+        ink: {
+          DEFAULT: '#0F172A',
+          muted: '#64748B',
+        },
+        sunny: '#F59E0B',
+        tomato: '#EF4444',
+        mint: '#10B981',
+        grape: '#8B5CF6',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],

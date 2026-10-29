@@ -523,10 +523,10 @@ export default function GymMode() {
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={() => setActiveTab('tracker')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'tracker'
-              ? 'bg-grape text-white shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-grape/10'
+              ? 'bg-grape text-white shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
           }`}
         >
           <Flame className="w-4 h-4" />
@@ -534,10 +534,10 @@ export default function GymMode() {
         </button>
         <button
           onClick={() => setActiveTab('calculator')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'calculator'
-              ? 'bg-grape text-white shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-grape/10'
+              ? 'bg-grape text-white shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
           }`}
         >
           <Scale className="w-4 h-4" />
@@ -545,10 +545,10 @@ export default function GymMode() {
         </button>
         <button
           onClick={() => setActiveTab('protein-foods')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'protein-foods'
-              ? 'bg-grape text-white shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-grape/10'
+              ? 'bg-grape text-white shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
           }`}
         >
           <Zap className="w-4 h-4" />
@@ -556,10 +556,10 @@ export default function GymMode() {
         </button>
         <button
           onClick={() => setActiveTab('supplements')}
-          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-ink transition cursor-pointer whitespace-nowrap ${
+          className={`btn-squish flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-display font-black border-2 border-[var(--border-color)] transition cursor-pointer whitespace-nowrap ${
             activeTab === 'supplements'
-              ? 'bg-grape text-white shadow-sticker-xs'
-              : 'bg-white dark:bg-dusk-card text-ink dark:text-dusk-text hover:bg-grape/10'
+              ? 'bg-grape text-white shadow-xs'
+              : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-grape/10'
           }`}
         >
           <Award className="w-4 h-4" />
@@ -571,28 +571,28 @@ export default function GymMode() {
       {activeTab === 'tracker' && (
         <div className="space-y-6">
           {/* Progress Rings Card */}
-          <div className="rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card p-6 shadow-sticker">
+          <div className="card-base p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h3 className="font-display font-black text-xl text-ink dark:text-dusk-text flex items-center gap-2">
+                <h3 className="font-display font-black text-xl text-[var(--text-primary)] flex items-center gap-2">
                   <span>Daily Fuel Adherence</span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-grape/20 text-grape border border-ink font-black">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-grape/20 text-grape border border-[var(--border-color)] font-black">
                     Target: {adherence?.target_calories || 2300} kcal
                   </span>
                 </h3>
-                <p className="text-xs font-semibold text-ink-muted mt-0.5">
+                <p className="text-xs font-semibold text-[var(--text-muted)] mt-0.5">
                   Live calorie & macronutrient progress rings for selected date.
                 </p>
               </div>
 
               {/* Date Selector */}
-              <div className="flex items-center gap-2 bg-sky-50 dark:bg-dusk-surface px-3 py-1.5 rounded-2xl border-2 border-ink shadow-sticker-xs">
+              <div className="flex items-center gap-2 bg-sky-50 dark:bg-[var(--bg-card-subtle)] px-3 py-1.5 rounded-2xl border-2 border-[var(--border-color)] shadow-xs">
                 <Calendar className="w-4 h-4 text-grape" />
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-transparent text-xs font-black text-ink dark:text-dusk-text focus:outline-none"
+                  className="bg-transparent text-xs font-black text-[var(--text-primary)] focus:outline-none"
                 />
               </div>
             </div>
@@ -637,7 +637,7 @@ export default function GymMode() {
 
           {/* Quick-Tap Preset Food Pills Carousel */}
           <div className="space-y-2">
-            <span className="text-xs font-black text-ink-muted flex items-center gap-1.5">
+            <span className="text-xs font-black text-[var(--text-muted)] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-sunny" />
               <span>Quick-Tap Gym Presets:</span>
             </span>
@@ -703,31 +703,31 @@ export default function GymMode() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Quick Log Form with Autocomplete */}
-            <div className="bg-white dark:bg-dusk-card rounded-3xl border-3 border-ink p-6 shadow-sticker space-y-4">
-              <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text flex items-center gap-2">
+            <div className="card-base p-6 space-y-4">
+              <h3 className="font-display font-black text-lg text-[var(--text-primary)] flex items-center gap-2">
                 <Plus className="w-5 h-5 text-grape" />
                 <span>Log Meal or Snack</span>
               </h3>
 
               {/* SEARCH PREDEFINED ITEM (e.g. "banana") */}
               <div className="relative">
-                <label className="block text-xs font-black text-ink dark:text-dusk-text mb-1">
+                <label className="block text-xs font-black text-[var(--text-primary)] mb-1">
                   Search Food Item (Auto-fills Macros)
                 </label>
                 <div className="relative">
-                  <Search className="w-4 h-4 text-ink-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Type e.g. 'banana', 'egg', 'chicken', 'oats'..."
-                    className="w-full pl-9 pr-4 py-2 text-xs font-bold rounded-2xl border-2 border-ink bg-sky-50 dark:bg-dusk-surface text-ink dark:text-dusk-text focus:outline-none focus:border-grape placeholder:text-ink-muted"
+                    className="w-full pl-9 pr-4 py-2 text-xs font-bold rounded-2xl border-2 border-[var(--border-color)] bg-sky-50 dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] focus:outline-none focus:border-grape placeholder:text-[var(--text-muted)]"
                   />
                 </div>
 
                 {/* Autocomplete Dropdown */}
                 {autocompleteResults.length > 0 && (
-                  <div className="absolute z-20 left-0 right-0 mt-1 bg-white dark:bg-dusk-card rounded-2xl border-2 border-ink shadow-sticker-lg max-h-56 overflow-y-auto divide-y-2 divide-ink/10">
+                  <div className="absolute z-20 left-0 right-0 mt-1 bg-[var(--bg-card)] rounded-2xl border-2 border-[var(--border-color)] shadow-xs max-h-56 overflow-y-auto divide-y-2 divide-ink/10">
                     {autocompleteResults.map((item) => (
                       <button
                         key={item.id}
@@ -736,11 +736,11 @@ export default function GymMode() {
                         className="w-full p-2.5 text-left hover:bg-grape/15 transition flex items-center justify-between cursor-pointer"
                       >
                         <div>
-                          <span className="text-xs font-black text-ink dark:text-dusk-text flex items-center gap-1.5">
+                          <span className="text-xs font-black text-[var(--text-primary)] flex items-center gap-1.5">
                             <span>{item.emoji}</span>
                             <span>{item.name}</span>
                           </span>
-                          <span className="text-[10px] font-semibold text-ink-muted">
+                          <span className="text-[10px] font-semibold text-[var(--text-muted)]">
                             {item.serving} • {item.category}
                           </span>
                         </div>
@@ -756,10 +756,10 @@ export default function GymMode() {
 
               {/* Selected Preset Food Card with Portion Stepper */}
               {selectedFoodPreset && (
-                <div className="p-3.5 rounded-2xl bg-grape/15 border-2 border-ink space-y-2.5">
+                <div className="p-3.5 rounded-2xl bg-grape/15 border-2 border-[var(--border-color)] space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-display font-black text-xs text-ink dark:text-dusk-text flex items-center gap-1">
+                      <h4 className="font-display font-black text-xs text-[var(--text-primary)] flex items-center gap-1">
                         <span>{selectedFoodPreset.emoji}</span>
                         <span>{selectedFoodPreset.name}</span>
                       </h4>
@@ -769,11 +769,11 @@ export default function GymMode() {
                     </div>
 
                     {/* Quantity Stepper */}
-                    <div className="flex items-center gap-1.5 bg-white dark:bg-dusk-surface px-2 py-1 rounded-xl border-1.5 border-ink shadow-xs">
+                    <div className="flex items-center gap-1.5 bg-white dark:bg-[var(--bg-card-subtle)] px-2 py-1 rounded-xl border-1.5 border-[var(--border-color)] shadow-xs">
                       <button
                         type="button"
                         onClick={() => handleChangeMultiplier(-1)}
-                        className="p-1 rounded-md text-ink hover:bg-grape/20"
+                        className="p-1 rounded-md text-[var(--text-primary)] hover:bg-grape/20"
                         title="Decrease portion"
                       >
                         <Minus className="w-3 h-3" />
@@ -784,7 +784,7 @@ export default function GymMode() {
                       <button
                         type="button"
                         onClick={() => handleChangeMultiplier(1)}
-                        className="p-1 rounded-md text-ink hover:bg-grape/20"
+                        className="p-1 rounded-md text-[var(--text-primary)] hover:bg-grape/20"
                         title="Increase portion"
                       >
                         <Plus className="w-3 h-3" />
@@ -793,27 +793,27 @@ export default function GymMode() {
                   </div>
 
                   {/* Calculated Stats Grid */}
-                  <div className="grid grid-cols-4 gap-1 text-center bg-white dark:bg-dusk-surface p-2 rounded-xl border border-ink">
+                  <div className="grid grid-cols-4 gap-1 text-center bg-white dark:bg-[var(--bg-card-subtle)] p-2 rounded-xl border border-[var(--border-color)]">
                     <div>
-                      <span className="text-[9px] text-ink-muted font-black block">CALORIES</span>
+                      <span className="text-[9px] text-[var(--text-muted)] font-black block">CALORIES</span>
                       <strong className="text-xs text-tomato font-black">
                         {Math.round(selectedFoodPreset.calories * portionMultiplier)}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-ink-muted font-black block">PROTEIN</span>
+                      <span className="text-[9px] text-[var(--text-muted)] font-black block">PROTEIN</span>
                       <strong className="text-xs text-grape font-black">
                         {Math.round(selectedFoodPreset.protein_g * portionMultiplier * 10) / 10}g
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-ink-muted font-black block">CARBS</span>
+                      <span className="text-[9px] text-[var(--text-muted)] font-black block">CARBS</span>
                       <strong className="text-xs text-amber-600 font-black">
                         {Math.round(selectedFoodPreset.carbs_g * portionMultiplier * 10) / 10}g
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-ink-muted font-black block">FAT</span>
+                      <span className="text-[9px] text-[var(--text-muted)] font-black block">FAT</span>
                       <strong className="text-xs text-orange-600 font-black">
                         {Math.round(selectedFoodPreset.fat_g * portionMultiplier * 10) / 10}g
                       </strong>
@@ -826,7 +826,7 @@ export default function GymMode() {
               <form onSubmit={handleAddLog} className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                       Meal Timing
                     </label>
                     <select
@@ -859,7 +859,7 @@ export default function GymMode() {
 
                 {newLog.meal_type === 'water' ? (
                   <div>
-                    <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                    <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                       Water Volume (ml)
                     </label>
                     <input
@@ -868,14 +868,14 @@ export default function GymMode() {
                       value={newLog.water_ml}
                       onChange={(e) => setNewLog({ ...newLog, water_ml: e.target.value })}
                       placeholder="e.g. 500"
-                      className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                      className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                     />
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                        <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                           Calories (kcal)
                         </label>
                         <input
@@ -884,11 +884,11 @@ export default function GymMode() {
                           value={newLog.calories}
                           onChange={(e) => setNewLog({ ...newLog, calories: e.target.value })}
                           placeholder="e.g. 105"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-tomato"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-tomato"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                        <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                           Protein (g)
                         </label>
                         <input
@@ -897,14 +897,14 @@ export default function GymMode() {
                           value={newLog.protein_g}
                           onChange={(e) => setNewLog({ ...newLog, protein_g: e.target.value })}
                           placeholder="e.g. 1.3"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-grape"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-grape"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                        <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                           Carbs (g)
                         </label>
                         <input
@@ -913,11 +913,11 @@ export default function GymMode() {
                           value={newLog.carbs_g}
                           onChange={(e) => setNewLog({ ...newLog, carbs_g: e.target.value })}
                           placeholder="e.g. 27"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-amber-600"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-amber-600"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                        <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                           Fat (g)
                         </label>
                         <input
@@ -926,7 +926,7 @@ export default function GymMode() {
                           value={newLog.fat_g}
                           onChange={(e) => setNewLog({ ...newLog, fat_g: e.target.value })}
                           placeholder="e.g. 0.3"
-                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-orange-600"
+                          className="w-full px-3 py-2 text-xs font-black rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-orange-600"
                         />
                       </div>
                     </div>
@@ -935,7 +935,7 @@ export default function GymMode() {
 
                 <button
                   type="submit"
-                  className="btn-squish w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer hover:shadow-sticker flex items-center justify-center gap-2"
+                  className="btn-squish w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border-2 border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs flex items-center justify-center gap-2"
                 >
                   <Dumbbell className="w-4 h-4" />
                   <span>Save Log & Update Macros</span>
@@ -944,16 +944,16 @@ export default function GymMode() {
             </div>
 
             {/* Today's Logged Meals Timeline */}
-            <div className="lg:col-span-2 bg-white dark:bg-dusk-card rounded-3xl border-3 border-ink p-6 shadow-sticker space-y-4">
+            <div className="lg:col-span-2 card-base p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text flex items-center gap-2">
+                  <h3 className="font-display font-black text-lg text-[var(--text-primary)] flex items-center gap-2">
                     <span>Logged Today</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-grape/20 text-grape border border-ink font-black">
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-grape/20 text-grape border border-[var(--border-color)] font-black">
                       {adherence?.logs?.length || 0} entries
                     </span>
                   </h3>
-                  <p className="text-xs font-semibold text-ink-muted">All entries are persistently stored and calculated in real-time.</p>
+                  <p className="text-xs font-semibold text-[var(--text-muted)]">All entries are persistently stored and calculated in real-time.</p>
                 </div>
               </div>
 
@@ -971,14 +971,14 @@ export default function GymMode() {
                     <div key={log.id} className="py-3.5 flex items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-grape/20 border border-ink text-grape">
+                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-grape/20 border border-[var(--border-color)] text-grape">
                             {log.meal_type.replace('_', ' ')}
                           </span>
-                          <span className="text-sm font-display font-black text-ink dark:text-dusk-text">
+                          <span className="text-sm font-display font-black text-[var(--text-primary)]">
                             {log.meal_name}
                           </span>
                         </div>
-                        <div className="text-xs text-ink-muted mt-1 space-x-3">
+                        <div className="text-xs text-[var(--text-muted)] mt-1 space-x-3">
                           {log.water_ml > 0 ? (
                             <span className="text-blue-600 dark:text-blue-400 font-semibold">
                               {log.water_ml} ml water
@@ -996,7 +996,7 @@ export default function GymMode() {
 
                       <button
                         onClick={() => handleDeleteLog(log.id)}
-                        className="btn-squish p-2 rounded-xl text-ink-muted hover:text-tomato hover:bg-tomato/15 transition cursor-pointer"
+                        className="btn-squish p-2 rounded-xl text-[var(--text-muted)] hover:text-tomato hover:bg-tomato/15 transition cursor-pointer"
                         title="Delete entry"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1013,32 +1013,32 @@ export default function GymMode() {
       {/* TAB 2: BMR & TDEE CALCULATOR */}
       {activeTab === 'calculator' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-dusk-card rounded-3xl border-3 border-ink p-6 shadow-sticker space-y-4">
-            <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+          <div className="card-base p-6 space-y-4">
+            <h3 className="font-display font-black text-lg text-[var(--text-primary)]">
               Athletic Profile Parameters
             </h3>
 
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                     Age
                   </label>
                   <input
                     type="number"
                     value={calcForm.age}
                     onChange={(e) => setCalcForm({ ...calcForm, age: parseInt(e.target.value) || 25 })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                     Biological Sex
                   </label>
                   <select
                     value={calcForm.sex}
                     onChange={(e) => setCalcForm({ ...calcForm, sex: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   >
                     <option value="male">Male (+5 offset)</option>
                     <option value="female">Female (-161 offset)</option>
@@ -1048,7 +1048,7 @@ export default function GymMode() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                     Height (cm)
                   </label>
                   <input
@@ -1056,11 +1056,11 @@ export default function GymMode() {
                     step="0.5"
                     value={calcForm.height_cm}
                     onChange={(e) => setCalcForm({ ...calcForm, height_cm: parseFloat(e.target.value) || 170 })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                     Weight (kg)
                   </label>
                   <input
@@ -1068,19 +1068,19 @@ export default function GymMode() {
                     step="0.5"
                     value={calcForm.weight_kg}
                     onChange={(e) => setCalcForm({ ...calcForm, weight_kg: parseFloat(e.target.value) || 70 })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                   Activity Level
                 </label>
                 <select
                   value={calcForm.activity_level}
                   onChange={(e) => setCalcForm({ ...calcForm, activity_level: e.target.value })}
-                  className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                  className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                 >
                   <option value="sedentary">Sedentary (desk job, minimal exercise × 1.2)</option>
                   <option value="light">Lightly Active (1-3 days exercise × 1.375)</option>
@@ -1092,13 +1092,13 @@ export default function GymMode() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                     Fitness Goal
                   </label>
                   <select
                     value={calcForm.goal}
                     onChange={(e) => setCalcForm({ ...calcForm, goal: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   >
                     <option value="cut">Cut (-500 kcal fat loss)</option>
                     <option value="bulk">Lean Bulk (+350 kcal muscle gain)</option>
@@ -1107,13 +1107,13 @@ export default function GymMode() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                  <label className="block text-xs font-bold text-[var(--text-primary)] mb-1">
                     Dietary Philosophy
                   </label>
                   <select
                     value={calcForm.diet_type}
                     onChange={(e) => setCalcForm({ ...calcForm, diet_type: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                    className="w-full px-3.5 py-2 text-xs font-bold rounded-xl border-2 border-[var(--border-color)] bg-white dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]"
                   >
                     <option value="omnivore">Balanced Omnivore</option>
                     <option value="vegetarian">Vegetarian (Lacto/Ovo)</option>
@@ -1125,7 +1125,7 @@ export default function GymMode() {
 
               <button
                 type="submit"
-                className="btn-squish w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer hover:shadow-sticker"
+                className="btn-squish w-full py-3 rounded-full bg-grape text-white font-display font-black text-xs border-2 border-[var(--border-color)] shadow-xs cursor-pointer hover:shadow-xs"
               >
                 Calculate & Update Active Targets
               </button>
@@ -1134,51 +1134,51 @@ export default function GymMode() {
 
           {/* Derived Breakdown Card */}
           <div className="space-y-4">
-            <div className="rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card p-6 shadow-sticker space-y-4">
-              <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+            <div className="card-base p-6 space-y-4">
+              <h3 className="font-display font-black text-lg text-[var(--text-primary)]">
                 Derived Metabolic Results
               </h3>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-dusk-surface border-2 border-ink">
-                  <span className="text-[11px] font-black text-ink-muted uppercase">Basal Metabolic Rate</span>
-                  <p className="text-2xl font-display font-black text-ink dark:text-dusk-text mt-1">
-                    {profile?.bmr || 1720} <span className="text-xs font-bold text-ink-muted">kcal</span>
+                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)]">
+                  <span className="text-[11px] font-black text-[var(--text-muted)] uppercase">Basal Metabolic Rate</span>
+                  <p className="text-2xl font-display font-black text-[var(--text-primary)] mt-1">
+                    {profile?.bmr || 1720} <span className="text-xs font-bold text-[var(--text-muted)]">kcal</span>
                   </p>
                 </div>
-                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-dusk-surface border-2 border-ink">
-                  <span className="text-[11px] font-black text-ink-muted uppercase">Total Daily Expenditure</span>
-                  <p className="text-2xl font-display font-black text-ink dark:text-dusk-text mt-1">
-                    {profile?.tdee || 2450} <span className="text-xs font-bold text-ink-muted">kcal</span>
+                <div className="p-4 rounded-2xl bg-sky-50 dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)]">
+                  <span className="text-[11px] font-black text-[var(--text-muted)] uppercase">Total Daily Expenditure</span>
+                  <p className="text-2xl font-display font-black text-[var(--text-primary)] mt-1">
+                    {profile?.tdee || 2450} <span className="text-xs font-bold text-[var(--text-muted)]">kcal</span>
                   </p>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-grape/15 border-2 border-ink space-y-3">
+              <div className="p-5 rounded-2xl bg-grape/15 border-2 border-[var(--border-color)] space-y-3">
                 <span className="text-xs font-black text-grape uppercase">
                   Daily Target Breakdown
                 </span>
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-dusk-surface border border-ink">
-                    <span className="text-[10px] text-ink-muted font-black block">CALORIES</span>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                    <span className="text-[10px] text-[var(--text-muted)] font-black block">CALORIES</span>
                     <strong className="text-sm text-tomato font-black">
                       {profile?.target_calories || 2300}
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-dusk-surface border border-ink">
-                    <span className="text-[10px] text-ink-muted font-black block">PROTEIN</span>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                    <span className="text-[10px] text-[var(--text-muted)] font-black block">PROTEIN</span>
                     <strong className="text-sm text-grape font-black">
                       {profile?.target_protein_g || 140}g
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-dusk-surface border border-ink">
-                    <span className="text-[10px] text-ink-muted font-black block">CARBS</span>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                    <span className="text-[10px] text-[var(--text-muted)] font-black block">CARBS</span>
                     <strong className="text-sm text-amber-600 font-black">
                       {profile?.target_carbs_g || 260}g
                     </strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white dark:bg-dusk-surface border border-ink">
-                    <span className="text-[10px] text-ink-muted font-black block">FAT</span>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                    <span className="text-[10px] text-[var(--text-muted)] font-black block">FAT</span>
                     <strong className="text-sm text-orange-600 font-black">
                       {profile?.target_fat_g || 70}g
                     </strong>
@@ -1187,9 +1187,9 @@ export default function GymMode() {
               </div>
 
               {/* Personalized Indian Gym Diet Distribution Plan */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-dusk-surface border-2 border-ink space-y-3">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[var(--bg-card-subtle)] border-2 border-[var(--border-color)] space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-display font-black text-sm text-ink dark:text-dusk-text flex items-center gap-1.5">
+                  <h4 className="font-display font-black text-sm text-[var(--text-primary)] flex items-center gap-1.5">
                     <span>Tailored Indian Gym Meal Timing Plan</span>
                   </h4>
                   <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-grape text-white">
@@ -1197,7 +1197,7 @@ export default function GymMode() {
                   </span>
                 </div>
 
-                <div className="space-y-2 text-xs font-bold text-ink dark:text-dusk-text">
+                <div className="space-y-2 text-xs font-bold text-[var(--text-primary)]">
                   <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-start justify-between gap-2">
                     <div>
                       <span className="text-[10px] font-semibold uppercase text-blue-600 dark:text-blue-400 block">Meal 1: Pre-Workout (45m before)</span>
@@ -1249,30 +1249,30 @@ export default function GymMode() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="font-display font-black text-xl text-ink dark:text-dusk-text">
+              <h3 className="font-display font-black text-xl text-[var(--text-primary)]">
                 High-Protein Food Leaderboard
               </h3>
-              <p className="text-xs font-semibold text-ink-muted">
+              <p className="text-xs font-semibold text-[var(--text-muted)]">
                 Foods ranked by biological protein density (per 100g) and efficiency ratio.
               </p>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
                 <input
                   type="text"
                   value={leaderboardSearch}
                   onChange={(e) => setLeaderboardSearch(e.target.value)}
                   placeholder="Filter foods (e.g. Soya, Whey, Paneer, Chicken)..."
-                  className="pl-8 pr-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card w-48 sm:w-64"
+                  className="pl-8 pr-3 py-1.5 rounded-full text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] w-48 sm:w-64"
                 />
               </div>
 
               <select
                 value={dietFilter}
                 onChange={(e) => setDietFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card cursor-pointer"
+                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] cursor-pointer"
               >
                 <option value="all">All Diets</option>
                 <option value="veg">Vegetarian</option>
@@ -1282,7 +1282,7 @@ export default function GymMode() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card cursor-pointer"
+                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-[var(--border-color)] bg-[var(--bg-card)] cursor-pointer"
               >
                 <option value="protein_per_100g">Sort by Protein / 100g (Highest First)</option>
                 <option value="efficiency">Sort by Protein Ratio / 100 kcal</option>
@@ -1290,10 +1290,10 @@ export default function GymMode() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-dusk-card rounded-3xl border-3 border-ink overflow-hidden shadow-sticker">
+          <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-color)] overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-sky-100 dark:bg-dusk-surface text-ink dark:text-dusk-text uppercase tracking-wider font-display font-black border-b-2 border-ink">
+                <thead className="bg-sky-100 dark:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] uppercase tracking-wider font-display font-black border-b-2 border-[var(--border-color)]">
                   <tr>
                     <th className="px-5 py-3.5 w-16 text-center">Rank</th>
                     <th className="px-6 py-3.5">Food Item</th>
@@ -1353,7 +1353,7 @@ export default function GymMode() {
                   })}
                   {displayedFoods.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="px-6 py-8 text-center text-ink-muted font-bold">
+                      <td colSpan="6" className="px-6 py-8 text-center text-[var(--text-muted)] font-bold">
                         No foods found matching "{leaderboardSearch}". Try another search term or reset filter.
                       </td>
                     </tr>
@@ -1369,39 +1369,39 @@ export default function GymMode() {
       {activeTab === 'supplements' && (
         <div className="space-y-6 max-w-4xl">
           <div>
-            <h3 className="font-display font-black text-xl text-ink dark:text-dusk-text">
+            <h3 className="font-display font-black text-xl text-[var(--text-primary)]">
               Scientific Supplement Grading Matrix
             </h3>
-            <p className="text-xs font-semibold text-ink-muted">
+            <p className="text-xs font-semibold text-[var(--text-muted)]">
               Graded strictly by peer-reviewed human randomized clinical trials.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink shadow-sticker space-y-2">
+            <div className="p-5 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-xs space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="font-display font-black text-ink dark:text-dusk-text text-base">
+                <h4 className="font-display font-black text-[var(--text-primary)] text-base">
                   Creatine Monohydrate
                 </h4>
-                <span className="px-2.5 py-0.5 rounded-full bg-mint text-ink border border-ink text-[11px] font-black">
+                <span className="px-2.5 py-0.5 rounded-full bg-mint text-[var(--text-primary)] border border-[var(--border-color)] text-[11px] font-black">
                   TIER A (STRONG)
                 </span>
               </div>
-              <p className="text-xs font-medium text-ink-muted leading-relaxed">
+              <p className="text-xs font-medium text-[var(--text-muted)] leading-relaxed">
                 Replenishes phosphocreatine stores (ATP) for explosive anaerobic power. Proven to increase maximal strength and sprint performance. Dose: 3-5g daily.
               </p>
             </div>
 
-            <div className="p-5 rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink shadow-sticker space-y-2">
+            <div className="p-5 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-xs space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="font-display font-black text-ink dark:text-dusk-text text-base">
+                <h4 className="font-display font-black text-[var(--text-primary)] text-base">
                   Whey Protein Isolate
                 </h4>
-                <span className="px-2.5 py-0.5 rounded-full bg-mint text-ink border border-ink text-[11px] font-black">
+                <span className="px-2.5 py-0.5 rounded-full bg-mint text-[var(--text-primary)] border border-[var(--border-color)] text-[11px] font-black">
                   TIER A (STRONG)
                 </span>
               </div>
-              <p className="text-xs font-medium text-ink-muted leading-relaxed">
+              <p className="text-xs font-medium text-[var(--text-muted)] leading-relaxed">
                 Rapid bioavailability with high leucine content (~2.7g/scoop) triggering Muscle Protein Synthesis (MPS). Optimal immediately post-training.
               </p>
             </div>
