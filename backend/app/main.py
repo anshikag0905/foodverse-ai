@@ -1,12 +1,26 @@
 import os
 import time
+from pathlib import Path
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
 
 from app.core.config import settings
+from app.core.database import engine, Base, SessionLocal
+from app.core.demo_seed import seed_demo_data_if_needed
+from app.api.v1 import api_v1_router
+
+# Lifespan Context Manager
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize tables
+    Base.metadata.create_all(bind=engine)
+    if settings.DEMO_MODE:
+        with SessionLocal() as db:
+            seed_demo_data_if_needed(db)
+    yield
+    # Shutdown logic (if any)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -14,6 +28,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # CORS Configuration
@@ -25,25 +40,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ensure upload and storage directory exists
-upload_path = Path(settings.UPLOAD_DIR)
+# Static file mounts
+upload_path = Path(settings.UPLOAD_DIR).resolve()
 upload_path.mkdir(parents=True, exist_ok=True)
 demo_assets_path = Path(__file__).resolve().parent.parent.parent / "demo-assets"
 demo_assets_path.mkdir(parents=True, exist_ok=True)
 
-# Mount static files for uploaded previews & demo assets
 app.mount("/static/uploads", StaticFiles(directory=str(upload_path)), name="uploads")
 if demo_assets_path.exists():
     app.mount("/static/demo-assets", StaticFiles(directory=str(demo_assets_path)), name="demo-assets")
 
-# Request performance timing & centralized logging middleware
-# @app.middleware("http")
-# async def add_process_time_header(request: Request, call_next):
-#     start_time = time.time()
-#     response = await call_next(request)
-#     process_time = time.time() - start_time
-#     response.headers["X-Process-Time"] = f"{process_time:.4f}s"
-#     return response
+# Include v1 Router
+app.include_router(api_v1_router, prefix=settings.API_V1_STR)
 
 # Root & Healthcheck endpoints
 @app.get("/")

@@ -7,10 +7,19 @@ if str(backend_dir) != sys.path[0]:
     sys.path.insert(0, str(backend_dir))
 
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+from app.core.database import Base, engine, SessionLocal
+from app.core.demo_seed import seed_demo_data_if_needed
 
-@pytest.fixture(scope="session")
-def client():
-    with TestClient(app) as test_client:
-        yield test_client
+def run_sync(coro):
+    """Executes a coroutine synchronously without spawning loopback network sockets."""
+    try:
+        coro.send(None)
+    except StopIteration as e:
+        return e.value
+
+@pytest.fixture(scope="session", autouse=True)
+def init_db():
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as db:
+        seed_demo_data_if_needed(db)
+    yield
