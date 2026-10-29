@@ -14,6 +14,9 @@ import CookingAssistant from './pages/CookingAssistant';
 import MealPlanner from './pages/MealPlanner';
 import FoodExplorer from './pages/FoodExplorer';
 import PantryTracker from './pages/PantryTracker';
+import DidYouKnow from './pages/DidYouKnow';
+import GymMode from './pages/GymMode';
+import About from './pages/About';
 import { aboutConfig } from './config/about';
 
 // Placeholder view for remaining pages
@@ -108,11 +111,11 @@ export default function App() {
             <Route path="/meal-planner" element={<MealPlanner />} />
             <Route path="/food-explorer" element={<FoodExplorer />} />
             <Route path="/pantry" element={<PantryTracker />} />
-            <Route path="/did-you-know" element={<GenericModulePage title={t('nav.did_you_know')} description="Curated Food Science & Hygiene Fact Directory" icon={Lightbulb} />} />
-            <Route path="/gym" element={<GenericModulePage title={t('nav.gym_mode')} description="BMR/TDEE Calculator & Protein Target Progress" icon={Dumbbell} accent="gym" />} />
+            <Route path="/did-you-know" element={<DidYouKnow />} />
+            <Route path="/gym" element={<GymMode />} />
             <Route path="/history" element={<GenericModulePage title={t('nav.history')} description="Multimodal Scan Archive & Export Center" icon={History} />} />
             <Route path="/settings" element={<GenericModulePage title={t('nav.settings')} description="User Preferences, Allergens & Privacy Controls" icon={Settings} />} />
-            <Route path="/about" element={<GenericModulePage title={t('nav.about')} description={aboutConfig.project.tagline} icon={Info} />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </main>
         <Footer />
