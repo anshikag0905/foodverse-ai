@@ -17,7 +17,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import Loader from '../components/common/Loader';
-import { DoodleSalad, DoodleAvocado } from '../assets/doodles';
+import AnimatedGirlFace from '../components/common/AnimatedGirlFace';
 import { useTheme } from '../context/ThemeContext';
 
 const ALLERGEN_OPTIONS = [
@@ -80,7 +80,7 @@ export default function SettingsPrivacy() {
       setNotice(res.data);
     } catch (err) {
       setNotice({
-        storage_policy: "All telemetry and personal logs are stored locally on your device in browser storage and local SQLite database.",
+        storage_policy: "All food logs and personal records are stored locally on your device in browser storage and local SQLite database.",
         kitchen_video_retention: "Videos uploaded for kitchen hygiene auditing are processed purely in ephemeral memory and discarded."
       });
     }
@@ -166,10 +166,10 @@ export default function SettingsPrivacy() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-sky-100 dark:bg-dusk-surface border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
-            <DoodleAvocado size={46} className="animate-float" />
+      <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900">
+            <ShieldCheck className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-200 dark:bg-dusk-surface border border-ink text-[11px] font-black uppercase text-ink dark:text-dusk-text">
@@ -181,6 +181,58 @@ export default function SettingsPrivacy() {
             <p className="text-xs font-semibold text-ink-muted mt-0.5">
               Manage allergen guardrails, dietary rules, bilingual toggles, and data export.
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* STUDENT / CREATOR PROFILE CARD */}
+      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 sm:p-7 shadow-sticker">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+          <div className="relative">
+            <div className="w-28 h-28 rounded-3xl overflow-hidden border-3 border-ink shadow-sticker-sm flex items-center justify-center bg-gradient-to-br from-pink-100 to-rose-200">
+              <AnimatedGirlFace size={110} />
+            </div>
+            <div className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-mint text-ink border-2 border-ink text-[10px] font-black uppercase shadow-xs">
+              Online
+            </div>
+          </div>
+
+          <div className="flex-1 space-y-3">
+            <div>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <h2 className="font-display font-black text-2xl text-ink dark:text-dusk-text">
+                  Anshika Gupta
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full bg-grape/15 text-grape border border-grape/30 text-[11px] font-extrabold">
+                  Verified Creator
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-tomato/15 text-tomato border border-tomato/30 text-[11px] font-extrabold">
+                  AI & ML • LNCT
+                </span>
+              </div>
+              <p className="text-xs font-semibold text-ink-muted mt-1">
+                Lakshmi Narain College of Technology (LNCT), Bhopal • AIML Specialization
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-center">
+              <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-dusk-surface border border-ink">
+                <span className="text-[10px] font-black uppercase text-ink-muted block">Current Diet</span>
+                <span className="text-xs font-display font-black text-ink dark:text-dusk-text capitalize">{diet}</span>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-dusk-surface border border-ink">
+                <span className="text-[10px] font-black uppercase text-ink-muted block">Gym Target</span>
+                <span className="text-xs font-display font-black text-grape">140g P • 2.3k kcal</span>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-dusk-surface border border-ink">
+                <span className="text-[10px] font-black uppercase text-ink-muted block">Allergen Shield</span>
+                <span className="text-xs font-display font-black text-tomato">{allergens.length} active</span>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-sky-50 dark:bg-dusk-surface border border-ink">
+                <span className="text-[10px] font-black uppercase text-ink-muted block">Safety Score</span>
+                <span className="text-xs font-display font-black text-emerald-600">98 / 100</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -354,7 +406,7 @@ export default function SettingsPrivacy() {
             <span>Data Sovereignty & Local Storage</span>
           </h2>
           <p className="text-xs font-semibold text-ink-muted mt-0.5">
-            Your telemetry stays local. You have full ownership to export or purge your records at any time.
+            Your data stays local. You have full ownership to export or purge your records at any time.
           </p>
         </div>
 

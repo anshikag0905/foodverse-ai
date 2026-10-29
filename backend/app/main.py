@@ -15,6 +15,17 @@ from app.api.v1 import api_v1_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Initialize tables
+    if os.getenv("VERCEL"):
+        tmp_db = Path("/tmp/foodverse.db")
+        if not tmp_db.exists():
+            src_db = Path(__file__).resolve().parent.parent.parent / "data" / "foodverse.db"
+            if src_db.exists():
+                import shutil
+                try:
+                    shutil.copyfile(src_db, tmp_db)
+                except Exception:
+                    pass
+
     Base.metadata.create_all(bind=engine)
     if settings.DEMO_MODE:
         with SessionLocal() as db:
@@ -44,7 +55,10 @@ app.add_middleware(
 upload_path = Path(settings.UPLOAD_DIR).resolve()
 upload_path.mkdir(parents=True, exist_ok=True)
 demo_assets_path = Path(__file__).resolve().parent.parent.parent / "demo-assets"
-demo_assets_path.mkdir(parents=True, exist_ok=True)
+try:
+    demo_assets_path.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
 
 app.mount("/static/uploads", StaticFiles(directory=str(upload_path)), name="uploads")
 if demo_assets_path.exists():

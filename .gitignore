@@ -64,6 +64,8 @@ backend/storage/*
 *.swo
 .DS_Store
 Thumbs.db
+scratch/
+scratch_*.py
 
 # Heavy datasets or downloaded weights (strictly git-ignored as required)
 datasets/

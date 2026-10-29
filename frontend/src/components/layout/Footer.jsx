@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Mail, Check, Sparkles } from 'lucide-react';
+import { Github, Mail, Check } from 'lucide-react';
 import { aboutConfig } from '../../config/about';
 
 export default function Footer() {
@@ -12,53 +12,53 @@ export default function Footer() {
   };
 
   return (
-    <footer className="mt-auto border-t-3 border-ink bg-card/90 dark:bg-dusk-card/90 backdrop-blur-md py-6 px-4 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-display">
+    <footer className="mt-auto border-t border-[var(--border-color)] bg-[var(--bg-card)]/90 backdrop-blur-md py-5 px-4 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
         {/* Creator Attribution */}
-        <div className="flex items-center gap-2 text-ink dark:text-dusk-text font-extrabold text-center sm:text-left">
-          <span className="w-2 h-2 rounded-full bg-mint" />
+        <div className="flex items-center gap-2 text-[var(--text-primary)] font-medium text-center sm:text-left">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
           <span>Built by Anshika Gupta, AIML, LNCT College</span>
-          <span className="hidden md:inline text-ink-muted/50">•</span>
-          <span className="hidden md:inline text-ink-muted dark:text-dusk-muted font-body font-semibold">
-            FoodVerse AI Multimodal Agent
+          <span className="hidden md:inline text-[var(--text-faint)]">•</span>
+          <span className="hidden md:inline text-[var(--text-muted)]">
+            FoodVerse AI Multimodal Platform
           </span>
         </div>
 
-        {/* Action Pills: GitHub & Email */}
-        <div className="flex items-center gap-3">
+        {/* Action Pills */}
+        <div className="flex items-center gap-2.5">
           <a
             href={aboutConfig.links.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-dusk-surface border-2 border-ink text-ink dark:text-dusk-text shadow-sticker-sm btn-squish font-extrabold text-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-primary)] hover:border-blue-400 font-medium text-xs transition-colors"
             title="View GitHub Profile"
           >
-            <Github className="w-3.5 h-3.5 text-ink dark:text-dusk-text" />
+            <Github className="w-3.5 h-3.5" strokeWidth={1.5} />
             <span>GitHub</span>
           </a>
 
           <a
             href={`mailto:${aboutConfig.links.email}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tomato text-white border-2 border-ink shadow-sticker-sm btn-squish font-extrabold text-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 transition-colors"
             title="Send Email"
           >
-            <Mail className="w-3.5 h-3.5" />
+            <Mail className="w-3.5 h-3.5" strokeWidth={1.5} />
             <span>Email</span>
           </a>
 
           <button
             type="button"
             onClick={copyEmail}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-sky-200 dark:bg-dusk-surface border-2 border-ink text-ink dark:text-dusk-text shadow-sticker-sm btn-squish font-bold text-[11px] cursor-pointer"
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)] font-medium text-[11px] transition-colors cursor-pointer"
             title="Copy email to clipboard"
           >
             {copied ? (
               <>
-                <Check className="w-3 h-3 text-emerald-600" />
-                <span>Copied!</span>
+                <Check className="w-3 h-3 text-emerald-600" strokeWidth={1.5} />
+                <span>Copied</span>
               </>
             ) : (
-              <span>Copy</span>
+              <span>Copy Email</span>
             )}
           </button>
         </div>

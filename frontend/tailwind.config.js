@@ -8,97 +8,38 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Sky Blue Canvas
-        sky: {
-          50: '#F0F9FF',
-          100: '#E0F2FE',
-          200: '#BFE6FF', // Target reference sky blue
-          300: '#A5DEFF',
-          400: '#8FD3FF', // Target reference deep sky
-          500: '#38BDF8',
-          600: '#0284C7',
-          light: '#BFE6FF',
-          deep: '#8FD3FF',
-          soft: '#EAF6FF',
+        brand: {
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB', // Primary royal blue accent
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
         },
-        // Deep Navy Ink & Borders
-        ink: {
-          DEFAULT: '#0F1B3D',
-          navy: '#0F1B3D',
-          muted: '#4A5568',
-          light: '#718096',
-        },
-        // Card Surfaces
-        card: {
-          DEFAULT: '#FFFDF9',
-          cream: '#FFFDF9',
-          white: '#FFFFFF',
-        },
-        // Playful Module Accents
-        tomato: {
-          DEFAULT: '#FF5A5F', // Food Recognition (Red)
-          light: '#FFEAEA',
-          dark: '#E0484D',
-        },
-        mint: {
-          DEFAULT: '#3DDC97', // Freshness (Mint)
-          light: '#E8FBF2',
-          dark: '#2CB87C',
-        },
-        teal: {
-          DEFAULT: '#0284C7', // Hygiene (Teal/Ocean)
-          light: '#E0F2FE',
-          dark: '#0369A1',
-        },
-        sunny: {
-          DEFAULT: '#FFC93C', // Cooking (Sunny Yellow)
-          light: '#FFF8E6',
-          dark: '#E0AE2C',
-        },
-        grape: {
-          DEFAULT: '#8B5CF6', // Meal Planner (Grape)
-          light: '#F3E8FF',
-          dark: '#7C3AED',
-        },
-        peach: {
-          DEFAULT: '#FFB38A', // Pantry (Peach)
-          light: '#FFF1E8',
-          dark: '#E8986D',
-        },
-        // Friendly Deep Navy Dark Mode
-        dusk: {
-          bg: '#0A1128',
-          card: '#131F42',
-          surface: '#1C2B59',
-          border: '#2A3C72',
-          text: '#F0F4FF',
-          muted: '#94A3B8',
+        navy: {
+          900: '#0F1B3D', // Deep navy primary text on blue theme
+          800: '#16244D',
+          700: '#1E2F5D',
         },
       },
       fontFamily: {
-        display: ['"Fredoka"', '"Baloo 2"', 'sans-serif'],
-        body: ['"Nunito"', 'sans-serif'],
-        sans: ['"Nunito"', 'sans-serif'],
-        hindi: ['"Baloo 2"', '"Noto Sans Devanagari"', 'sans-serif'],
-        cute: ['"Fredoka"', '"Quicksand"', 'cursive', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        hindi: ['"Noto Sans Devanagari"', 'sans-serif'],
       },
       borderRadius: {
-        'xl': '1rem',
-        '2xl': '1.25rem',
-        '3xl': '1.75rem',
-        '4xl': '2.25rem',
+        'card': '16px',
         'pill': '9999px',
       },
       boxShadow: {
-        'sticker': '4px 4px 0px #0F1B3D',
-        'sticker-sm': '2px 2px 0px #0F1B3D',
-        'sticker-lg': '6px 6px 0px #0F1B3D',
-        'sticker-dark': '4px 4px 0px rgba(0, 0, 0, 0.8)',
-        'sticker-dark-sm': '2px 2px 0px rgba(0, 0, 0, 0.8)',
+        'card': '0 1px 3px 0 rgba(15, 27, 61, 0.05), 0 1px 2px -1px rgba(15, 27, 61, 0.03)',
+        'card-hover': '0 4px 12px 0 rgba(15, 27, 61, 0.08), 0 2px 4px -1px rgba(15, 27, 61, 0.04)',
+        'elevated': '0 10px 25px -3px rgba(15, 27, 61, 0.08), 0 4px 6px -4px rgba(15, 27, 61, 0.04)',
       },
-      borderWidth: {
-        '3': '3px',
-      }
     },
   },
   plugins: [],

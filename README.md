@@ -56,8 +56,7 @@ Built with an emphasis on **Explainability, Allergen Safety, Global Database Cov
 1. **Food Recognition & Nutrition Analysis**: Real-time vision classification, calorie/macro breakdowns, health score (0-100), explainability cues ("Why this result?"), and allergen safety alerts.
 2. **Food Freshness & Spoilage Detection**: Surface pattern and discoloration evaluation classifying items into *Fresh*, *Moderately Fresh*, or *Spoiled* with storage suggestions.
 3. **Restaurant Kitchen Hygiene & Safety Monitoring**: Video upload analysis sampling key frames to assess hair-caps, glove usage, cross-contamination, and station cleanliness with downloadable PDF/JSON compliance reports.
-4. **Smart Cooking Assistant**: Chat and voice-driven recipe generator with step-by-step guidance, ingredient substitution, interactive cooking timers, and "Cook from my Pantry" prioritization.
-5. **Personalized Adaptive Meal Planner**: Dynamic weekly nutrition planning calibrated to dietary constraints, allergies, caloric targets, and macro distribution with one-click meal swapping.
+4. **Personalized Adaptive Meal Planner**: Dynamic weekly nutrition planning calibrated to dietary constraints, allergies, caloric targets, and macro distribution with one-click meal swapping.
 6. **Pantry & Expiry Tracker**: Inventory monitoring with shelf-life estimates, expiry threshold warnings, food-waste metrics, and automated grocery list generation.
 7. **Gym Mode**: Dedicated athletic hub featuring Mifflin-St Jeor BMR/TDEE calculation, training/rest day splits, macro adherence progress rings, high-protein food explorer, and evidence-based supplement summaries.
 8. **Did You Know? (Food Science Facts)**: Curated repository of 100+ verified food facts categorized across nutrition, culinary science, food safety, and fitness with category filtering and contextual triggers.

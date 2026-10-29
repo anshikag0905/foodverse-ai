@@ -6,7 +6,6 @@ from app.models.analysis import Analysis, FoodCorrection
 from app.models.hygiene import HygieneReport
 from app.models.pantry import PantryItem, GroceryItem
 from app.models.meal_plan import MealPlan
-from app.models.cooking import CookingSession
 from app.models.gym import GymProfile, GymLog, ProgressEntry
 from app.storage.local_storage import get_storage
 
@@ -19,7 +18,6 @@ class PrivacyService:
         pantry_items = db.query(PantryItem).filter(PantryItem.user_id == user_id).all()
         grocery_items = db.query(GroceryItem).filter(GroceryItem.user_id == user_id).all()
         meal_plans = db.query(MealPlan).filter(MealPlan.user_id == user_id).all()
-        cooking_sessions = db.query(CookingSession).filter(CookingSession.user_id == user_id).all()
         gym_profile = db.query(GymProfile).filter(GymProfile.user_id == user_id).first()
         gym_logs = db.query(GymLog).filter(GymLog.user_id == user_id).all()
         progress_entries = db.query(ProgressEntry).filter(ProgressEntry.user_id == user_id).all()
@@ -121,7 +119,6 @@ class PrivacyService:
             "pantry_items": db.query(PantryItem).filter(PantryItem.user_id == user_id).delete(),
             "grocery_items": db.query(GroceryItem).filter(GroceryItem.user_id == user_id).delete(),
             "meal_plans": db.query(MealPlan).filter(MealPlan.user_id == user_id).delete(),
-            "cooking_sessions": db.query(CookingSession).filter(CookingSession.user_id == user_id).delete(),
             "gym_logs": db.query(GymLog).filter(GymLog.user_id == user_id).delete(),
             "progress_entries": db.query(ProgressEntry).filter(ProgressEntry.user_id == user_id).delete(),
             "corrections": db.query(FoodCorrection).filter(FoodCorrection.user_id == user_id).delete(),

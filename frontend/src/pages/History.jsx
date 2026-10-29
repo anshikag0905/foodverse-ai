@@ -15,8 +15,7 @@ import {
   FileJson,
   Sparkles
 } from 'lucide-react';
-import Loader, { DoodleEmptyState } from '../components/common/Loader';
-import { DoodleDonut, DoodlePizza } from '../assets/doodles';
+import { Loader, EmptyState } from '../components/common/Loader';
 
 export default function History() {
   const [historyItems, setHistoryItems] = useState([]);
@@ -96,24 +95,19 @@ export default function History() {
   });
 
   return (
-    <div className="space-y-8">
-      {/* =========================================================================
-          MODULE HEADER BAND (DOODLE DONUT)
-          ========================================================================= */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-sky-100 dark:bg-dusk-surface border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
-            <DoodleDonut size={46} className="animate-float" />
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Module Header */}
+      <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900">
+            <History className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-200 dark:bg-dusk-surface border border-ink text-[11px] font-black uppercase text-ink dark:text-dusk-text">
-              <span>Audit Trail</span>
-            </div>
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+            <h1 className="font-display font-bold text-xl sm:text-2xl text-[var(--text-primary)]">
               Analysis History & Archive
             </h1>
-            <p className="text-xs font-semibold text-ink-muted mt-0.5">
-              Review past food classifications, freshness scores, and sensory cue records.
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Review past food recognitions, spoilage inspections, and kitchen sanitation audits.
             </p>
           </div>
         </div>
@@ -178,10 +172,10 @@ export default function History() {
 
       {/* Main List */}
       {loading ? (
-        <Loader message="Loading historical scan records..." type="donut" />
+        <Loader message="Loading historical scan records..." />
       ) : filteredItems.length === 0 ? (
-        <DoodleEmptyState
-          Doodle={DoodleDonut}
+        <EmptyState
+          icon={History}
           title="No scan records found"
           description="Scan a meal or run a freshness check to build your nutritional history."
           actionLabel="Scan a Meal"

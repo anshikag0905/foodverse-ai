@@ -4,37 +4,40 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('foodverse_theme');
-    if (saved && ['pink', 'sky', 'dark'].includes(saved)) return saved;
-    // Default to cute smooth light pink theme as requested!
-    return 'pink';
+    try {
+      const saved = localStorage.getItem('foodverse_theme');
+      if (saved && ['blue', 'white', 'black'].includes(saved)) return saved;
+      if (saved === 'dark') return 'black';
+      if (saved === 'sky' || saved === 'pink') return 'blue';
+    } catch (e) {}
+    // Default to Sky Blue (Image 5 Target Style)
+    return 'blue';
   });
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('dark', 'theme-pink', 'theme-sky');
-
-    if (theme === 'dark') {
+    root.setAttribute('data-theme', theme);
+    if (theme === 'black') {
       root.classList.add('dark');
-    } else if (theme === 'sky') {
-      root.classList.add('theme-sky');
     } else {
-      root.classList.add('theme-pink');
+      root.classList.remove('dark');
     }
-    localStorage.setItem('foodverse_theme', theme);
+    try {
+      localStorage.setItem('foodverse_theme', theme);
+    } catch (e) {}
   }, [theme]);
 
-  // Cycle through: Pink -> Sky -> Dark -> Pink
+  // Cycle through: Blue -> White -> Black -> Blue
   const toggleTheme = () => {
     setTheme((prev) => {
-      if (prev === 'pink') return 'sky';
-      if (prev === 'sky') return 'dark';
-      return 'pink';
+      if (prev === 'blue') return 'white';
+      if (prev === 'white') return 'black';
+      return 'blue';
     });
   };
 
   const setThemeExplicit = (t) => {
-    if (['pink', 'sky', 'dark'].includes(t)) {
+    if (['blue', 'white', 'black'].includes(t)) {
       setTheme(t);
     }
   };

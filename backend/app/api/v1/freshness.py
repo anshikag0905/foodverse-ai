@@ -12,6 +12,9 @@ freshness_service = FreshnessService()
 async def analyze_freshness(
     image: Optional[UploadFile] = File(None),
     food_hint: Optional[str] = Form(None),
+    sample_name: Optional[str] = Form(None),
+    storage_condition: Optional[str] = Form(None),
+    days_stored: Optional[str] = Form(None),
     pantry_item_id: Optional[int] = Form(None),
     lang: str = Form("en"),
     user_id: int = Depends(get_current_user_id),
@@ -24,12 +27,13 @@ async def analyze_freshness(
         image_bytes = await image.read()
         filename = image.filename
 
+    hint = food_hint or sample_name
     result = await freshness_service.analyze_freshness(
         db=db,
         user_id=user_id,
         image_bytes=image_bytes,
         filename=filename,
-        food_hint=food_hint,
+        food_hint=hint,
         pantry_item_id=pantry_item_id,
         lang=lang
     )

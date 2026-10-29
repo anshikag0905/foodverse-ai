@@ -3,18 +3,15 @@ import {
   GraduationCap,
   Github,
   Mail,
-  Sparkles,
   Cpu,
   Database,
   ShieldCheck,
   Code2,
-  Heart,
   Check,
   Copy
 } from 'lucide-react';
 import { aboutConfig } from '../config/about';
 import AnimatedGirlFace from '../components/common/AnimatedGirlFace';
-import { DoodleAvocado, DoodlePancakes } from '../assets/doodles';
 
 export default function About() {
   const [copied, setCopied] = useState(false);
@@ -26,175 +23,148 @@ export default function About() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      {/* =========================================================================
-          CREATOR PROFILE HERO CARD (ANSHIKA GUPTA, AIML, LNCT COLLEGE)
-          ========================================================================= */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 sm:p-8 md:p-10 shadow-sticker relative overflow-hidden">
-        {/* Subtle background doodle */}
-        <div className="absolute -top-4 -right-4 opacity-15 pointer-events-none rotate-12">
-          <DoodlePancakes size={120} />
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 relative z-10">
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Creator Profile Hero Card */}
+      <div className="card-base p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Animated Girl Avatar */}
-          <div className="relative flex-shrink-0">
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-pink-100 dark:bg-dusk-surface border-3 border-ink flex flex-col items-center justify-center p-1 shadow-sticker-sm overflow-hidden">
-              <AnimatedGirlFace size={115} />
-            </div>
-            <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-tomato text-white border-2 border-ink shadow-xs">
-              <Sparkles className="w-4 h-4" />
-            </div>
+          <div className="w-24 h-24 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-[var(--border-color)] flex items-center justify-center p-1 shrink-0 overflow-hidden shadow-xs">
+            <AnimatedGirlFace size={88} />
           </div>
 
           {/* Profile Information */}
-          <div className="flex-1 text-center md:text-left space-y-3">
+          <div className="flex-1 text-center sm:text-left space-y-3">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 dark:bg-dusk-surface border-2 border-ink text-xs font-black text-ink dark:text-dusk-text shadow-sticker-xs mb-2">
-                <GraduationCap className="w-3.5 h-3.5 text-tomato" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                <GraduationCap className="w-3.5 h-3.5" strokeWidth={1.5} />
                 <span>{aboutConfig.education}</span>
               </div>
-              <h1 className="font-display font-black text-3xl sm:text-4xl text-ink dark:text-dusk-text tracking-tight">
+              <h1 className="font-display font-bold text-2xl sm:text-3xl text-[var(--text-primary)]">
                 {aboutConfig.name}
               </h1>
-              <p className="text-xs sm:text-sm font-bold text-tomato mt-0.5">
+              <p className="text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
                 {aboutConfig.role}
               </p>
             </div>
 
-            <p className="text-xs sm:text-sm font-semibold text-ink-muted leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed max-w-2xl">
               {aboutConfig.bio}
             </p>
 
-            {/* Colorful Skills Chips */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 pt-1">
-              {aboutConfig.skills.map((skill, idx) => {
-                const colors = [
-                  'bg-tomato/15 text-tomato border-tomato',
-                  'bg-mint/25 text-emerald-800 dark:text-mint border-mint',
-                  'bg-sunny/30 text-amber-900 dark:text-sunny border-sunny',
-                  'bg-grape/15 text-grape border-grape',
-                  'bg-peach/25 text-orange-800 dark:text-peach border-peach'
-                ];
-                const colorClass = colors[idx % colors.length];
-                return (
-                  <span
-                    key={idx}
-                    className={`px-3 py-1 rounded-full text-xs font-black border-1.5 shadow-xs ${colorClass}`}
-                  >
-                    {skill}
-                  </span>
-                );
-              })}
+            {/* Skills Chips */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 pt-1">
+              {aboutConfig.skills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--bg-card-subtle)] text-[var(--text-muted)] border border-[var(--border-color)]"
+                >
+                  {skill}
+                </span>
+              ))}
             </div>
 
             {/* Links and Contact Buttons */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-3">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-2">
               <a
                 href={aboutConfig.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink text-white dark:bg-white dark:text-ink font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer hover:shadow-sticker"
+                className="pill-btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5"
               >
-                <Github className="w-4 h-4" />
+                <Github className="w-3.5 h-3.5" strokeWidth={1.5} />
                 <span>GitHub Profile</span>
               </a>
 
               <a
                 href={`mailto:${aboutConfig.links.email}`}
-                className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-tomato text-white font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer hover:shadow-sticker"
+                className="pill-btn-secondary text-xs py-2 px-4 inline-flex items-center gap-1.5"
               >
-                <Mail className="w-4 h-4" />
+                <Mail className="w-3.5 h-3.5" strokeWidth={1.5} />
                 <span>Send Email</span>
               </a>
 
               <button
                 type="button"
                 onClick={copyEmail}
-                className="btn-squish inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer"
+                className="pill-btn-secondary text-xs py-2 px-3 inline-flex items-center gap-1.5 cursor-pointer"
               >
-                {copied ? <Check className="w-4 h-4 text-mint" /> : <Copy className="w-4 h-4 text-ink-muted" />}
-                <span>{copied ? 'Copied!' : 'Copy Email'}</span>
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" strokeWidth={1.5} /> : <Copy className="w-3.5 h-3.5" strokeWidth={1.5} />}
+                <span>{copied ? 'Copied' : 'Copy Email'}</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* =========================================================================
-          PROJECT VISION & ARCHITECTURE (FRIENDLY & SCANNABLE)
-          ========================================================================= */}
-      <div className="space-y-6">
+      {/* Project Vision & Architecture */}
+      <div className="space-y-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-mint/25 border border-ink text-[11px] font-black uppercase text-emerald-800 dark:text-mint">
-            <span>Project Overview</span>
-          </div>
-          <h2 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+          <h2 className="font-display font-bold text-lg text-[var(--text-primary)]">
             About {aboutConfig.project.title}
           </h2>
-          <p className="text-xs font-semibold text-ink-muted mt-0.5">
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
             {aboutConfig.project.tagline}
           </p>
         </div>
 
-        <p className="text-xs sm:text-sm font-semibold text-ink-muted leading-relaxed">
+        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
           {aboutConfig.project.description}
         </p>
 
         {/* 3 Architecture Pillar Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="p-6 rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink shadow-sticker space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-tomato/20 border-2 border-ink flex items-center justify-center text-tomato shadow-xs">
-              <Cpu className="w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="card-base p-5 space-y-2">
+            <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-900">
+              <Cpu className="w-5 h-5" strokeWidth={1.5} />
             </div>
-            <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+            <h3 className="font-semibold text-sm text-[var(--text-primary)]">
               Multimodal AI Engine
             </h3>
-            <p className="text-xs font-semibold text-ink-muted leading-relaxed">
-              Accepts meal photos, commercial kitchen videos, voice queries, and barcodes through unified routers backed by pluggable provider interfaces.
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+              Accepts meal photos, commercial kitchen videos, and food text queries through unified endpoints backed by Google Gemini Vision.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink shadow-sticker space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-sunny/30 border-2 border-ink flex items-center justify-center text-amber-600 shadow-xs">
-              <Database className="w-6 h-6" />
+          <div className="card-base p-5 space-y-2">
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-900">
+              <Database className="w-5 h-5" strokeWidth={1.5} />
             </div>
-            <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
-              FTS5 Food Database
+            <h3 className="font-semibold text-sm text-[var(--text-primary)]">
+              Verified SQLite FTS5 Database
             </h3>
-            <p className="text-xs font-semibold text-ink-muted leading-relaxed">
-              Over 20,000 international and Indian foods indexed with full-text search, calibrated macro compositions, and allergen safety guardrails.
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+              Over 1,000 authentic Indian, Japanese, and global nutrition records with instant full-text search and alias resolution.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink shadow-sticker space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-mint/25 border-2 border-ink flex items-center justify-center text-emerald-700 shadow-xs">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="card-base p-5 space-y-2">
+            <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-900">
+              <ShieldCheck className="w-5 h-5" strokeWidth={1.5} />
             </div>
-            <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+            <h3 className="font-semibold text-sm text-[var(--text-primary)]">
               Safety & Explainability
             </h3>
-            <p className="text-xs font-semibold text-ink-muted leading-relaxed">
-              Every inference reveals confidence metrics, sensory cues, and provenance ("Database" vs "AI estimate") to keep nutrition clear and actionable.
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+              Every inference provides transparent rubrics, visual bounding boxes, and portion scaling to maintain accuracy and reliability.
             </p>
           </div>
         </div>
 
         {/* Tech Stack Badges */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink shadow-sticker space-y-3">
-          <h3 className="font-display font-black text-base text-ink dark:text-dusk-text flex items-center gap-2">
-            <Code2 className="w-5 h-5 text-tomato" />
+        <div className="card-base p-5 space-y-3">
+          <h3 className="font-semibold text-sm text-[var(--text-primary)] flex items-center gap-2">
+            <Code2 className="w-4 h-4 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
             <span>Full-Stack Technology Stack</span>
           </h3>
           <div className="flex flex-wrap gap-2">
             {aboutConfig.project.techStack.map((tech, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 dark:bg-dusk-surface border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)]"
               >
-                <span className="w-2 h-2 rounded-full bg-mint border border-ink" />
-                <span>{tech.name}</span>
-                <span className="text-[10px] text-ink-muted">({tech.category})</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="font-medium">{tech.name}</span>
+                <span className="text-[10px] text-[var(--text-muted)]">({tech.category})</span>
               </span>
             ))}
           </div>

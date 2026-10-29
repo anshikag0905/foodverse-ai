@@ -26,7 +26,7 @@ Modern dietary and culinary health tools suffer from fragmented user workflows a
       |  (REST API, Multipart, Speech-to-Text, Barcode Scanner)
       v
 [ FastAPI Backend (Python 3.11) ]
-  ├── Modular Service Layer (Food, Freshness, Hygiene, Cooking, Meal, Pantry, Gym, Facts)
+  ├── Modular Service Layer (Food, Freshness, Hygiene, Meal, Pantry, Gym, Facts)
   ├── Background Asynchronous Task Processing (Video Frame Analysis)
   ├── Pluggable AI Interface (Gemini / OpenAI / Deterministic Mock)
   └── Data & Storage Layer (SQLite FTS5 Full-Text Index + Local Storage Provider)
@@ -42,8 +42,7 @@ Modern dietary and culinary health tools suffer from fragmented user workflows a
 1. **Food Recognition & Nutrition**: Identifies dishes, portions, calories, macros, and calculates health scores (0-100).
 2. **Freshness & Spoilage**: Inspects surface discoloration and textural decay to classify items (Fresh, Moderately Fresh, Spoiled) with storage advice.
 3. **Kitchen Hygiene & Safety**: Video analysis sampling frames to verify hair-caps, gloves, cross-contamination, and station cleanliness with downloadable reports.
-4. **Smart Cooking Assistant**: Conversational recipe generation with live timers, substitution advice, and "Cook from my Pantry" prioritization.
-5. **Personalized Meal Planner**: Weekly macro-optimized planning with instant meal swapping and grocery list synchronization.
+4. **Personalized Meal Planner**: Weekly macro-optimized planning with instant meal swapping and grocery list synchronization.
 6. **Pantry & Expiry Tracker**: Inventory tracking with shelf-life prediction, expiry alerts, and food waste reduction metrics.
 7. **Gym Mode**: Mifflin-St Jeor BMR/TDEE calculation, protein targets, daily macro progress rings, and high-protein food explorer.
 8. **Did You Know?**: 100+ peer-reviewed and authoritative food science facts with category filtering and contextual triggers.

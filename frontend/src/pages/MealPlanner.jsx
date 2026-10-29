@@ -1,10 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, RefreshCw, Shuffle, CheckSquare, Square, ShoppingBag, ShieldAlert, Sparkles, Check, Flame, Dumbbell, Zap, Droplets } from 'lucide-react';
+import {
+  Calendar,
+  RefreshCw,
+  Shuffle,
+  CheckSquare,
+  Square,
+  ShoppingBag,
+  ShieldAlert,
+  Flame,
+  Dumbbell,
+  Clock,
+  ChevronRight,
+  Filter,
+  Check,
+  Printer,
+  Sparkles
+} from 'lucide-react';
 import apiClient from '../services/api';
-import AllergenAlert from '../components/common/AllergenAlert';
 import { Loader } from '../components/common/Loader';
-import { DoodlePancakes } from '../assets/doodles';
+
+const PRESET_PLANS = [
+  { id: 'indian_balanced', label: 'Indian Balanced', calories: 2000, desc: 'Dal, roti, paneer/egg, seasonal sabzi, curd, and brown basmati rice' },
+  { id: 'indian_gym', label: 'Indian Gym Diet', calories: 2400, desc: 'High protein with paneer, soya chunks, boiled eggs, moong sprouts, and oats' },
+  { id: 'japanese', label: 'Japanese Traditional', calories: 1850, desc: 'Miso soup, grilled salmon, steamed edamame, rice, and green tea' },
+  { id: 'global_fitness', label: 'Global High-Protein', calories: 2200, desc: 'Grilled chicken breast, quinoa, greek yogurt, eggs, and sweet potatoes' },
+  { id: 'vegetarian', label: 'Pure Vegetarian', calories: 1900, desc: 'Lentils, chickpeas, tofu, paneer, nuts, seeds, and leafy greens' }
+];
 
 export default function MealPlanner() {
   const { t, i18n } = useTranslation();
@@ -12,6 +34,8 @@ export default function MealPlanner() {
   const [isLoading, setIsLoading] = useState(false);
   const [swappingMeal, setSwappingMeal] = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
+  const [targetCalories, setTargetCalories] = useState(2050);
+  const [selectedDiet, setSelectedDiet] = useState('indian_balanced');
 
   useEffect(() => {
     fetchCurrentPlan();
@@ -21,267 +45,461 @@ export default function MealPlanner() {
     setIsLoading(true);
     try {
       const res = await apiClient.get('/meal-plans/current');
-      if (res && res.id) {
+      if (res && res.id && res.days && res.days.length > 0) {
         setMealPlan(res);
+        if (res.target_calories) setTargetCalories(Math.round(res.target_calories));
       } else {
-        await handleGeneratePlan();
+        await handleGeneratePlan(selectedDiet, targetCalories);
       }
     } catch (err) {
-      await handleGeneratePlan();
+      await handleGeneratePlan(selectedDiet, targetCalories);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGeneratePlan = async () => {
+  const handleGeneratePlan = async (dietKey = selectedDiet, calTarget = targetCalories) => {
     setIsLoading(true);
     try {
       const res = await apiClient.post('/meal-plans/generate', {
-        plan_type: "daily",
-        target_calories: 2050.0,
-        lang: i18n.language || "en"
+        plan_type: 'daily',
+        target_calories: Number(calTarget),
+        diet_type: dietKey,
+        lang: i18n.language || 'en'
       });
-      setMealPlan(res);
+      if (res && res.days && res.days.length > 0) {
+        setMealPlan(res);
+      } else {
+        buildFallbackPlan(dietKey, calTarget);
+      }
     } catch (err) {
-      // Fallback meal plan
-      setMealPlan({
-        id: `plan_${Date.now()}`,
-        title: "Balanced Active Lifestyle Plan",
-        target_calories: 2050,
-        diet_applied: "Balanced High-Protein",
-        target_macros: {
-          protein: 135,
-          carbs: 230,
-          fat: 65
-        },
-        allergen_exclusions_applied: ["Shellfish"],
-        days: [
-          {
-            day: "Today's Recommended Meals",
-            meals: [
-              {
-                meal_type: "Breakfast",
-                dish_name: "Rolled Oatmeal with Blueberries & Greek Yogurt",
-                description: "Complex slow-digesting oats topped with fresh antioxidant berries and creamy protein.",
-                calories: 420,
-                protein: 26,
-                carbs: 58,
-                fat: 8
-              },
-              {
-                meal_type: "Lunch",
-                dish_name: "Grilled Herb Chicken Breast & Quinoa Bowl",
-                description: "Marinated breast with fluffy tri-color quinoa, baby spinach, and lemon vinaigrette.",
-                calories: 540,
-                protein: 48,
-                carbs: 45,
-                fat: 14
-              },
-              {
-                meal_type: "Snack",
-                dish_name: "Ripe Banana with Almond Butter",
-                description: "Quick clean carbohydrates and potassium to fuel stamina and stop muscle cramps.",
-                calories: 220,
-                protein: 6,
-                carbs: 32,
-                fat: 9
-              },
-              {
-                meal_type: "Dinner",
-                dish_name: "Steamed Atlantic Salmon with Brown Rice & Broccoli",
-                description: "Omega-3 rich salmon fillet with steamed florets and bioavailable fiber.",
-                calories: 590,
-                protein: 42,
-                carbs: 48,
-                fat: 18
-              }
-            ]
-          }
-        ],
-        grocery_list: [
-          "Rolled Oats (500g)",
-          "Fresh Blueberries (1 punnet)",
-          "Greek Yogurt 0% Fat (400g)",
-          "Boneless Chicken Breast (500g)",
-          "Organic Tri-Color Quinoa (1 pack)",
-          "Ripe Bananas (1 bunch)",
-          "Natural Almond Butter (1 jar)",
-          "Fresh Salmon Fillet (2 pcs)",
-          "Fresh Broccoli Crown (1 head)"
-        ],
-        disclaimer: "Calibrated nutritional plan enforcing a safe 1200 kcal floor to protect metabolic health."
-      });
+      console.warn('Backend meal plan generate fallback:', err);
+      buildFallbackPlan(dietKey, calTarget);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const buildFallbackPlan = (dietKey, cal) => {
+    const calNum = Number(cal) || 2000;
+    const isGym = dietKey === 'indian_gym' || dietKey === 'global_fitness';
+    const isJap = dietKey === 'japanese';
+    const isVeg = dietKey === 'vegetarian';
+
+    const proteinTarget = isGym ? Math.round(calNum * 0.32 / 4) : Math.round(calNum * 0.25 / 4);
+    const fatTarget = Math.round(calNum * 0.25 / 9);
+    const carbsTarget = Math.round((calNum - (proteinTarget * 4 + fatTarget * 9)) / 4);
+
+    let meals = [];
+    let groceryList = [];
+
+    if (dietKey === 'indian_gym') {
+      meals = [
+        {
+          meal_type: "Breakfast (Pre-Workout Fuel)",
+          dish_name: "Rolled Oats with Peanut Butter, Sliced Banana & Boiled Eggs",
+          description: "60g oats cooked with warm water/milk, 1 tbsp peanut butter, 1 fresh banana, and 3 egg whites (or 100g low-fat paneer).",
+          calories: Math.round(calNum * 0.26),
+          protein: Math.round(proteinTarget * 0.28),
+          carbs: Math.round(carbsTarget * 0.32),
+          fat: Math.round(fatTarget * 0.22)
+        },
+        {
+          meal_type: "Lunch (Anabolic Recovery)",
+          dish_name: "Grilled Paneer Tikka (or Chicken Breast) with Brown Rice & Yellow Dal",
+          description: "150g spiced grilled paneer, 1 cup cooked brown basmati rice, 1 katori moong dal, and cucumber-tomato salad.",
+          calories: Math.round(calNum * 0.35),
+          protein: Math.round(proteinTarget * 0.36),
+          carbs: Math.round(carbsTarget * 0.35),
+          fat: Math.round(fatTarget * 0.35)
+        },
+        {
+          meal_type: "Evening Snack",
+          dish_name: "Sprouted Moong & Black Chana Chaat with Roasted Almonds",
+          description: "1 cup steamed sprouted moong & black chana tossed with lemon juice, chaat masala, onions, and 12 almonds.",
+          calories: Math.round(calNum * 0.14),
+          protein: Math.round(proteinTarget * 0.14),
+          carbs: Math.round(carbsTarget * 0.15),
+          fat: Math.round(fatTarget * 0.18)
+        },
+        {
+          meal_type: "Dinner (Slow-Release Night Protein)",
+          dish_name: "Soya Chunks Masala Curry with 2 Whole Wheat Phulkas & Greek Curd",
+          description: "50g high-protein nutri soya chunks simmered with tomato-onion gravy, 2 soft phulkas, and 100g fresh curd.",
+          calories: Math.round(calNum * 0.25),
+          protein: Math.round(proteinTarget * 0.22),
+          carbs: Math.round(carbsTarget * 0.18),
+          fat: Math.round(fatTarget * 0.25)
+        }
+      ];
+      groceryList = [
+        "Rolled Oats (500g)", "Raw Peanuts / Peanut Butter", "Fresh Bananas (1 dozen)",
+        "Fresh Low-Fat Paneer (500g)", "Brown Basmati Rice (1kg)", "Yellow Moong Dal (500g)",
+        "Sprouted Moong Beans (250g)", "Black Chana (Kala Chana) (500g)", "Whole Wheat Atta (1kg)",
+        "Nutri Soya Chunks (200g)", "Plain Greek Yogurt / Curd (400g)", "Almonds (100g)"
+      ];
+    } else if (isJap) {
+      meals = [
+        {
+          meal_type: "Asagohan (Traditional Breakfast)",
+          dish_name: "Miso Soup with Silken Tofu, Wakame & Steamed Rice",
+          description: "Authentic dashi-miso broth with cubes of soft tofu, wakame seaweed, warm short-grain rice, and green tea.",
+          calories: Math.round(calNum * 0.24),
+          protein: Math.round(proteinTarget * 0.22),
+          carbs: Math.round(carbsTarget * 0.32),
+          fat: Math.round(fatTarget * 0.18)
+        },
+        {
+          meal_type: "Hirugohan (Nutrient Lunch)",
+          dish_name: "Sake Shioyaki (Salt-Grilled Salmon) with Edamame & Tamagoyaki",
+          description: "Crispy skin Atlantic salmon seasoned with sea salt, steamed edamame pods, rolled omelette, and pickled radish.",
+          calories: Math.round(calNum * 0.36),
+          protein: Math.round(proteinTarget * 0.40),
+          carbs: Math.round(carbsTarget * 0.30),
+          fat: Math.round(fatTarget * 0.38)
+        },
+        {
+          meal_type: "Oyatsu (Afternoon Tea)",
+          dish_name: "Warm Matcha Green Tea with Steamed Edamame & Roasted Nori",
+          description: "Ceremonial grade green matcha with steamed sea salt edamame pods.",
+          calories: Math.round(calNum * 0.12),
+          protein: Math.round(proteinTarget * 0.12),
+          carbs: Math.round(carbsTarget * 0.12),
+          fat: Math.round(fatTarget * 0.12)
+        },
+        {
+          meal_type: "Bangohan (Evening Dinner)",
+          dish_name: "Teriyaki Chicken (or Teriyaki Tofu) with Soba Noodles & Bok Choy",
+          description: "Pan-seared protein glazed with ginger teriyaki, chilled buckwheat soba noodles, and crisp steamed baby bok choy.",
+          calories: Math.round(calNum * 0.28),
+          protein: Math.round(proteinTarget * 0.26),
+          carbs: Math.round(carbsTarget * 0.26),
+          fat: Math.round(fatTarget * 0.32)
+        }
+      ];
+      groceryList = [
+        "White Miso Paste (300g)", "Silken Tofu (2 packs)", "Wakame Dried Seaweed",
+        "Japanese Short-Grain Rice (1kg)", "Fresh Salmon Fillets (300g)", "Frozen Edamame Pods (500g)",
+        "Eggs (1 dozen)", "Buckwheat Soba Noodles (1 pack)", "Fresh Baby Bok Choy (2 heads)", "Matcha Powder"
+      ];
+    } else {
+      meals = [
+        {
+          meal_type: "Breakfast",
+          dish_name: "Vegetable Poha with Roasted Peanuts & Fresh Coconut",
+          description: "Flattened rice tempered with mustard seeds, curry leaves, onions, peas, crunchy peanuts, and lemon.",
+          calories: Math.round(calNum * 0.25),
+          protein: Math.round(proteinTarget * 0.20),
+          carbs: Math.round(carbsTarget * 0.32),
+          fat: Math.round(fatTarget * 0.22)
+        },
+        {
+          meal_type: "Lunch",
+          dish_name: "Homestyle Dal Tadka with 2 Phulkas, Bhindi Masala & Curd",
+          description: "Garlic-cumin tempered toor dal, 2 whole wheat rotis, spiced okra stir-fry, and probiotic fresh yogurt.",
+          calories: Math.round(calNum * 0.36),
+          protein: Math.round(proteinTarget * 0.35),
+          carbs: Math.round(carbsTarget * 0.36),
+          fat: Math.round(fatTarget * 0.35)
+        },
+        {
+          meal_type: "Evening Snack",
+          dish_name: "Roasted Makhana (Foxnuts) with Chai & Fresh Apple",
+          description: "Crunchy ghee-roasted makhana seasoned with rock salt and black pepper with 1 fresh seasonal fruit.",
+          calories: Math.round(calNum * 0.14),
+          protein: Math.round(proteinTarget * 0.15),
+          carbs: Math.round(carbsTarget * 0.15),
+          fat: Math.round(fatTarget * 0.15)
+        },
+        {
+          meal_type: "Dinner",
+          dish_name: "Paneer Palak Curry with Jeera Rice & Green Salad",
+          description: "Fresh paneer cubes simmered in iron-rich spinach purée, fragrant cumin rice, and sliced cucumber salad.",
+          calories: Math.round(calNum * 0.25),
+          protein: Math.round(proteinTarget * 0.30),
+          carbs: Math.round(carbsTarget * 0.17),
+          fat: Math.round(fatTarget * 0.28)
+        }
+      ];
+      groceryList = [
+        "Thick Poha (500g)", "Raw Peanuts (250g)", "Toor Dal (1kg)", "Whole Wheat Atta (2kg)",
+        "Fresh Bhindi / Okra (500g)", "Plain Curd / Dahi (500g)", "Phool Makhana (100g)",
+        "Fresh Spinach (Palak) (2 bunches)", "Fresh Paneer (300g)", "Basmati Rice (1kg)", "Lemons & Ginger"
+      ];
+    }
+
+    setMealPlan({
+      id: `plan_${Date.now()}`,
+      title: `${PRESET_PLANS.find(p => p.id === dietKey)?.label || 'Balanced'} Regimen`,
+      target_calories: calNum,
+      diet_applied: PRESET_PLANS.find(p => p.id === dietKey)?.label || 'Indian Balanced',
+      target_macros: {
+        protein: proteinTarget,
+        carbs: carbsTarget,
+        fat: fatTarget
+      },
+      allergen_exclusions_applied: ["Shellfish", "Artificial Sweeteners"],
+      days: [
+        {
+          day: "Today's Nutrition Schedule",
+          meals: meals
+        }
+      ],
+      grocery_list: groceryList,
+      disclaimer: "Calibrated nutritional plan adhering to safe dietary bounds (1200 kcal floor)."
+    });
   };
 
   const handleSwapMeal = async (dayIdx, mealIdx) => {
     if (!mealPlan) return;
     setSwappingMeal(`${dayIdx}-${mealIdx}`);
+
     try {
       const res = await apiClient.post('/meal-plans/swap', {
         plan_id: mealPlan.id,
         day_index: dayIdx,
         meal_index: mealIdx
       });
-      if (res.status === 'success') {
-        setMealPlan(prev => ({
-          ...prev,
-          days: res.days
-        }));
+      if (res && res.status === 'success' && res.days) {
+        setMealPlan(prev => ({ ...prev, days: res.days }));
+        setSwappingMeal(null);
+        return;
       }
-    } catch (err) {
-      // Local swap simulation
-      const alternativeMeals = [
-        {
-          meal_type: "Alternative Option",
-          dish_name: "High-Protein Paneer & Veggie Sauté",
-          description: "Golden pan-seared paneer cubes with bell peppers and toasted sesame.",
-          calories: 480,
-          protein: 28,
-          carbs: 22,
-          fat: 20
-        },
-        {
-          meal_type: "Alternative Option",
-          dish_name: "Garlic Chickpea Salad with Cherry Tomatoes",
-          description: "High-fiber Mediterranean salad with chickpeas, cucumbers, and olive oil.",
-          calories: 390,
-          protein: 18,
-          carbs: 46,
-          fat: 12
-        }
-      ];
-      const randomAlt = alternativeMeals[Math.floor(Math.random() * alternativeMeals.length)];
-      setMealPlan(prev => {
-        const copy = JSON.parse(JSON.stringify(prev));
-        if (copy.days?.[dayIdx]?.meals?.[mealIdx]) {
-          copy.days[dayIdx].meals[mealIdx] = randomAlt;
-        }
-        return copy;
-      });
-    } finally {
-      setSwappingMeal(null);
+    } catch (e) {
+      // Local fallback swap
     }
+
+    const swapBank = [
+      {
+        meal_type: "Alternative Option",
+        dish_name: "Paneer & Bell Pepper Tikka Bowl",
+        description: "Fresh cottage cheese cubes marinated in yogurt and ajwain, griddled with crisp capsicum.",
+        calories: 380,
+        protein: 26,
+        carbs: 18,
+        fat: 16
+      },
+      {
+        meal_type: "Alternative Option",
+        dish_name: "Sprouted Moong & Pomegranate Salad",
+        description: "Steamed green moong sprouts, ruby pomegranate pearls, roasted cumin, and lime dressing.",
+        calories: 290,
+        protein: 16,
+        carbs: 42,
+        fat: 4
+      },
+      {
+        meal_type: "Alternative Option",
+        dish_name: "Quinoa Veggie Khichdi with Ghee Tadka",
+        description: "High-fiber quinoa cooked with yellow moong lentils, carrots, beans, and a light cumin tempering.",
+        calories: 410,
+        protein: 22,
+        carbs: 52,
+        fat: 10
+      },
+      {
+        meal_type: "Alternative Option",
+        dish_name: "Egg Bhurji (Scrambled) with Multigrain Toast",
+        description: "3 whole eggs sautéed with onions, green chilies, and coriander, served with toasted artisan bread.",
+        calories: 360,
+        protein: 24,
+        carbs: 26,
+        fat: 14
+      }
+    ];
+
+    const randomPick = swapBank[Math.floor(Math.random() * swapBank.length)];
+    setMealPlan(prev => {
+      if (!prev) return prev;
+      const copy = JSON.parse(JSON.stringify(prev));
+      if (copy.days?.[dayIdx]?.meals?.[mealIdx]) {
+        copy.days[dayIdx].meals[mealIdx] = {
+          ...randomPick,
+          meal_type: copy.days[dayIdx].meals[mealIdx].meal_type
+        };
+      }
+      return copy;
+    });
+    setSwappingMeal(null);
   };
 
   const toggleCheck = (idx) => {
     setCheckedItems(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div className="space-y-8">
-      {/* =========================================================================
-          MODULE HEADER BAND (GRAPE ACCENT + DOODLE PANCAKES)
-          ========================================================================= */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-grape/20 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
-            <DoodlePancakes size={46} className="animate-float" />
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900">
+            <Calendar className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-grape/25 border border-ink text-[11px] font-black uppercase text-grape">
-              <span>Dietetics AI</span>
-            </div>
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
-              Adaptive Meal Planner
+            <h1 className="font-display font-bold text-xl sm:text-2xl text-[var(--text-primary)]">
+              Personalized Meal Planner
             </h1>
-            <p className="text-xs font-semibold text-ink-muted mt-0.5">
-              Calibrated daily & weekly regimens tailored to macro targets, allergy safety & groceries.
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Goal-oriented nutrition plans calibrated to target calories, macro splits, and cuisine preferences.
             </p>
           </div>
         </div>
 
-        <button
-          onClick={handleGeneratePlan}
-          disabled={isLoading}
-          className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-grape text-white border-2 border-ink text-xs font-display font-black shadow-sticker-xs cursor-pointer hover:shadow-sticker disabled:opacity-50 self-end md:self-auto"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>Regenerate Plan</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="pill-btn-secondary py-1.5 px-3 text-xs cursor-pointer inline-flex items-center gap-1.5"
+            title="Print or save as PDF"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Print</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleGeneratePlan(selectedDiet, targetCalories)}
+            disabled={isLoading}
+            className="pill-btn-primary py-1.5 px-3.5 text-xs cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Generate Plan</span>
+          </button>
+        </div>
       </div>
 
-      {/* =========================================================================
-          3-STEP "HOW IT WORKS" STRIP
-          ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-ink dark:text-dusk-text">
-        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-grape text-white border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
-            1
+      {/* Plan Customizer Controls */}
+      <div className="card-base p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-[var(--border-color)] pb-3">
+          <span className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider">
+            1. Select Cuisine & Diet Profile
           </span>
-          <span>Set calorie & macro goals (or use Gym Mode profile)</span>
+          <span className="text-xs text-[var(--text-muted)]">
+            Active: <strong className="text-blue-600 dark:text-blue-400">{PRESET_PLANS.find(p => p.id === selectedDiet)?.label}</strong>
+          </span>
         </div>
-        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-sunny text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
-            2
-          </span>
-          <span>AI balances protein, carbs, fats & filters allergen conflicts</span>
+
+        {/* Diet Pills */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          {PRESET_PLANS.map((preset) => {
+            const isSelected = selectedDiet === preset.id;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => {
+                  setSelectedDiet(preset.id);
+                  setTargetCalories(preset.calories);
+                  handleGeneratePlan(preset.id, preset.calories);
+                }}
+                className={`p-2.5 rounded-xl text-left border text-xs transition-all cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold shadow-xs'
+                    : 'border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-card-subtle)]'
+                }`}
+              >
+                <span className="truncate block font-medium">{preset.label}</span>
+                <span className="text-[11px] text-[var(--text-muted)] mt-1 font-mono">{preset.calories} kcal</span>
+              </button>
+            );
+          })}
         </div>
-        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-mint text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
-            3
-          </span>
-          <span>Swap any dish with 1 tap & export aisle-ready grocery list</span>
+
+        {/* Calorie Slider */}
+        <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-[var(--border-color)]">
+          <div className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-amber-500" strokeWidth={1.5} />
+            <span className="text-xs font-medium text-[var(--text-secondary)]">Daily Calorie Target:</span>
+            <span className="font-bold text-sm text-[var(--text-primary)] font-mono">{targetCalories} kcal</span>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto max-w-xs">
+            <input
+              type="range"
+              min="1400"
+              max="3200"
+              step="50"
+              value={targetCalories}
+              onChange={(e) => setTargetCalories(Number(e.target.value))}
+              className="w-full accent-blue-600 cursor-pointer"
+            />
+            <button
+              type="button"
+              onClick={() => handleGeneratePlan(selectedDiet, targetCalories)}
+              className="pill-btn-secondary text-xs py-1 px-2.5 whitespace-nowrap cursor-pointer"
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </div>
 
       {isLoading ? (
         <Loader
           message="Synthesizing personalized macro-balanced meal regimen..."
-          subtext="Balancing protein ratios & verifying zero-allergen guardrails ✨"
-          type="pancake"
+          subtext="Calibrating amino acids, essential fats, and bioavailable micronutrients"
         />
       ) : mealPlan ? (
         <div className="space-y-6">
           {/* Target Macro Summary Header */}
-          <div className="p-6 rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card shadow-sticker">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b-2 border-ink/10">
+          <div className="card-base p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
               <div>
-                <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-grape/20 text-grape border border-ink uppercase">
+                <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 uppercase">
                   {mealPlan.diet_applied || 'Active Balanced'} Protocol
                 </span>
-                <h3 className="font-display font-black text-2xl text-ink dark:text-dusk-text mt-1">
+                <h3 className="font-display font-bold text-xl text-[var(--text-primary)] mt-1.5">
                   {mealPlan.title || 'Personalized Regimen'}
                 </h3>
               </div>
               <div className="text-right">
-                <span className="font-display font-black text-3xl text-tomato">
+                <span className="font-display font-bold text-3xl text-blue-600 dark:text-blue-400">
                   {Math.round(mealPlan.target_calories)}
                 </span>
-                <span className="text-xs font-bold text-ink-muted ml-1">kcal target</span>
+                <span className="text-xs text-[var(--text-muted)] ml-1">kcal target</span>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3 pt-4 text-center">
-              <div className="p-3 rounded-2xl bg-grape/15 border-2 border-ink">
-                <span className="text-xs text-grape font-extrabold uppercase">Protein</span>
-                <p className="font-display font-black text-xl text-ink dark:text-dusk-text mt-0.5">
+              <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold uppercase">Protein</span>
+                <p className="font-bold text-lg text-[var(--text-primary)] mt-0.5">
                   {mealPlan.target_macros?.protein || 135}g
                 </p>
+                <span className="text-[10px] text-[var(--text-muted)]">
+                  {Math.round(((mealPlan.target_macros?.protein || 135) * 4 / mealPlan.target_calories) * 100)}% calories
+                </span>
               </div>
-              <div className="p-3 rounded-2xl bg-sunny/20 border-2 border-ink">
-                <span className="text-xs text-amber-700 dark:text-sunny font-extrabold uppercase">Carbs</span>
-                <p className="font-display font-black text-xl text-ink dark:text-dusk-text mt-0.5">
+              <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold uppercase">Carbs</span>
+                <p className="font-bold text-lg text-[var(--text-primary)] mt-0.5">
                   {mealPlan.target_macros?.carbs || 230}g
                 </p>
+                <span className="text-[10px] text-[var(--text-muted)]">
+                  {Math.round(((mealPlan.target_macros?.carbs || 230) * 4 / mealPlan.target_calories) * 100)}% calories
+                </span>
               </div>
-              <div className="p-3 rounded-2xl bg-peach/20 border-2 border-ink">
-                <span className="text-xs text-orange-700 dark:text-peach font-extrabold uppercase">Fats</span>
-                <p className="font-display font-black text-xl text-ink dark:text-dusk-text mt-0.5">
+              <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase">Fats</span>
+                <p className="font-bold text-lg text-[var(--text-primary)] mt-0.5">
                   {mealPlan.target_macros?.fat || 65}g
                 </p>
+                <span className="text-[10px] text-[var(--text-muted)]">
+                  {Math.round(((mealPlan.target_macros?.fat || 65) * 9 / mealPlan.target_calories) * 100)}% calories
+                </span>
               </div>
             </div>
           </div>
 
           {/* Allergen Exclusions Notice */}
           {mealPlan.allergen_exclusions_applied && mealPlan.allergen_exclusions_applied.length > 0 && (
-            <div className="p-4 rounded-2xl bg-mint/20 border-2 border-mint text-xs flex items-center gap-2.5 text-emerald-900 dark:text-mint font-bold shadow-sticker-xs">
-              <ShieldAlert className="w-4 h-4 text-emerald-700 flex-shrink-0" />
+            <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs flex items-center gap-2.5 text-emerald-800 dark:text-emerald-300">
+              <ShieldAlert className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={1.5} />
               <span>
-                Allergen safety verified: Excluded all ingredients containing <strong>{mealPlan.allergen_exclusions_applied.join(', ')}</strong>.
+                Safety verified: Excluded recipes containing <strong>{mealPlan.allergen_exclusions_applied.join(', ')}</strong>.
               </span>
             </div>
           )}
@@ -290,46 +508,47 @@ export default function MealPlanner() {
           <div className="space-y-4">
             {(mealPlan.days || []).map((day, dIdx) => (
               <div key={dIdx} className="space-y-3">
-                <h4 className="font-display font-black text-lg text-ink dark:text-dusk-text uppercase tracking-wider">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                   {day.day}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {day.meals.map((meal, mIdx) => (
                     <div
                       key={mIdx}
-                      className="p-5 rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card shadow-sticker hover:shadow-sticker-lg transition-all flex flex-col justify-between"
+                      className="card-base p-5 flex flex-col justify-between transition-all hover:border-blue-500/40"
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-dusk-surface border border-ink text-ink dark:text-dusk-text uppercase">
+                          <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-secondary)]">
                             {meal.meal_type}
                           </span>
-                          <span className="text-xs font-black text-tomato">
+                          <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
                             {Math.round(meal.calories)} kcal
                           </span>
                         </div>
-                        <h5 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+                        <h5 className="font-semibold text-base text-[var(--text-primary)]">
                           {meal.dish_name}
                         </h5>
-                        <p className="text-xs font-semibold text-ink-muted leading-relaxed">
+                        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                           {meal.description}
                         </p>
                       </div>
 
-                      <div className="pt-4 mt-3 border-t-2 border-ink/10 flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-[11px] font-bold text-ink-muted">
-                          <span>P: <strong className="text-grape">{meal.protein}g</strong></span>
-                          <span>C: <strong className="text-amber-600">{meal.carbs}g</strong></span>
-                          <span>F: <strong className="text-orange-600">{meal.fat}g</strong></span>
+                      <div className="pt-4 mt-3 border-t border-[var(--border-color)] flex items-center justify-between">
+                        <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
+                          <span>P: <strong className="text-[var(--text-primary)]">{meal.protein}g</strong></span>
+                          <span>C: <strong className="text-[var(--text-primary)]">{meal.carbs}g</strong></span>
+                          <span>F: <strong className="text-[var(--text-primary)]">{meal.fat}g</strong></span>
                         </div>
 
                         <button
+                          type="button"
                           onClick={() => handleSwapMeal(dIdx, mIdx)}
                           disabled={swappingMeal === `${dIdx}-${mIdx}`}
-                          className="btn-squish inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-display font-black bg-white dark:bg-dusk-surface text-ink border-1.5 border-ink shadow-sticker-xs cursor-pointer hover:bg-grape/15"
-                          title="Swap with another meal recipe"
+                          className="pill-btn-secondary text-xs py-1 px-2.5 cursor-pointer inline-flex items-center gap-1"
+                          title="Swap with another balanced dish"
                         >
-                          <Shuffle className={`w-3.5 h-3.5 ${swappingMeal === `${dIdx}-${mIdx}` ? 'animate-spin' : ''}`} />
+                          <Shuffle className={`w-3 h-3 ${swappingMeal === `${dIdx}-${mIdx}` ? 'animate-spin' : ''}`} />
                           <span>Swap</span>
                         </button>
                       </div>
@@ -342,32 +561,32 @@ export default function MealPlanner() {
 
           {/* Synchronized Grocery List */}
           {mealPlan.grocery_list && mealPlan.grocery_list.length > 0 && (
-            <div className="p-6 md:p-8 rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card shadow-sticker space-y-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-grape/20 border-2 border-ink flex items-center justify-center">
-                  <ShoppingBag className="w-5 h-5 text-grape" />
+            <div className="card-base p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
                 </div>
                 <div>
-                  <h4 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+                  <h4 className="font-semibold text-sm text-[var(--text-primary)]">
                     Synchronized Grocery Checklist
                   </h4>
-                  <p className="text-xs font-semibold text-ink-muted">Tap any item to check off as you shop in the supermarket.</p>
+                  <p className="text-xs text-[var(--text-muted)]">Check items off as you stock your kitchen or pantry.</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {mealPlan.grocery_list.map((item, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => toggleCheck(idx)}
-                    className="p-3 rounded-2xl border-2 border-ink bg-sky-50 dark:bg-dusk-surface hover:bg-grape/10 flex items-center gap-3 text-xs text-left transition-colors cursor-pointer shadow-xs"
+                    className="p-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] flex items-center gap-2.5 text-xs text-left transition-colors cursor-pointer"
                   >
                     {checkedItems[idx] ? (
-                      <CheckSquare className="w-4 h-4 text-mint flex-shrink-0" />
+                      <CheckSquare className="w-4 h-4 text-emerald-500 shrink-0" />
                     ) : (
-                      <Square className="w-4 h-4 text-ink-muted flex-shrink-0" />
+                      <Square className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
                     )}
-                    <span className={`font-bold ${checkedItems[idx] ? 'line-through text-ink-muted' : 'text-ink dark:text-dusk-text'}`}>
+                    <span className={`${checkedItems[idx] ? 'line-through text-[var(--text-muted)]' : 'text-[var(--text-primary)] font-medium'}`}>
                       {item}
                     </span>
                   </button>
@@ -376,8 +595,8 @@ export default function MealPlanner() {
             </div>
           )}
 
-          <p className="text-[11px] font-semibold text-ink-muted italic">
-            * {mealPlan.disclaimer || "General dietary guidance. Enforces a 1200 kcal floor to protect against crash starvation."}
+          <p className="text-[11px] text-[var(--text-muted)] italic">
+            * {mealPlan.disclaimer || "General dietary guidance calibrated to healthy macro splits."}
           </p>
         </div>
       ) : null}

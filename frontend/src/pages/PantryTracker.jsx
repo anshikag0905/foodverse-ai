@@ -22,7 +22,6 @@ import {
 import ExpiryBadge from '../components/common/ExpiryBadge';
 import BarcodeScanner from '../components/common/BarcodeScanner';
 import Loader from '../components/common/Loader';
-import { DoodlePopcorn, DoodleAvocado } from '../assets/doodles';
 
 const SEED_PANTRY_ITEMS = [
   {
@@ -490,32 +489,28 @@ export default function PantryTracker() {
   });
 
   return (
-    <div className="space-y-8">
-      {/* =========================================================================
-          MODULE HEADER BAND (PEACH ACCENT + DOODLE POPCORN)
-          ========================================================================= */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-peach/25 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
-            <DoodlePopcorn size={46} className="animate-float" />
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Module Header */}
+      <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900">
+            <Package className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-peach/30 border border-ink text-[11px] font-black uppercase text-orange-800 dark:text-peach">
-              <span>Inventory AI</span>
-            </div>
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+            <h1 className="font-display font-bold text-xl sm:text-2xl text-[var(--text-primary)]">
               Pantry & Expiry Tracker
             </h1>
-            <p className="text-xs font-semibold text-ink-muted mt-0.5">
-              Track fridge and shelf expiration countdowns, scan barcodes & eliminate food waste.
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Track fridge and shelf expiration countdowns, scan barcodes, and eliminate household food waste.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap self-end md:self-auto">
           <button
+            type="button"
             onClick={() => setShowBarcodeScanner(true)}
-            className="btn-squish inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-display font-black bg-white dark:bg-dusk-surface border-2 border-ink text-ink dark:text-dusk-text shadow-sticker-xs cursor-pointer hover:border-tomato"
+            className="pill-btn-secondary text-xs py-1.5 px-3.5 cursor-pointer"
           >
             <Barcode className="w-4 h-4 text-tomato" />
             <span>Barcode</span>
@@ -586,7 +581,7 @@ export default function PantryTracker() {
             className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sunny text-ink font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer whitespace-nowrap"
           >
             <ChefHat className="w-4 h-4" />
-            <span>Cook From My Pantry</span>
+            <span>View Recipes for Expiring Items</span>
           </button>
         </div>
       )}

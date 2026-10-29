@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from typing import Optional, List, Dict, Any
 from app.schemas.ai import (
     FoodItemDetection,
+    MultiFoodDetectionResult,
     FreshnessAnalysisResult,
     HygieneAnalysisResult,
-    CookingChatResult,
     MealPlanResult
 )
 
@@ -23,6 +23,19 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
+    async def analyze_food_multi(
+        self,
+        image_bytes: Optional[bytes] = None,
+        image_path: Optional[str] = None,
+        query: Optional[str] = None,
+        user_diet: Optional[str] = None,
+        user_allergies: Optional[List[str]] = None,
+        lang: str = "en"
+    ) -> MultiFoodDetectionResult:
+        """Detects multiple food items on a plate with bounding boxes, portion grams, and macros."""
+        pass
+
+    @abstractmethod
     async def analyze_freshness(
         self,
         image_bytes: Optional[bytes] = None,
@@ -34,24 +47,29 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
+    async def analyze_kitchen_photo(
+        self,
+        image_bytes: Optional[bytes] = None,
+        image_path: Optional[str] = None,
+        filename: Optional[str] = None,
+        lang: str = "en"
+    ) -> HygieneAnalysisResult:
+        """Inspects a single kitchen/prep photo for cleanliness, cross-contamination, and sanitation."""
+        pass
+
+    @abstractmethod
     async def analyze_kitchen_video(
         self,
         video_path: str,
         job_id: str,
-        lang: str = "en"
+        file_hash: Optional[str] = None,
+        filename: Optional[str] = None,
+        extracted_frames: Optional[List[Dict[str, Any]]] = None,
+        duration_sec: float = 0.0,
+        lang: str = "en",
+        progress_callback: Optional[Any] = None
     ) -> HygieneAnalysisResult:
         """Samples keyframes from kitchen video and evaluates hygiene compliance."""
-        pass
-
-    @abstractmethod
-    async def chat_cooking(
-        self,
-        query: str,
-        history: List[Dict[str, str]],
-        pantry_items: Optional[List[Dict[str, Any]]] = None,
-        lang: str = "en"
-    ) -> CookingChatResult:
-        """Generates recipes, cooking instructions, substitutions, and timers."""
         pass
 
     @abstractmethod

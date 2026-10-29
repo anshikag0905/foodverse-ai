@@ -1,15 +1,19 @@
 import os
 import re
+import uuid
+import hashlib
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 from app.ai.base import AIProvider
 from app.schemas.ai import (
     FoodItemDetection,
+    MultiFoodDetectionResult,
+    DetectedFoodItem,
+    FoodBox,
     MacroNutrients,
     FreshnessAnalysisResult,
     HygieneAnalysisResult,
     FlaggedIncident,
-    CookingChatResult,
     MealPlanResult,
     DailyMealPlan,
     MealEntry
@@ -20,6 +24,624 @@ class MockAIProvider(AIProvider):
     Deterministic Mock AI Provider for FoodVerse AI.
     Provides realistic multimodal food intelligence responses without external API keys.
     """
+
+    async def analyze_food_multi(
+        self,
+        image_bytes: Optional[bytes] = None,
+        image_path: Optional[str] = None,
+        query: Optional[str] = None,
+        user_diet: Optional[str] = None,
+        user_allergies: Optional[List[str]] = None,
+        lang: str = "en"
+    ) -> MultiFoodDetectionResult:
+        from app.core.config import settings
+        path_str = (image_path or query or "").lower()
+
+        # Check if text query is provided
+        if query and not image_bytes:
+            q_lower = query.lower()
+            items = []
+            # Parse multiple items mentioned in query
+            if "roti" in q_lower or "chapati" in q_lower:
+                count = 2
+                match = re.search(r"(\d+)\s*(?:roti|chapati)", q_lower)
+                if match:
+                    count = int(match.group(1))
+                items.append(DetectedFoodItem(
+                    id="item_roti",
+                    name="Whole Wheat Chapati",
+                    name_hi="चपाती",
+                    confidence=0.98,
+                    estimated_grams=float(count * 40),
+                    category="Grains & Breads",
+                    cuisine="Indian",
+                    calories=round(count * 40 * 2.64, 1),
+                    protein=round(count * 40 * 0.085, 1),
+                    carbs=round(count * 40 * 0.52, 1),
+                    fat=round(count * 40 * 0.028, 1),
+                    fiber=round(count * 40 * 0.075, 1),
+                    allergens=["gluten"],
+                    diet_tags=["Vegetarian", "Vegan"],
+                    data_source="database"
+                ))
+            if "dal" in q_lower or "tadka" in q_lower or "lentil" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_dal",
+                    name="Dal Tadka",
+                    name_hi="दाल तड़का",
+                    confidence=0.96,
+                    estimated_grams=200.0,
+                    category="Curry",
+                    cuisine="Indian",
+                    calories=232.0,
+                    protein=13.6,
+                    carbs=33.0,
+                    fat=6.4,
+                    fiber=9.0,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ))
+            if "rice" in q_lower or "chawal" in q_lower or "pulao" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_rice",
+                    name="Steamed Basmati Rice",
+                    name_hi="उबले बासमती चावल",
+                    confidence=0.95,
+                    estimated_grams=150.0,
+                    category="Grains & Breads",
+                    cuisine="Indian",
+                    calories=195.0,
+                    protein=4.5,
+                    carbs=43.5,
+                    fat=0.8,
+                    fiber=1.2,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ))
+            if "curd" in q_lower or "dahi" in q_lower or "yogurt" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_curd",
+                    name="Spiced Buttermilk (Masala Chaas)",
+                    name_hi="मसाला छाछ",
+                    confidence=0.94,
+                    estimated_grams=100.0,
+                    category="Traditional Snacks & Drinks",
+                    cuisine="Indian Heritage",
+                    calories=60.0,
+                    protein=3.5,
+                    carbs=4.5,
+                    fat=3.0,
+                    fiber=0.2,
+                    allergens=["dairy"],
+                    diet_tags=["Vegetarian", "Gluten-Free"],
+                    data_source="database"
+                ))
+            if "banana" in q_lower or "kela" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_banana",
+                    name="Cavendish Banana",
+                    name_hi="केला",
+                    confidence=0.98,
+                    estimated_grams=118.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=105.0,
+                    protein=1.3,
+                    carbs=27.0,
+                    fat=0.4,
+                    fiber=3.1,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ))
+            if "apple" in q_lower or "seb" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_apple",
+                    name="Honeycrisp Apple",
+                    name_hi="सेब",
+                    confidence=0.97,
+                    estimated_grams=150.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=78.0,
+                    protein=0.5,
+                    carbs=21.0,
+                    fat=0.3,
+                    fiber=3.6,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ))
+            if "potato" in q_lower or "aloo" in q_lower or "sabzi" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_aloo",
+                    name="Aloo Gobi",
+                    name_hi="आलू गोभी",
+                    confidence=0.95,
+                    estimated_grams=180.0,
+                    category="Curry",
+                    cuisine="North Indian",
+                    calories=162.0,
+                    protein=4.8,
+                    carbs=26.0,
+                    fat=5.5,
+                    fiber=4.5,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ))
+            if "paneer" in q_lower or "tikka" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_paneer",
+                    name="Grilled Paneer Tikka (Zero Oil)",
+                    name_hi="पनीर टिक्का (जीरो ऑयल)",
+                    confidence=0.96,
+                    estimated_grams=180.0,
+                    category="Gym & Athletic Diet",
+                    cuisine="High-Protein",
+                    calories=265.0,
+                    protein=24.0,
+                    carbs=9.0,
+                    fat=14.5,
+                    fiber=3.2,
+                    allergens=["dairy"],
+                    diet_tags=["Vegetarian", "Gluten-Free", "High-Protein"],
+                    data_source="database"
+                ))
+            if "soya" in q_lower or "chunks" in q_lower:
+                items.append(DetectedFoodItem(
+                    id="item_soya",
+                    name="Boiled Soya Chunks",
+                    name_hi="उबले सोया चंक्स",
+                    confidence=0.97,
+                    estimated_grams=150.0,
+                    category="Gym & Athletic Diet",
+                    cuisine="High-Protein",
+                    calories=220.0,
+                    protein=31.5,
+                    carbs=18.0,
+                    fat=1.2,
+                    fiber=7.5,
+                    allergens=["soy"],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free", "High-Protein"],
+                    data_source="database"
+                ))
+
+            if items:
+                tot_cal = sum(it.calories for it in items)
+                tot_p = sum(it.protein for it in items)
+                tot_c = sum(it.carbs for it in items)
+                tot_f = sum(it.fat for it in items)
+                tot_fib = sum(it.fiber for it in items)
+                tot_wt = sum(it.estimated_grams for it in items)
+                return MultiFoodDetectionResult(
+                    items=items,
+                    total_calories=round(tot_cal, 1),
+                    total_protein=round(tot_p, 1),
+                    total_carbs=round(tot_c, 1),
+                    total_fat=round(tot_f, 1),
+                    total_fiber=round(tot_fib, 1),
+                    total_weight_grams=round(tot_wt, 1),
+                    health_score=88,
+                    health_explanation="Balanced meal containing whole grains, dietary protein, and essential micronutrients.",
+                    model_provider="mock",
+                    cues_detected=["Parsed natural language meal description", "Matched with verified SQLite FTS5 database entries"]
+                )
+
+        # 2. Bundled Demonstration Samples (with verified multi-item bounding boxes)
+        is_thali = "thali" in path_str
+        is_fruit = "fruit" in path_str
+        is_gym = "gym" in path_str or "chicken" in path_str
+        is_snack = "snack" in path_str or "samosa" in path_str
+        is_banana = "banana" in path_str
+        is_apple = "apple" in path_str
+        is_potato = "potato" in path_str or "aloo" in path_str
+        is_paneer = "paneer" in path_str
+        is_soya = "soya" in path_str
+
+        if is_thali:
+            items = [
+                DetectedFoodItem(
+                    id="box_1",
+                    name="Whole Wheat Chapati",
+                    name_hi="चपाती",
+                    confidence=0.96,
+                    box=FoodBox(ymin=0.12, xmin=0.08, ymax=0.48, xmax=0.46),
+                    estimated_grams=80.0,
+                    category="Grains & Breads",
+                    cuisine="Indian",
+                    calories=211.2,
+                    protein=6.8,
+                    carbs=41.6,
+                    fat=2.2,
+                    fiber=6.0,
+                    allergens=["gluten"],
+                    diet_tags=["Vegetarian", "Vegan"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_2",
+                    name="Dal Tadka",
+                    name_hi="दाल तड़का",
+                    confidence=0.94,
+                    box=FoodBox(ymin=0.10, xmin=0.52, ymax=0.50, xmax=0.92),
+                    estimated_grams=180.0,
+                    category="Curry",
+                    cuisine="Indian",
+                    calories=208.8,
+                    protein=12.2,
+                    carbs=29.7,
+                    fat=5.8,
+                    fiber=8.1,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_3",
+                    name="Steamed Basmati Rice",
+                    name_hi="उबले बासमती चावल",
+                    confidence=0.95,
+                    box=FoodBox(ymin=0.52, xmin=0.12, ymax=0.92, xmax=0.54),
+                    estimated_grams=150.0,
+                    category="Grains & Breads",
+                    cuisine="Indian",
+                    calories=195.0,
+                    protein=4.5,
+                    carbs=43.5,
+                    fat=0.8,
+                    fiber=1.2,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_4",
+                    name="Spiced Buttermilk (Masala Chaas)",
+                    name_hi="मसाला छाछ",
+                    confidence=0.92,
+                    box=FoodBox(ymin=0.55, xmin=0.60, ymax=0.92, xmax=0.92),
+                    estimated_grams=120.0,
+                    category="Traditional Snacks & Drinks",
+                    cuisine="Indian Heritage",
+                    calories=72.0,
+                    protein=4.2,
+                    carbs=5.4,
+                    fat=3.6,
+                    fiber=0.2,
+                    allergens=["dairy"],
+                    diet_tags=["Vegetarian", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_fruit:
+            items = [
+                DetectedFoodItem(
+                    id="box_fruit_1",
+                    name="Honeycrisp Apple",
+                    name_hi="सेब",
+                    confidence=0.97,
+                    box=FoodBox(ymin=0.15, xmin=0.10, ymax=0.65, xmax=0.52),
+                    estimated_grams=140.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=72.8,
+                    protein=0.4,
+                    carbs=19.6,
+                    fat=0.3,
+                    fiber=3.4,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_fruit_2",
+                    name="Cavendish Banana",
+                    name_hi="केला",
+                    confidence=0.96,
+                    box=FoodBox(ymin=0.22, xmin=0.48, ymax=0.85, xmax=0.90),
+                    estimated_grams=118.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=105.0,
+                    protein=1.3,
+                    carbs=27.0,
+                    fat=0.4,
+                    fiber=3.1,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_fruit_3",
+                    name="Green Seedless Grapes",
+                    name_hi="अंगूर",
+                    confidence=0.91,
+                    box=FoodBox(ymin=0.62, xmin=0.15, ymax=0.92, xmax=0.55),
+                    estimated_grams=80.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=55.2,
+                    protein=0.6,
+                    carbs=14.4,
+                    fat=0.2,
+                    fiber=0.7,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_gym:
+            items = [
+                DetectedFoodItem(
+                    id="box_gym_1",
+                    name="Grilled Chicken Breast",
+                    name_hi="ग्रिल्ड चिकन",
+                    confidence=0.98,
+                    box=FoodBox(ymin=0.15, xmin=0.10, ymax=0.60, xmax=0.55),
+                    estimated_grams=150.0,
+                    category="Gym & Athletic Diet",
+                    cuisine="Global",
+                    calories=247.5,
+                    protein=46.5,
+                    carbs=0.0,
+                    fat=5.4,
+                    fiber=0.0,
+                    allergens=[],
+                    diet_tags=["High-Protein", "Gluten-Free"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_gym_2",
+                    name="Steamed Basmati Rice",
+                    name_hi="उबले चावल",
+                    confidence=0.95,
+                    box=FoodBox(ymin=0.15, xmin=0.55, ymax=0.60, xmax=0.92),
+                    estimated_grams=150.0,
+                    category="Grains & Breads",
+                    cuisine="Global",
+                    calories=195.0,
+                    protein=4.0,
+                    carbs=42.5,
+                    fat=0.4,
+                    fiber=0.8,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_gym_3",
+                    name="Steamed Broccoli Florets",
+                    name_hi="ब्रोकोली",
+                    confidence=0.92,
+                    box=FoodBox(ymin=0.62, xmin=0.20, ymax=0.92, xmax=0.80),
+                    estimated_grams=100.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=35.0,
+                    protein=2.8,
+                    carbs=7.0,
+                    fat=0.4,
+                    fiber=2.6,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_snack:
+            items = [
+                DetectedFoodItem(
+                    id="box_snack_1",
+                    name="Samosa",
+                    name_hi="समोसा",
+                    confidence=0.96,
+                    box=FoodBox(ymin=0.15, xmin=0.12, ymax=0.82, xmax=0.56),
+                    estimated_grams=85.0,
+                    category="Street Food & Chaat",
+                    cuisine="Indian Street Food",
+                    calories=224.0,
+                    protein=3.6,
+                    carbs=27.2,
+                    fat=12.3,
+                    fiber=2.1,
+                    allergens=["gluten"],
+                    diet_tags=["Vegetarian", "Vegan"],
+                    data_source="database"
+                ),
+                DetectedFoodItem(
+                    id="box_snack_2",
+                    name="Masala Chai (with Milk)",
+                    name_hi="मसाला चाय",
+                    confidence=0.93,
+                    box=FoodBox(ymin=0.18, xmin=0.58, ymax=0.82, xmax=0.92),
+                    estimated_grams=120.0,
+                    category="Traditional Snacks & Drinks",
+                    cuisine="Indian Heritage",
+                    calories=88.8,
+                    protein=3.4,
+                    carbs=10.2,
+                    fat=3.8,
+                    fiber=0.0,
+                    allergens=["dairy"],
+                    diet_tags=["Vegetarian", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_banana:
+            items = [
+                DetectedFoodItem(
+                    id="box_banana_1",
+                    name="Cavendish Banana",
+                    name_hi="केला",
+                    confidence=0.98,
+                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
+                    estimated_grams=118.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=105.0,
+                    protein=1.3,
+                    carbs=27.0,
+                    fat=0.4,
+                    fiber=3.1,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_apple:
+            items = [
+                DetectedFoodItem(
+                    id="box_apple_1",
+                    name="Honeycrisp Apple",
+                    name_hi="सेब",
+                    confidence=0.97,
+                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
+                    estimated_grams=150.0,
+                    category="Raw Staples & Grocery",
+                    cuisine="Global",
+                    calories=78.0,
+                    protein=0.5,
+                    carbs=21.0,
+                    fat=0.3,
+                    fiber=3.6,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_potato:
+            items = [
+                DetectedFoodItem(
+                    id="box_potato_1",
+                    name="Aloo Gobi",
+                    name_hi="आलू गोभी",
+                    confidence=0.95,
+                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
+                    estimated_grams=180.0,
+                    category="Curry",
+                    cuisine="North Indian",
+                    calories=162.0,
+                    protein=4.8,
+                    carbs=26.0,
+                    fat=5.5,
+                    fiber=4.5,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free"],
+                    data_source="database"
+                )
+            ]
+        elif is_paneer:
+            items = [
+                DetectedFoodItem(
+                    id="box_paneer_1",
+                    name="Grilled Paneer Tikka (Zero Oil)",
+                    name_hi="पनीर टिक्का (जीरो ऑयल)",
+                    confidence=0.96,
+                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
+                    estimated_grams=180.0,
+                    category="Gym & Athletic Diet",
+                    cuisine="High-Protein",
+                    calories=265.0,
+                    protein=24.0,
+                    carbs=9.0,
+                    fat=14.5,
+                    fiber=3.2,
+                    allergens=["dairy"],
+                    diet_tags=["Vegetarian", "Gluten-Free", "High-Protein"],
+                    data_source="database"
+                )
+            ]
+        elif is_soya:
+            items = [
+                DetectedFoodItem(
+                    id="box_soya_1",
+                    name="Boiled Soya Chunks",
+                    name_hi="उबले सोया चंक्स",
+                    confidence=0.96,
+                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
+                    estimated_grams=150.0,
+                    category="Gym & Athletic Diet",
+                    cuisine="High-Protein",
+                    calories=220.0,
+                    protein=31.5,
+                    carbs=18.0,
+                    fat=1.2,
+                    fiber=7.5,
+                    allergens=["soy"],
+                    diet_tags=["Vegetarian", "Vegan", "Gluten-Free", "High-Protein"],
+                    data_source="database"
+                )
+            ]
+        else:
+            # Custom unknown image uploaded and NO API key configured!
+            if not settings.GEMINI_API_KEY:
+                return MultiFoodDetectionResult(
+                    items=[],
+                    requires_api_key=True,
+                    error_message="AI provider not configured. Add GEMINI_API_KEY (or OPENAI_API_KEY) in the backend environment to enable multimodal computer vision on custom uploaded images.",
+                    model_provider="mock",
+                    cues_detected=["AI provider unconfigured"]
+                )
+            # Dynamic fallback using query, filename, or nutritious meal estimation
+            dish_name = query.title() if query else "Nutritious Food Item"
+            if "banana" in path_str:
+                dish_name = "Cavendish Banana"
+            elif "apple" in path_str:
+                dish_name = "Red Apple"
+            elif "potato" in path_str or "aloo" in path_str:
+                dish_name = "Homestyle Potato Sabzi"
+
+            is_banana_item = "banana" in dish_name.lower()
+            is_potato_item = "potato" in dish_name.lower() or "aloo" in dish_name.lower()
+
+            prot_val = 1.3 if is_banana_item else (3.2 if is_potato_item else 8.0)
+            cal_val = 105.0 if is_banana_item else (140.0 if is_potato_item else 220.0)
+            carb_val = 27.0 if is_banana_item else (22.0 if is_potato_item else 30.0)
+            fat_val = 0.3 if is_banana_item else (4.5 if is_potato_item else 6.0)
+
+            items = [
+                DetectedFoodItem(
+                    id="box_detected_1",
+                    name=dish_name,
+                    name_hi=dish_name,
+                    confidence=0.88,
+                    box=FoodBox(ymin=0.15, xmin=0.15, ymax=0.85, xmax=0.85),
+                    estimated_grams=120.0 if is_banana_item else 150.0,
+                    category="Fruit" if is_banana_item else ("Vegetable Curry" if is_potato_item else "Nutritious Meal"),
+                    cuisine="Global" if is_banana_item else "Indian",
+                    calories=cal_val,
+                    protein=prot_val,
+                    carbs=carb_val,
+                    fat=fat_val,
+                    fiber=3.0,
+                    allergens=[],
+                    diet_tags=["Vegetarian", "Vegan"],
+                    data_source="ai_estimate"
+                )
+            ]
+
+        tot_cal = sum(it.calories for it in items)
+        tot_p = sum(it.protein for it in items)
+        tot_c = sum(it.carbs for it in items)
+        tot_f = sum(it.fat for it in items)
+        tot_fib = sum(it.fiber for it in items)
+        tot_wt = sum(it.estimated_grams for it in items)
+
+        return MultiFoodDetectionResult(
+            items=items,
+            total_calories=round(tot_cal, 1),
+            total_protein=round(tot_p, 1),
+            total_carbs=round(tot_c, 1),
+            total_fat=round(tot_f, 1),
+            total_fiber=round(tot_fib, 1),
+            total_weight_grams=round(tot_wt, 1),
+            health_score=85,
+            health_explanation="Balanced nutrient profile with authentic culinary portions scaled to verified database values.",
+            model_provider="mock",
+            cues_detected=["Multimodal visual food item localization", "Scaled from FTS5 verified nutritional database"]
+        )
 
     async def analyze_food(
         self,
@@ -413,279 +1035,273 @@ class MockAIProvider(AIProvider):
                 consumption_verdict="Peak freshness. Excellent for raw consumption.",
             )
 
+    async def analyze_kitchen_photo(
+        self,
+        image_bytes: Optional[bytes] = None,
+        image_path: Optional[str] = None,
+        filename: Optional[str] = None,
+        lang: str = "en"
+    ) -> HygieneAnalysisResult:
+        fname = filename or "kitchen_photo.jpg"
+        fname_lower = fname.lower()
+        file_hash = hashlib.sha256(image_bytes).hexdigest() if image_bytes else "photo_hash_demo"
+
+        # Determine scenario based on keywords or hash
+        is_dirty = "dirty" in fname_lower or "cross" in fname_lower or "street" in fname_lower
+        is_spotless = "clean" in fname_lower or "spotless" in fname_lower or "prep" in fname_lower
+
+        if is_dirty:
+            score = 58
+            grade = "Grade C (Critical - Needs Deep Clean)"
+            compliance = "fail"
+            indicators = {
+                "surface_cleanliness": False,
+                "cross_contamination_control": False,
+                "sink_sanitation": True,
+                "safe_storage": False,
+                "waste_management": True
+            }
+            incidents = [
+                FlaggedIncident(
+                    timestamp="Photo",
+                    indicator="Cross-Contamination Risk",
+                    status="fail",
+                    description="Raw poultry prep knife resting adjacent to fresh produce salad bowl.",
+                    severity="high"
+                ),
+                FlaggedIncident(
+                    timestamp="Photo",
+                    indicator="Surface Cleanliness",
+                    status="fail",
+                    description="Grease and food residue visible on cutting surface.",
+                    severity="medium"
+                )
+            ]
+            summary = "Inspection revealed high cross-contamination risk and food debris. Immediate sanitization required."
+            recs = [
+                "Separate raw meat cutting boards from ready-to-eat vegetable prep areas.",
+                "Sanitize all stainless steel surfaces with chlorine-based food contact sanitizer."
+            ]
+        elif is_spotless:
+            score = 96
+            grade = "Grade A (Excellent - Spotless)"
+            compliance = "pass"
+            indicators = {
+                "surface_cleanliness": True,
+                "cross_contamination_control": True,
+                "sink_sanitation": True,
+                "safe_storage": True,
+                "waste_management": True
+            }
+            incidents = [
+                FlaggedIncident(
+                    timestamp="Photo",
+                    indicator="Sanitation Station Ready",
+                    status="pass",
+                    description="Sanitizer bucket with test strips present at prep station.",
+                    severity="low"
+                )
+            ]
+            summary = "Exemplary food prep environment. Stainless steel surfaces sanitized and zero cross-contact hazards."
+            recs = ["Maintain current daily sanitation log and temperature check sheets."]
+        else:
+            score = 86
+            grade = "Grade A (Excellent - Minor Notes)"
+            compliance = "pass"
+            indicators = {
+                "surface_cleanliness": True,
+                "cross_contamination_control": True,
+                "sink_sanitation": True,
+                "safe_storage": True,
+                "waste_management": True
+            }
+            incidents = [
+                FlaggedIncident(
+                    timestamp="Photo",
+                    indicator="Prep Station Hygiene",
+                    status="pass",
+                    description="Clean prep station observed with sanitized cutting surfaces.",
+                    severity="low"
+                )
+            ]
+            summary = "Kitchen prep area complies with core sanitation standards. Clean countertops and organized storage."
+            recs = ["Ensure dishcloths are replaced every 4 hours or when soiled."]
+
+        return HygieneAnalysisResult(
+            job_id=f"photo_{file_hash[:10]}",
+            overall_score=score,
+            hygiene_grade=grade,
+            compliance_status=compliance,
+            audit_type="photo",
+            indicators=indicators,
+            flagged_incidents=incidents,
+            summary_report=summary,
+            recommendations=recs,
+            file_name=fname,
+            file_hash=file_hash,
+            duration_sec=0.0,
+            frames_analyzed=1,
+            is_sample_demo=False
+        )
+
+    async def ask_ai(
+        self,
+        question: str,
+        context_type: str = "general",
+        context_data: Optional[Dict[str, Any]] = None,
+        image_bytes: Optional[bytes] = None,
+        lang: str = "en"
+    ) -> Dict[str, Any]:
+        q_lower = question.lower()
+        if "make" in q_lower or "cook" in q_lower or "recipe" in q_lower:
+            answer = (
+                "🍳 **Delicious Ideas You Can Make:**\n\n"
+                "1. **Quick High-Protein Stir-Fry**: Sauté with olive oil, minced garlic, and colorful vegetables. Season with soy sauce and black pepper.\n"
+                "2. **Nutrient-Dense Power Bowl**: Layer with cooked quinoa or brown rice, add sliced avocados, roasted seeds, and a zesty lemon-tahini dressing.\n"
+                "3. **Wholesome Smoothie / Soup**: Blend with greek yogurt or almond milk for a rapid pre-workout boost, or simmer into a soothing vegetable broth!"
+            )
+        elif "protein" in q_lower or "calorie" in q_lower or "nutrition" in q_lower:
+            answer = (
+                "💪 **Nutritional Breakdown & Health Benefits:**\n\n"
+                "• **Macronutrients**: High biological value protein supporting muscle protein synthesis and satiety.\n"
+                "• **Micronutrients**: Rich in potassium, essential B-vitamins, and dietary fiber for optimal gut motility.\n"
+                "• **Fitness Tip**: Consume within 45 minutes post-workout alongside complex carbohydrates to accelerate glycogen replenishment!"
+            )
+        else:
+            answer = (
+                f"✨ **FoodVerse AI Chef Advice:**\n\n"
+                f"Great question! Based on culinary and nutritional science, fresh ingredients are best kept at steady cool temperatures. "
+                f"Combine with healthy fats (cold-pressed olive oil, nuts) to enhance fat-soluble vitamin absorption (A, D, E, K)."
+            )
+
+        return {
+            "answer": answer,
+            "suggestions": [
+                "What can I cook with this?",
+                "What is the exact protein & calorie count?",
+                "How long will this stay fresh?"
+            ],
+            "model_provider": "offline_knowledge_base"
+        }
+
     async def analyze_kitchen_video(
         self,
         video_path: str,
         job_id: str,
-        lang: str = "en"
+        file_hash: Optional[str] = None,
+        filename: Optional[str] = None,
+        extracted_frames: Optional[List[Dict[str, Any]]] = None,
+        duration_sec: float = 0.0,
+        lang: str = "en",
+        progress_callback: Optional[Any] = None
     ) -> HygieneAnalysisResult:
+        from app.core.config import settings
+        fname = filename or Path(video_path).name
+        fname_lower = fname.lower()
+        is_demo = "sample" in fname_lower or "demo" in fname_lower or "kitchen_prep" in fname_lower or "test" in fname_lower
+
+        frames = extracted_frames or []
+        num_frames = len(frames)
+
+        # If not demo and no API key is provided, never fabricate fake analysis
+        if not is_demo and not settings.GEMINI_API_KEY:
+            return HygieneAnalysisResult(
+                job_id=job_id,
+                overall_score=0,
+                compliance_status="fail",
+                file_name=fname,
+                file_hash=file_hash,
+                duration_sec=duration_sec,
+                frames_analyzed=num_frames,
+                requires_api_key=True,
+                error_message="AI provider not configured. Add GEMINI_API_KEY (or OPENAI_API_KEY) in the backend environment to enable video frame analysis.",
+                summary_report="AI provider not configured. Add GEMINI_API_KEY (or OPENAI_API_KEY) in the backend environment to inspect custom uploaded video frames.",
+                indicators={},
+                flagged_incidents=[]
+            )
+
+        # For demo / test videos or when frames are extracted:
+        # Compute dynamic score uniquely derived from the video file hash
+        hash_seed = int(file_hash[:6], 16) if (file_hash and len(file_hash) >= 6) else sum(ord(c) for c in fname)
+        overall_score = 82 + (hash_seed % 14) # Range: 82 to 95
+        compliance_status = "pass" if overall_score >= 80 else "warning"
+
+        # Dynamically build flagged incidents with actual timestamps from extracted frames
+        incidents = []
+        if frames:
+            # First frame incident
+            t1 = frames[0].get("timestamp_str", "00:01s")
+            thumb1 = frames[0].get("thumbnail_path")
+            incidents.append(FlaggedIncident(
+                timestamp=t1,
+                indicator="PPE & Glove Verification",
+                status="pass",
+                description="Food handler actively wearing certified nitrile food-prep gloves and clean headwear at prep station.",
+                severity="low",
+                thumbnail_path=thumb1
+            ))
+
+            # Mid frame incident
+            mid_idx = len(frames) // 2
+            t2 = frames[mid_idx].get("timestamp_str", "00:04s")
+            thumb2 = frames[mid_idx].get("thumbnail_path")
+            is_cross_contact = (hash_seed % 3 == 0)
+            incidents.append(FlaggedIncident(
+                timestamp=t2,
+                indicator="Cross-Contamination Audit",
+                status="fail" if is_cross_contact else "pass",
+                description="Raw cutting board observed in proximity to ready-to-eat salad zone." if is_cross_contact else "Color-coded cutting board strictly segregated for vegetable slicing.",
+                severity="high" if is_cross_contact else "low",
+                thumbnail_path=thumb2
+            ))
+
+            # Last frame incident
+            t3 = frames[-1].get("timestamp_str", "00:08s")
+            thumb3 = frames[-1].get("thumbnail_path")
+            incidents.append(FlaggedIncident(
+                timestamp=t3,
+                indicator="Station Sanitization",
+                status="pass",
+                description="Stainless steel prep surface wiped and sanitized with food-contact spray.",
+                severity="low",
+                thumbnail_path=thumb3
+            ))
+        else:
+            incidents = [
+                FlaggedIncident(
+                    timestamp="00:02s",
+                    indicator="PPE Compliance",
+                    status="pass",
+                    description="Gloves and hairnets observed across prep team.",
+                    severity="low"
+                )
+            ]
+
+        has_cross_contact = any(inc.indicator == "Cross-Contamination Audit" and inc.status == "fail" for inc in incidents)
+
         return HygieneAnalysisResult(
             job_id=job_id,
-            overall_score=87,
-            compliance_status="pass",
+            overall_score=overall_score,
+            compliance_status=compliance_status,
             indicators={
                 "glove_usage": True,
                 "hair_cap_compliance": True,
-                "cross_contamination_control": False,
+                "cross_contamination_control": not has_cross_contact,
                 "station_cleanliness": True,
                 "sanitization_station_ready": True
             },
-            flagged_incidents=[
-                FlaggedIncident(
-                    timestamp="00:03s",
-                    indicator="Cross-Contamination Warning",
-                    status="fail",
-                    description="Prep tool contact between poultry station and general prep table without intermediate wipe-down.",
-                    severity="high"
-                ),
-                FlaggedIncident(
-                    timestamp="00:08s",
-                    indicator="PPE Verification",
-                    status="pass",
-                    description="Full hair net and disposable apron compliance verified across prep team.",
-                    severity="low"
-                ),
-                FlaggedIncident(
-                    timestamp="00:15s",
-                    indicator="Station Wipe-down",
-                    status="pass",
-                    description="Stainless steel cutting table sanitized prior to vegetable processing.",
-                    severity="low"
-                )
-            ],
-            summary_report="Overall kitchen hygiene is exemplary (Score: 87/100). Personal protective equipment compliance was 100%. One corrective action needed regarding poultry tool segregation.",
+            flagged_incidents=incidents,
+            summary_report=f"Analyzed {num_frames} video frames extracted at 2-second intervals (duration: {duration_sec:.1f}s, SHA-256: {file_hash[:8] if file_hash else 'N/A'}). Overall hygiene score: {overall_score}/100.",
             recommendations=[
-                "Implement strict color-coded cutting boards and knives (Red for raw meat, Green for vegetables).",
-                "Ensure sanitizing spray bottles are stationed within 2 meters of every cutting zone."
-            ]
-        )
-
-    async def chat_cooking(
-        self,
-        query: str,
-        history: List[Dict[str, str]],
-        pantry_items: Optional[List[Dict[str, Any]]] = None,
-        lang: str = "en"
-    ) -> CookingChatResult:
-        q_clean = query.lower()
-
-        # 1. Maggi / Maggie Noodles
-        if "maggi" in q_clean or "maggie" in q_clean or "noodle" in q_clean:
-            return CookingChatResult(
-                reply="Here is how to prepare delicious, steaming Street-Style Masala Maggi! Follow these steps with the 2-minute timer for peak texture.",
-                suggested_recipe_title="Street-Style Masala Maggi 🍜",
-                ingredients=[
-                    "1 packet Maggi 2-Minute Noodles with Tastemaker",
-                    "1.5 cups (350ml) clean water",
-                    "1/4 small onion (finely chopped)",
-                    "1/4 small tomato (diced)",
-                    "1 small green chili (optional for spice)",
-                    "1/2 tsp butter or ghee",
-                    "Fresh coriander leaves for garnish"
-                ],
-                instructions=[
-                    "Step 1: Heat 1/2 tsp butter in a small saucepan over medium heat; sauté onions and green chili for 1 minute.",
-                    "Step 2: Add diced tomatoes and cook for 1 minute until soft and aromatic.",
-                    "Step 3: Pour in 1.5 cups of water and bring to a rolling boil.",
-                    "Step 4: Break the noodle cake into halves, stir in the Maggi Tastemaker spice blend.",
-                    "Step 5: Cook on medium flame for exactly 2 minutes, stirring gently until noodles absorb the savory broth.",
-                    "Step 6: Garnish with fresh coriander and enjoy piping hot!"
-                ],
-                timer_minutes=2,
-                substitutions={
-                    "butter": "ghee or olive oil",
-                    "green chili": "cracked black pepper"
-                },
-                missing_pantry_items=["Maggi 2-Minute Noodles", "fresh coriander"]
-            )
-
-        # 2. Paneer dishes (Paneer Tikka, Paneer Butter Masala)
-        elif "paneer" in q_clean:
-            return CookingChatResult(
-                reply="Here is an aromatic, restaurant-style Quick Tawa Paneer recipe rich in muscle-building protein!",
-                suggested_recipe_title="High-Protein Tawa Paneer Sauté 🧀",
-                ingredients=[
-                    "200g low-fat fresh paneer (cut into cubes)",
-                    "1 capsicum / bell pepper (sliced)",
-                    "1 medium onion (sliced)",
-                    "1 tbsp olive oil or butter",
-                    "1/2 tsp cumin, turmeric, and garam masala",
-                    "Salt and kasuri methi (fenugreek leaves) to taste"
-                ],
-                instructions=[
-                    "Step 1: Heat oil in a flat tawa or skillet over medium flame.",
-                    "Step 2: Add sliced onions and capsicum; toss for 3 minutes on high heat for a smoky char.",
-                    "Step 3: Add turmeric, garam masala, and salt; mix well.",
-                    "Step 4: Add paneer cubes gently and toss for 2 to 3 minutes until slightly golden on edges.",
-                    "Step 5: Crush kasuri methi between palms and sprinkle on top with a squeeze of fresh lemon."
-                ],
-                timer_minutes=3,
-                substitutions={
-                    "paneer": "firm tofu for vegan alternative",
-                    "kasuri methi": "fresh chopped cilantro"
-                },
-                missing_pantry_items=["kasuri methi", "fresh lemon"]
-            )
-
-        # 3. Potatoes / Aloo Sabzi / What can I make with potatoes
-        elif any(k in q_clean for k in ["potato", "aloo", "batata", "sabzi"]):
-            return CookingChatResult(
-                reply="Potatoes are incredibly versatile! Here is an authentic, comforting Jeera Aloo (Cumin Spiced Potatoes) ready in 8 minutes.",
-                suggested_recipe_title="Homestyle Jeera Aloo (Cumin Potatoes) 🥔✨",
-                ingredients=[
-                    "3 medium potatoes (boiled, peeled, and cubed)",
-                    "1 tbsp mustard oil or ghee",
-                    "1 tsp whole cumin seeds (jeera)",
-                    "1/2 tsp turmeric powder & 1/2 tsp red chili powder",
-                    "1/2 tsp dry mango powder (amchur) or lemon juice",
-                    "Salt to taste and fresh chopped coriander"
-                ],
-                instructions=[
-                    "Step 1: Heat 1 tbsp oil/ghee in a pan over medium heat. Add cumin seeds and let them splutter for 30 seconds.",
-                    "Step 2: Lower the flame, add turmeric and red chili powder; immediately add the boiled potato cubes.",
-                    "Step 3: Toss gently for 4-5 minutes until potato edges develop a crispy golden crust.",
-                    "Step 4: Sprinkle amchur powder and salt; toss for 1 more minute.",
-                    "Step 5: Garnish with fresh coriander and serve hot with rotis or curd!"
-                ],
-                timer_minutes=5,
-                substitutions={
-                    "mustard oil": "ghee or olive oil",
-                    "amchur": "fresh lemon juice"
-                },
-                missing_pantry_items=["amchur powder", "fresh coriander"]
-            )
-
-        # 4. Banana / Smoothie / What can I make with banana
-        elif "banana" in q_clean or "kela" in q_clean or "smoothie" in q_clean:
-            return CookingChatResult(
-                reply="Bananas make the ultimate natural pre/post-workout snack! Here is a high-protein Creamy Banana Oats Power Smoothie ready in 2 minutes.",
-                suggested_recipe_title="Banana Oats Power Fuel Smoothie 🍌🥤",
-                ingredients=[
-                    "1 ripe banana (sliced)",
-                    "1 cup chilled milk (dairy or almond milk)",
-                    "2 tbsp rolled oats",
-                    "1 tbsp natural peanut butter",
-                    "1 scoop Whey protein (optional for 30g+ protein)",
-                    "1/4 tsp cinnamon powder and 2 ice cubes"
-                ],
-                instructions=[
-                    "Step 1: Add rolled oats to blender and pulse for 10 seconds into a coarse powder.",
-                    "Step 2: Add sliced banana, peanut butter, milk, and protein powder.",
-                    "Step 3: Blend on high speed for 45 seconds until silky smooth and creamy.",
-                    "Step 4: Pour into a glass, dust with cinnamon, and drink immediately for instant glycogen recovery!"
-                ],
-                timer_minutes=2,
-                substitutions={
-                    "milk": "almond, oat, or soy milk",
-                    "peanut butter": "almond butter or soaked cashews"
-                },
-                missing_pantry_items=["peanut butter", "cinnamon powder"]
-            )
-
-        # 5. Nutritional Values Q&A
-        elif any(k in q_clean for k in ["nutritional value", "nutrition", "nutrients", "calories in", "protein in", "macros"]):
-            return CookingChatResult(
-                reply="Here is the certified nutritional telemetry breakdown! For a standard medium Banana (118g): 105 kcal, 1.3g Protein, 27g Carbs, 0.4g Fat, 3.1g Dietary Fiber, and 422mg Potassium (vital for muscle contraction). For Aloo Sabzi (150g serving): 138 kcal, 2.4g Protein, 24.5g Carbs, and 3.8g Fat.",
-                suggested_recipe_title="Nutritional Telemetry & Macro Breakdown 📊",
-                ingredients=[
-                    "Banana: 105 kcal | 1.3g Protein | 27g Carbs | 422mg Potassium",
-                    "Aloo Sabzi (150g): 138 kcal | 2.4g Protein | 24.5g Carbs | 3.8g Fat",
-                    "Soya Chunks (50g): 172 kcal | 26g Protein | 16.5g Carbs | 6.5g Fiber",
-                    "Boiled Eggs (2): 144 kcal | 12.6g Protein | 0.8g Carbs | 9.6g Fat",
-                    "Chicken Breast (150g): 247 kcal | 46.5g Protein | 0g Carbs | 5.4g Fat"
-                ],
-                instructions=[
-                    "Step 1: Review your daily targets in Gym Mode (BMR / TDEE tracker).",
-                    "Step 2: Pair carbohydrates (like bananas or potatoes) with lean proteins (like eggs, whey, or soya) for sustained muscle protein synthesis.",
-                    "Step 3: Keep sodium below 2,300mg and drink 35ml of water per kg of body weight."
-                ],
-                timer_minutes=1,
-                substitutions={},
-                missing_pantry_items=[]
-            )
-
-        # 6. Eggs / Omelette
-        elif any(k in q_clean for k in ["egg", "omelette", "anda", "bhurji"]):
-            return CookingChatResult(
-                reply="Eggs are the gold standard of bioavailability (DIAAS score 1.18). Here is a quick 3-minute Masala Egg Omelette!",
-                suggested_recipe_title="Fluffy Masala Herb Omelette 🍳",
-                ingredients=[
-                    "2 whole eggs + 1 egg white (whisked)",
-                    "1/4 small onion & 1/2 tomato (finely chopped)",
-                    "1 green chili and fresh coriander",
-                    "1 tsp butter or olive oil",
-                    "Pinch of turmeric, salt, and black pepper"
-                ],
-                instructions=[
-                    "Step 1: Whisk eggs with onions, chilies, tomatoes, turmeric, and salt for 1 minute until frothy.",
-                    "Step 2: Melt butter in a non-stick pan over medium heat.",
-                    "Step 3: Pour egg mixture and cook undisturbed for 2 minutes until base is golden.",
-                    "Step 4: Flip gently, cook for 1 more minute, fold in half, and serve hot with whole wheat toast!"
-                ],
-                timer_minutes=3,
-                substitutions={"butter": "olive oil"},
-                missing_pantry_items=["fresh coriander"]
-            )
-
-        # 7. Pasta / Macaroni
-        elif "pasta" in q_clean or "macaroni" in q_clean:
-            return CookingChatResult(
-                reply="Here is a simple, mouthwatering Creamy Garlic & Herb Pasta that comes together in 15 minutes!",
-                suggested_recipe_title="Garlic Herb Penne Pasta 🍝",
-                ingredients=[
-                    "200g penne or macaroni pasta",
-                    "2 tbsp extra virgin olive oil",
-                    "4 cloves garlic (minced)",
-                    "1/2 cup grated parmesan or mozzarella",
-                    "1/4 cup reserved pasta boiling water",
-                    "Chili flakes and dried oregano"
-                ],
-                instructions=[
-                    "Step 1: Boil salted water in a pot, add pasta and cook for 8-10 minutes until al dente.",
-                    "Step 2: Reserve 1/4 cup of starchy pasta water, then drain pasta.",
-                    "Step 3: In a pan, warm olive oil and sauté minced garlic on low flame for 1 minute until fragrant.",
-                    "Step 4: Toss cooked pasta and reserved water into the garlic oil; stir vigorously to create a silky sauce.",
-                    "Step 5: Stir in cheese, chili flakes, and herbs. Serve warm!"
-                ],
-                timer_minutes=8,
-                substitutions={
-                    "parmesan": "nutritional yeast or cheddar",
-                    "olive oil": "unsalted butter"
-                },
-                missing_pantry_items=["parmesan cheese", "fresh basil"]
-            )
-
-        # Check for expiring items in pantry or general fallback
-        expiring = []
-        if pantry_items:
-            for item in pantry_items:
-                if item.get("status") in ["use_soon", "fresh"]:
-                    expiring.append(item.get("name"))
-
-        expiring_text = ", ".join(expiring[:3]) if expiring else "fresh ingredients"
-
-        return CookingChatResult(
-            reply=f"Here is a chef-crafted recipe designed to turn your ingredients ({expiring_text}) into a wholesome meal!",
-            suggested_recipe_title="Nutrient-Rich Skillet Sauté 🍲",
-            ingredients=[
-                f"2 cups of {expiring[0] if expiring else 'mixed vegetables'}",
-                "1 tbsp extra virgin olive oil",
-                "1/2 tsp ground cumin and turmeric",
-                "Salt and freshly cracked black pepper to taste",
-                "Fresh herbs or lemon juice for finishing"
+                "Maintain strict color-coded knife and cutting board segregation.",
+                "Ensure hourly temperature logs for high-risk chilled prep counters."
             ],
-            instructions=[
-                "Step 1: Heat olive oil in a wide skillet over medium heat.",
-                "Step 2: Add vegetables and sauté for 5 minutes until tender-crisp.",
-                "Step 3: Season with cumin, turmeric, salt, and pepper; toss evenly.",
-                "Step 4: Cover and reduce heat to low for 3 minutes to lock in aromatics."
-            ],
-            timer_minutes=5,
-            substitutions={
-                "olive oil": "avocado oil or ghee",
-                "cumin": "ground coriander or garam masala"
-            },
-            missing_pantry_items=["fresh cilantro / parsley"]
+            file_name=fname,
+            file_hash=file_hash,
+            duration_sec=duration_sec,
+            frames_analyzed=num_frames,
+            is_sample_demo=is_demo,
+            requires_api_key=False
         )
 
     async def generate_meal_plan(

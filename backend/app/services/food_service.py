@@ -70,7 +70,10 @@ class FoodService:
                 cur.execute(sql, params)
                 rows = cur.fetchall()
             except sqlite3.OperationalError:
-                # Fallback to standard LIKE if FTS fails on unusual syntax
+                rows = []
+
+            if not rows:
+                # Fallback to standard LIKE if FTS produced 0 results (e.g. compound words like 'burger' in 'Cheeseburger')
                 sql_like = "SELECT * FROM foods WHERE (name LIKE ? OR aliases LIKE ? OR name_hi LIKE ?)"
                 params_like = [f"%{clean_q}%", f"%{clean_q}%", f"%{clean_q}%"]
                 if category and category != "All":

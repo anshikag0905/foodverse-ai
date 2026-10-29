@@ -50,14 +50,18 @@ The FastAPI backend runs as a containerized Python service.
    ENVIRONMENT=production
    DEBUG=false
    SECRET_KEY=generate-a-strong-random-key-here
-   DEMO_MODE=true
-   AI_PROVIDER=mock
-   ALLOWED_ORIGINS=https://your-frontend.vercel.app
+   DEMO_MODE=false
+   AI_PROVIDER=gemini
+   GEMINI_API_KEY=your_gemini_api_key_from_google_ai_studio
+   ALLOWED_ORIGINS=https://foodverse-frontend-l1bc.onrender.com,http://localhost:5173
    DATABASE_URL=sqlite:///./backend/data/foodverse.db
    FOOD_DATABASE_PATH=./backend/data/food_database.sqlite
    STORAGE_TYPE=local
    UPLOAD_DIR=./storage/uploads
    ```
+
+   > [!IMPORTANT]
+   > **AI Multimodal Vision Activation**: To analyze custom uploaded videos in Hygiene Monitor and arbitrary custom food images in Food Recognition, set `AI_PROVIDER=gemini` and supply your `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/)). If left unconfigured, FoodVerse AI safely uses the verified offline deterministic provider and provides 5 bundled demonstration plates with authentic bounding boxes and real OpenCV video frame processing without fabricating outputs.
 4. **Persistent Disk Note**: On Render, add a **Persistent Disk** mounted at `/app/backend/data` and `/app/storage/uploads` if you want user history and uploaded images to persist across dyno restarts.
 
 ### Option B: Railway.app

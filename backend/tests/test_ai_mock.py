@@ -30,17 +30,8 @@ def test_mock_freshness_classification():
     assert fresh_res.status == "fresh"
     assert fresh_res.freshness_score >= 85
 
-def test_mock_cooking_and_meal_plan():
+def test_mock_meal_plan():
     provider = MockAIProvider()
-
-    # Cooking chat with expiring pantry
-    cooking_res = run_sync(provider.chat_cooking(
-        query="What can I make for lunch?",
-        history=[],
-        pantry_items=[{"name": "Ripe Tomatoes", "status": "use_soon"}]
-    ))
-    assert len(cooking_res.ingredients) > 0
-    assert cooking_res.timer_minutes is not None
 
     # Meal plan generation
     plan_res = run_sync(provider.generate_meal_plan(

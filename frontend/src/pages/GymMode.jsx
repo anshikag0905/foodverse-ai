@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
   Dumbbell,
@@ -24,7 +24,6 @@ import {
 import ProgressRing from '../components/common/ProgressRing';
 import Loader from '../components/common/Loader';
 import { PREDEFINED_FOODS, searchPredefinedFoods } from '../data/predefinedFoods';
-import { DoodleBanana, DoodleDrumstick } from '../assets/doodles';
 
 // Local storage helpers for guaranteed offline persistence
 const getLocalLogs = (date) => {
@@ -101,6 +100,63 @@ export default function GymMode() {
   const [dietFilter, setDietFilter] = useState('all');
   const [sortBy, setSortBy] = useState('protein_per_100g');
   const [loadingFoods, setLoadingFoods] = useState(false);
+  const [leaderboardSearch, setLeaderboardSearch] = useState('');
+
+  // Strictly sorted High-Protein Leaderboard with fallback & filtering
+  const displayedFoods = useMemo(() => {
+    let list = [];
+    if (proteinFoods && proteinFoods.length > 0) {
+      list = proteinFoods.map(f => ({
+        id: String(f.id),
+        name: f.name,
+        category: f.category,
+        protein_g: f.protein_per_100g,
+        calories: f.calories_per_100g,
+        diet_tags: f.diet_tags || [],
+        efficiency: f.protein_per_calorie || (f.protein_per_100g / (f.calories_per_100g || 1)) * 100,
+      }));
+    } else {
+      list = PREDEFINED_FOODS.map(f => ({
+        id: f.id,
+        name: f.name,
+        category: f.category,
+        protein_g: f.protein_g,
+        calories: f.calories,
+        diet_tags: f.gym_tags || [],
+        efficiency: (f.protein_g / (f.calories || 1)) * 100,
+      }));
+    }
+
+    // Filter by diet
+    if (dietFilter === 'veg') {
+      list = list.filter(f => {
+        const cat = (f.category || '').toLowerCase();
+        const tags = (f.diet_tags || []).map(t => String(t).toLowerCase());
+        const nm = f.name.toLowerCase();
+        return !nm.includes('chicken') && !nm.includes('fish') && !nm.includes('salmon') && !nm.includes('meat') && !nm.includes('beef');
+      });
+    } else if (dietFilter === 'vegan') {
+      list = list.filter(f => {
+        const nm = f.name.toLowerCase();
+        return !nm.includes('chicken') && !nm.includes('fish') && !nm.includes('egg') && !nm.includes('paneer') && !nm.includes('whey') && !nm.includes('yogurt') && !nm.includes('milk');
+      });
+    }
+
+    // Filter by user search query
+    if (leaderboardSearch.trim()) {
+      const q = leaderboardSearch.toLowerCase();
+      list = list.filter(f => f.name.toLowerCase().includes(q) || (f.category && f.category.toLowerCase().includes(q)));
+    }
+
+    // Sort strictly descending by protein per 100g or efficiency
+    if (sortBy === 'efficiency') {
+      list.sort((a, b) => (b.efficiency || 0) - (a.efficiency || 0));
+    } else {
+      list.sort((a, b) => (b.protein_g || 0) - (a.protein_g || 0));
+    }
+
+    return list;
+  }, [proteinFoods, dietFilter, sortBy, leaderboardSearch]);
 
   useEffect(() => {
     fetchProfile();
@@ -252,7 +308,7 @@ export default function GymMode() {
 
     setNewLog({
       meal_type: item.gym_tags?.includes('pre-workout') ? 'snack' : 'lunch',
-      meal_name: `${item.emoji || '🥑'} ${item.name} (${multiplier}x)`,
+      meal_name: `${item.name} (${multiplier}x)`,
       calories: cal.toString(),
       protein_g: prot.toString(),
       carbs_g: carb.toString(),
@@ -397,7 +453,7 @@ export default function GymMode() {
         id: Date.now() + 1,
         log_date: selectedDate,
         meal_type: 'breakfast',
-        meal_name: '🥣 Rolled Oats Bowl with Whey',
+        meal_name: 'Rolled Oats Bowl with Whey',
         calories: 310,
         protein_g: 30.5,
         carbs_g: 37,
@@ -409,7 +465,7 @@ export default function GymMode() {
         id: Date.now() + 2,
         log_date: selectedDate,
         meal_type: 'snack',
-        meal_name: '🍌 Banana (1 medium)',
+        meal_name: 'Banana (1 medium)',
         calories: 105,
         protein_g: 1.3,
         carbs_g: 27,
@@ -422,48 +478,44 @@ export default function GymMode() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* =========================================================================
-          MODULE HEADER BAND (GRAPE ACCENT + DOODLE DRUMSTICK)
-          ========================================================================= */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-grape/20 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
-            <DoodleDrumstick size={46} className="animate-float" />
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Module Header */}
+      <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-900">
+            <Dumbbell className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-grape/25 border border-ink text-[11px] font-black uppercase text-grape">
-              <span>Fitness & Bodybuilding</span>
-            </div>
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+            <h1 className="font-display font-bold text-xl sm:text-2xl text-[var(--text-primary)]">
               Gym Mode & Macro Fuel
             </h1>
-            <p className="text-xs font-semibold text-ink-muted mt-0.5">
-              Instant food auto-fill, portion multipliers, daily target rings, and high-protein rankings.
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Personalized macro targets, BMR/TDEE calculation, and verified high-protein food rankings.
             </p>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={handleSeedDemo}
-          className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-dusk-surface border-2 border-ink text-xs font-display font-black text-ink dark:text-dusk-text shadow-sticker-xs cursor-pointer hover:shadow-sticker"
+          className="pill-btn-secondary text-xs py-1.5 px-3.5 cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-grape" />
+          <RefreshCw className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
           <span>Quick Sample Logs</span>
         </button>
       </div>
 
       {/* Celebratory Alert Banner */}
       {showCelebration && (
-        <div className="p-4 rounded-3xl bg-grape/20 border-2.5 border-ink text-ink shadow-sticker-sm flex items-center justify-between gap-3 animate-bounce">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-grape flex-shrink-0" />
+        <div className="card-base p-4 border-l-4 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-xs text-emerald-800 dark:text-emerald-200 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" strokeWidth={1.5} />
             <div>
-              <h4 className="font-display font-black text-sm">Meal Saved & Macros Updated! 💪</h4>
-              <p className="text-xs font-semibold text-ink/80">Your calories and protein targets are recorded and saved offline.</p>
+              <p className="font-semibold">Meal Saved & Macros Updated</p>
+              <p className="text-[11px] text-[var(--text-muted)]">Your daily calorie and protein totals are persistently recorded.</p>
             </div>
           </div>
-          <span className="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-white border border-ink">Saved</span>
+          <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-white dark:bg-neutral-800 border border-[var(--border-color)]">Logged</span>
         </div>
       )}
 
@@ -589,55 +641,62 @@ export default function GymMode() {
               <Sparkles className="w-3.5 h-3.5 text-sunny" />
               <span>Quick-Tap Gym Presets:</span>
             </span>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
               <button
                 type="button"
                 onClick={() => handleSelectPresetFood(PREDEFINED_FOODS[0])}
-                className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs whitespace-nowrap cursor-pointer hover:border-grape"
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer hover:border-blue-500"
               >
-                <span>🍌</span> Banana (105 kcal)
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span>Banana (105 kcal)</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSelectPresetFood(PREDEFINED_FOODS[5])}
-                className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs whitespace-nowrap cursor-pointer hover:border-grape"
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer hover:border-blue-500"
               >
-                <span>🥚🥚</span> 2 Boiled Eggs (148 kcal)
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                <span>2 Boiled Eggs (148 kcal)</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSelectPresetFood(PREDEFINED_FOODS[8])}
-                className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs whitespace-nowrap cursor-pointer hover:border-grape"
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer hover:border-blue-500"
               >
-                <span>🥛</span> 1 Scoop Whey (120 kcal)
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span>1 Scoop Whey (120 kcal)</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSelectPresetFood(PREDEFINED_FOODS[6])}
-                className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs whitespace-nowrap cursor-pointer hover:border-grape"
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer hover:border-blue-500"
               >
-                <span>🍗</span> Chicken 100g (165 kcal)
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                <span>Chicken 100g (165 kcal)</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSelectPresetFood(PREDEFINED_FOODS[10])}
-                className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs whitespace-nowrap cursor-pointer hover:border-grape"
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer hover:border-blue-500"
               >
-                <span>🧀</span> Paneer 100g (265 kcal)
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                <span>Paneer 100g (265 kcal)</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSelectPresetFood(PREDEFINED_FOODS[12])}
-                className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-xs font-bold text-ink dark:text-dusk-text shadow-sticker-xs whitespace-nowrap cursor-pointer hover:border-grape"
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer hover:border-blue-500"
               >
-                <span>🥣</span> Oats Bowl (190 kcal)
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>Oats Bowl (190 kcal)</span>
               </button>
               <button
                 type="button"
-                onClick={() => setNewLog(prev => ({ ...prev, meal_type: 'water', meal_name: '💧 500ml Water Bottle', water_ml: '500', calories: '0', protein_g: '0', carbs_g: '0', fat_g: '0' }))}
-                className="btn-squish inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-mint/20 border-2 border-ink text-emerald-800 dark:text-mint text-xs font-black shadow-sticker-xs whitespace-nowrap cursor-pointer"
+                onClick={() => setNewLog(prev => ({ ...prev, meal_type: 'water', meal_name: '500ml Water Bottle', water_ml: '500', calories: '0', protein_g: '0', carbs_g: '0', fat_g: '0' }))}
+                className="pill-btn-secondary text-xs py-1 px-3 whitespace-nowrap cursor-pointer text-blue-600 dark:text-blue-400 hover:border-blue-500"
               >
-                <span>💧</span> +500ml Water
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                <span>+500ml Water</span>
               </button>
             </div>
           </div>
@@ -773,27 +832,27 @@ export default function GymMode() {
                     <select
                       value={newLog.meal_type}
                       onChange={(e) => setNewLog({ ...newLog, meal_type: e.target.value })}
-                      className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                      className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)]"
                     >
-                      <option value="breakfast">Breakfast 🍳</option>
-                      <option value="lunch">Lunch 🥗</option>
-                      <option value="dinner">Dinner 🍲</option>
-                      <option value="snack">Snack 🍌</option>
-                      <option value="pre_workout">Pre-Workout ⚡</option>
-                      <option value="post_workout">Post-Workout 💪</option>
-                      <option value="water">Water 💧</option>
+                      <option value="breakfast">Breakfast</option>
+                      <option value="lunch">Lunch</option>
+                      <option value="dinner">Dinner</option>
+                      <option value="snack">Snack</option>
+                      <option value="pre_workout">Pre-Workout</option>
+                      <option value="post_workout">Post-Workout</option>
+                      <option value="water">Water</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-ink dark:text-dusk-text mb-1">
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">
                       Item Name
                     </label>
                     <input
                       type="text"
                       value={newLog.meal_name}
                       onChange={(e) => setNewLog({ ...newLog, meal_name: e.target.value })}
-                      placeholder="e.g. 🍌 Banana"
-                      className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text"
+                      placeholder="e.g. Banana"
+                      className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)]"
                     />
                   </div>
                 </div>
@@ -899,12 +958,12 @@ export default function GymMode() {
               </div>
 
               {!adherence?.logs || adherence.logs.length === 0 ? (
-                <div className="py-16 text-center text-xs text-ink-muted space-y-3">
-                  <div className="w-16 h-16 rounded-3xl bg-grape/15 border-2 border-ink flex items-center justify-center mx-auto shadow-sticker-sm animate-float">
-                    <DoodleBanana size={44} />
+                <div className="py-12 text-center text-xs text-[var(--text-muted)] space-y-2">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center mx-auto text-blue-600 dark:text-blue-400 border border-[var(--border-color)]">
+                    <Flame className="w-6 h-6" strokeWidth={1.5} />
                   </div>
-                  <p className="font-display font-black text-sm text-ink dark:text-dusk-text">No meals or water logged for this date yet!</p>
-                  <p>Tap any quick-add preset above or search for "banana" to log your first item.</p>
+                  <p className="font-semibold text-sm text-[var(--text-primary)]">No meals or water logged for this date yet</p>
+                  <p>Select a quick preset above or search foods to record your first meal.</p>
                 </div>
               ) : (
                 <div className="divide-y-2 divide-ink/10">
@@ -921,8 +980,8 @@ export default function GymMode() {
                         </div>
                         <div className="text-xs text-ink-muted mt-1 space-x-3">
                           {log.water_ml > 0 ? (
-                            <span className="text-emerald-700 dark:text-mint font-black">
-                              💧 {log.water_ml} ml water
+                            <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                              {log.water_ml} ml water
                             </span>
                           ) : (
                             <>
@@ -1131,7 +1190,7 @@ export default function GymMode() {
               <div className="p-5 rounded-2xl bg-white dark:bg-dusk-surface border-2 border-ink space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-display font-black text-sm text-ink dark:text-dusk-text flex items-center gap-1.5">
-                    <span>🇮🇳 Tailored Indian Gym Meal Timing Plan</span>
+                    <span>Tailored Indian Gym Meal Timing Plan</span>
                   </h4>
                   <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-grape text-white">
                     {profile?.goal || 'Maintain'}
@@ -1139,44 +1198,44 @@ export default function GymMode() {
                 </div>
 
                 <div className="space-y-2 text-xs font-bold text-ink dark:text-dusk-text">
-                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-tomato block">Meal 1: Pre-Workout (45m before)</span>
-                      <span>🍌 1 Medium Banana + 1 tbsp Peanut Butter</span>
+                      <span className="text-[10px] font-semibold uppercase text-blue-600 dark:text-blue-400 block">Meal 1: Pre-Workout (45m before)</span>
+                      <span>1 Medium Banana + 1 tbsp Peanut Butter</span>
                     </div>
-                    <span className="text-[11px] font-black text-tomato">190 kcal • 7g P</span>
+                    <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">190 kcal • 7g P</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-grape block">Meal 2: Post-Workout Window (30m)</span>
-                      <span>🥤 1 Scoop Whey Isolate or 4 Boiled Egg Whites</span>
+                      <span className="text-[10px] font-semibold uppercase text-blue-600 dark:text-blue-400 block">Meal 2: Post-Workout Window (30m)</span>
+                      <span>1 Scoop Whey Isolate or 4 Boiled Egg Whites</span>
                     </div>
-                    <span className="text-[11px] font-black text-grape">115 kcal • 27g P</span>
+                    <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">115 kcal • 27g P</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-emerald-700 dark:text-mint block">Meal 3: Power Lunch</span>
-                      <span>🧆 Soya Chunks Curry (50g raw) or Chicken Breast + 2 Rotis + Dal</span>
+                      <span className="text-[10px] font-semibold uppercase text-emerald-600 block">Meal 3: Power Lunch</span>
+                      <span>Soya Chunks Curry (50g raw) or Chicken Breast + 2 Rotis + Dal</span>
                     </div>
-                    <span className="text-[11px] font-black text-emerald-700 dark:text-mint">480 kcal • 42g P</span>
+                    <span className="text-[11px] font-semibold text-emerald-600">480 kcal • 42g P</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-amber-600 block">Meal 4: Evening Recovery Snack</span>
-                      <span>🥜 1 Cup Roasted Chana or Moong Sprouts Chaat</span>
+                      <span className="text-[10px] font-semibold uppercase text-amber-600 block">Meal 4: Evening Recovery Snack</span>
+                      <span>1 Cup Roasted Chana or Moong Sprouts Chaat</span>
                     </div>
-                    <span className="text-[11px] font-black text-amber-600">185 kcal • 11g P</span>
+                    <span className="text-[11px] font-semibold text-amber-600">185 kcal • 11g P</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-purple-700 block">Meal 5: Anabolic Dinner</span>
-                      <span>🧀 Low-Fat Paneer Bhurji (150g) or Grilled Fish + 1 Cup Brown Rice</span>
+                      <span className="text-[10px] font-semibold uppercase text-purple-600 block">Meal 5: Balanced Dinner</span>
+                      <span>Low-Fat Paneer Bhurji (150g) or Grilled Fish + 1 Cup Brown Rice</span>
                     </div>
-                    <span className="text-[11px] font-black text-purple-700">420 kcal • 32g P</span>
+                    <span className="text-[11px] font-semibold text-purple-600">420 kcal • 32g P</span>
                   </div>
                 </div>
               </div>
@@ -1199,10 +1258,21 @@ export default function GymMode() {
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+                <input
+                  type="text"
+                  value={leaderboardSearch}
+                  onChange={(e) => setLeaderboardSearch(e.target.value)}
+                  placeholder="Filter foods (e.g. Soya, Whey, Paneer, Chicken)..."
+                  className="pl-8 pr-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card w-48 sm:w-64"
+                />
+              </div>
+
               <select
                 value={dietFilter}
                 onChange={(e) => setDietFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card"
+                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card cursor-pointer"
               >
                 <option value="all">All Diets</option>
                 <option value="veg">Vegetarian</option>
@@ -1212,10 +1282,10 @@ export default function GymMode() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card"
+                className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-card cursor-pointer"
               >
-                <option value="protein_per_100g">Sort by Protein / 100g</option>
-                <option value="efficiency">Sort by Protein Ratio</option>
+                <option value="protein_per_100g">Sort by Protein / 100g (Highest First)</option>
+                <option value="efficiency">Sort by Protein Ratio / 100 kcal</option>
               </select>
             </div>
           </div>
@@ -1225,6 +1295,7 @@ export default function GymMode() {
               <table className="w-full text-left text-xs">
                 <thead className="bg-sky-100 dark:bg-dusk-surface text-ink dark:text-dusk-text uppercase tracking-wider font-display font-black border-b-2 border-ink">
                   <tr>
+                    <th className="px-5 py-3.5 w-16 text-center">Rank</th>
                     <th className="px-6 py-3.5">Food Item</th>
                     <th className="px-6 py-3.5">Category</th>
                     <th className="px-6 py-3.5 text-right">Protein / 100g</th>
@@ -1233,34 +1304,60 @@ export default function GymMode() {
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-ink/10">
-                  {PREDEFINED_FOODS.map((f) => (
-                    <tr key={f.id} className="hover:bg-grape/10 transition">
-                      <td className="px-6 py-3.5 font-bold text-ink dark:text-dusk-text flex items-center gap-2">
-                        <span>{f.emoji}</span>
-                        <span>{f.name}</span>
-                      </td>
-                      <td className="px-6 py-3.5 font-semibold text-ink-muted">
-                        {f.category}
-                      </td>
-                      <td className="px-6 py-3.5 text-right font-black text-grape text-sm">
-                        {f.protein_g}g
-                      </td>
-                      <td className="px-6 py-3.5 text-right text-ink font-bold">
-                        {f.calories} kcal
-                      </td>
-                      <td className="px-6 py-3.5 text-right">
-                        <button
-                          onClick={() => {
-                            handleSelectPresetFood(f);
-                            setActiveTab('tracker');
-                          }}
-                          className="btn-squish px-3 py-1 rounded-full bg-grape text-white border-1.5 border-ink font-black text-[11px] shadow-sticker-xs cursor-pointer"
-                        >
-                          + Quick Log
-                        </button>
+                  {displayedFoods.map((f, idx) => {
+                    const isTop1 = idx === 0;
+                    return (
+                      <tr key={f.id} className="hover:bg-[var(--bg-card-subtle)] transition">
+                        <td className="px-5 py-3 text-center font-mono font-semibold text-xs text-[var(--text-muted)]">
+                          #{idx + 1}
+                        </td>
+                        <td className="px-6 py-3 font-medium text-[var(--text-primary)]">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                            <div>
+                              <span className="block font-semibold text-xs sm:text-sm">{f.name}</span>
+                              {f.protein_g >= 20 && (
+                                <span className="inline-block mt-0.5 px-1.5 py-0.2 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 text-[10px] font-medium border border-blue-200 dark:border-blue-800">
+                                  High Protein Density
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 text-[var(--text-muted)]">
+                          {f.category}
+                        </td>
+                        <td className="px-6 py-3 text-right">
+                          <span className="font-semibold text-blue-600 dark:text-blue-400 text-sm">
+                            {f.protein_g}g
+                          </span>
+                          <span className="block text-[10px] text-[var(--text-muted)]">protein</span>
+                        </td>
+                        <td className="px-6 py-3 text-right text-[var(--text-primary)] font-medium">
+                          {Math.round(f.calories)} kcal
+                        </td>
+                        <td className="px-6 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleSelectPresetFood(f);
+                              setActiveTab('tracker');
+                            }}
+                            className="pill-btn-secondary text-[11px] py-1 px-3 cursor-pointer hover:border-blue-500"
+                          >
+                            + Log
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {displayedFoods.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-8 text-center text-ink-muted font-bold">
+                        No foods found matching "{leaderboardSearch}". Try another search term or reset filter.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

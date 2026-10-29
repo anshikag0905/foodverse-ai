@@ -6,12 +6,15 @@ export default function UploadDropzone({
   accept = "image/*",
   mediaType = "image", // "image", "video", "audio", "all"
   onFileSelect,
+  onFileAccepted,
   onTextQuery,
   onSampleSelect,
   sampleOptions = [],
   isUploading = false,
   uploadProgress = 0,
   maxSizeMB = 50,
+  title,
+  subtitle,
   className = ""
 }) {
   const { t } = useTranslation();
@@ -23,6 +26,23 @@ export default function UploadDropzone({
   const [isRecording, setIsRecording] = useState(false);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // Normalize accept attribute if passed as an object (e.g. { 'image/*': ['.jpg', ...] })
+  const normalizedAccept = React.useMemo(() => {
+    if (!accept) return "image/*";
+    if (typeof accept === 'string') return accept;
+    if (typeof accept === 'object') {
+      const parts = [];
+      Object.entries(accept).forEach(([key, exts]) => {
+        parts.push(key);
+        if (Array.isArray(exts)) {
+          parts.push(...exts);
+        }
+      });
+      return parts.join(',');
+    }
+    return "image/*";
+  }, [accept]);
 
   const compressImageIfNeeded = async (file) => {
     if (!file.type.startsWith("image/") || file.type.includes("svg") || file.size < 1024 * 1024) {
@@ -82,8 +102,15 @@ export default function UploadDropzone({
       setSelectedFile(processed);
       const url = URL.createObjectURL(processed);
       setPreviewUrl(url);
-      if (onFileSelect) onFileSelect(processed);
+
+      if (onFileAccepted) {
+        onFileAccepted(processed);
+      }
+      if (onFileSelect) {
+        onFileSelect(processed);
+      }
     } catch (e) {
+      console.error("Error processing file in dropzone:", e);
       setErrorMessage("Error processing media file.");
     }
   };
@@ -111,6 +138,7 @@ export default function UploadDropzone({
     setPreviewUrl(null);
     setErrorMessage("");
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (onFileAccepted) onFileAccepted(null);
     if (onFileSelect) onFileSelect(null);
   };
 
@@ -159,6 +187,9 @@ export default function UploadDropzone({
     }
   };
 
+  const displayTitle = title || (mediaType === "video" ? "Upload Kitchen Video" : "Upload Food or Plate Photo");
+  const displaySubtitle = subtitle || `Drag & drop your ${mediaType} or click to browse (Max ${maxSizeMB}MB)`;
+
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Dropzone container */}
@@ -167,39 +198,39 @@ export default function UploadDropzone({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => !selectedFile && fileInputRef.current?.click()}
-        className={`relative border-3 border-dashed rounded-3xl p-6 md:p-8 text-center transition-all cursor-pointer shadow-sticker ${
+        className={`relative border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all cursor-pointer ${
           isDragging
-            ? 'border-tomato bg-tomato/10 scale-[1.01]'
-            : 'border-ink bg-white dark:bg-dusk-card hover:border-tomato hover:shadow-sticker-lg'
+            ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 scale-[1.005]'
+            : 'border-[var(--border-color)] bg-[var(--bg-card)] hover:border-blue-500/60 hover:bg-[var(--bg-card-subtle)]'
         } ${selectedFile ? 'cursor-default' : ''}`}
       >
         <input
           ref={fileInputRef}
           type="file"
-          accept={accept}
+          accept={normalizedAccept}
           className="hidden"
           onChange={(e) => e.target.files?.[0] && validateAndProcessFile(e.target.files[0])}
         />
 
         {selectedFile ? (
           <div className="space-y-4">
-            <div className="relative inline-block max-w-sm mx-auto overflow-hidden rounded-2xl border-2.5 border-ink shadow-sticker-sm">
+            <div className="relative inline-block max-w-sm mx-auto overflow-hidden rounded-xl border border-[var(--border-color)] bg-black/5">
               {selectedFile.type.startsWith("image/") ? (
                 <img
                   src={previewUrl}
                   alt="Selected upload preview"
-                  className="w-full max-h-64 object-cover"
+                  className="w-full max-h-64 object-contain"
                 />
               ) : selectedFile.type.startsWith("video/") ? (
                 <video
                   src={previewUrl}
                   controls
-                  className="w-full max-h-64 object-cover"
+                  className="w-full max-h-64 object-contain"
                 />
               ) : (
-                <div className="p-8 flex items-center justify-center gap-3 bg-sky-100 dark:bg-dusk-surface">
-                  <FileText className="w-8 h-8 text-tomato" />
-                  <span className="font-bold text-sm text-ink">{selectedFile.name}</span>
+                <div className="p-8 flex items-center justify-center gap-3 bg-[var(--bg-card-subtle)]">
+                  <FileText className="w-8 h-8 text-blue-600" />
+                  <span className="font-medium text-sm text-[var(--text-primary)]">{selectedFile.name}</span>
                 </div>
               )}
               <button
@@ -208,55 +239,55 @@ export default function UploadDropzone({
                   e.stopPropagation();
                   clearSelection();
                 }}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-ink hover:bg-tomato hover:text-white transition-colors shadow-sticker-xs cursor-pointer"
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-black text-white transition-colors cursor-pointer"
                 title="Remove selection"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-xs font-bold text-ink dark:text-dusk-text">
-              <CheckCircle2 className="w-4 h-4 text-mint" />
+            <div className="flex items-center justify-center gap-2 text-xs font-medium text-[var(--text-secondary)]">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               <span>{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
             </div>
 
             {isUploading && (
               <div className="w-full max-w-xs mx-auto space-y-1.5">
-                <div className="w-full bg-sky-100 dark:bg-dusk-surface rounded-full h-2.5 border border-ink overflow-hidden">
+                <div className="w-full bg-[var(--bg-card-subtle)] rounded-full h-2 border border-[var(--border-color)] overflow-hidden">
                   <div
-                    className="bg-tomato h-full transition-all duration-300"
+                    className="bg-blue-600 h-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
-                <p className="text-xs font-black text-ink dark:text-dusk-text">
-                  {t('common.analyzing')} {uploadProgress > 0 ? `${uploadProgress}%` : ''}
+                <p className="text-xs font-medium text-[var(--text-muted)]">
+                  Analyzing {uploadProgress > 0 ? `${uploadProgress}%` : ''}
                 </p>
               </div>
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-sky-100 dark:bg-dusk-surface border-2.5 border-ink flex items-center justify-center text-ink dark:text-dusk-text shadow-sticker-sm">
+          <div className="space-y-3">
+            <div className="w-12 h-12 mx-auto rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400">
               {mediaType === "video" ? (
-                <Video className="w-8 h-8 text-teal" />
+                <Video className="w-6 h-6" strokeWidth={1.5} />
               ) : (
-                <UploadCloud className="w-8 h-8 text-tomato" />
+                <UploadCloud className="w-6 h-6" strokeWidth={1.5} />
               )}
             </div>
 
             <div>
-              <p className="font-display font-black text-base text-ink dark:text-dusk-text">
-                Click to browse or drop your {mediaType} here
+              <p className="font-semibold text-sm text-[var(--text-primary)]">
+                {displayTitle}
               </p>
-              <p className="text-xs font-semibold text-ink-muted mt-1">
-                Supported: {accept} (Max {maxSizeMB} MB)
+              <p className="text-xs text-[var(--text-muted)] mt-1 max-w-md mx-auto">
+                {displaySubtitle}
               </p>
             </div>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-tomato/20 border-2 border-tomato text-xs font-bold text-tomato">
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs font-medium text-rose-600 dark:text-rose-400">
             <AlertCircle className="w-4 h-4" />
             <span>{errorMessage}</span>
           </div>
@@ -271,16 +302,16 @@ export default function UploadDropzone({
               type="text"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Or type a dish name (e.g. Fresh Apple, Paneer Tikka, Oatmeal)..."
-              className="w-full pl-4 pr-10 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold border-2.5 border-ink bg-white dark:bg-dusk-card text-ink dark:text-dusk-text placeholder:text-ink-muted shadow-sticker-xs focus:outline-none focus:border-tomato"
+              placeholder="Or type a meal (e.g. 2 Bananas, Paneer Butter Masala with Roti, Dal Khichdi)..."
+              className="w-full pl-4 pr-10 py-2 rounded-xl text-xs sm:text-sm border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none focus:border-blue-500"
             />
             <button
               type="button"
               onClick={toggleSpeechRecognition}
-              className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl border border-ink transition-all ${
+              className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
                 isRecording
-                  ? 'bg-tomato text-white animate-pulse'
-                  : 'bg-sky-100 dark:bg-dusk-surface text-ink hover:bg-sunny'
+                  ? 'bg-rose-600 text-white animate-pulse'
+                  : 'text-[var(--text-muted)] hover:text-blue-600'
               }`}
               title={isRecording ? "Listening... click to stop" : "Speak voice query"}
             >
@@ -290,10 +321,10 @@ export default function UploadDropzone({
           <button
             type="submit"
             disabled={!textInput.trim()}
-            className="btn-squish inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl text-xs font-display font-black bg-tomato hover:bg-tomato/90 disabled:opacity-50 text-white border-2 border-ink shadow-sticker-xs cursor-pointer"
+            className="pill-btn-primary py-2 px-4 text-xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
           >
             <Send className="w-3.5 h-3.5" />
-            <span>Ask</span>
+            <span>Search</span>
           </button>
         </form>
       )}
@@ -301,8 +332,7 @@ export default function UploadDropzone({
       {/* Try a Sample Action */}
       {sampleOptions.length > 0 && onSampleSelect && (
         <div className="pt-1 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-black text-ink-muted flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-sunny" />
+          <span className="text-xs text-[var(--text-muted)] font-medium flex items-center gap-1">
             <span>Try sample:</span>
           </span>
           {sampleOptions.map((sample, idx) => (
@@ -310,7 +340,7 @@ export default function UploadDropzone({
               key={idx}
               type="button"
               onClick={() => onSampleSelect(sample)}
-              className="btn-squish px-3 py-1 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-surface hover:bg-sunny/30 text-ink dark:text-dusk-text shadow-sticker-xs cursor-pointer transition-all"
+              className="pill-btn-secondary py-1 px-3 text-xs cursor-pointer"
             >
               {sample.label}
             </button>

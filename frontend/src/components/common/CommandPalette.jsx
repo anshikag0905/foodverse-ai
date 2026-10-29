@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
-  Sparkles,
-  Utensils,
-  ShieldCheck,
+  Scan,
+  ShieldAlert,
   Video,
-  ChefHat,
   Calendar,
   Package,
   Compass,
@@ -16,9 +14,10 @@ import {
   Settings,
   Info,
   ArrowRight,
-  X
+  X,
+  LayoutDashboard
 } from 'lucide-react';
-import { ALL_DOODLES } from '../../assets/doodles';
+import { PREDEFINED_FOODS } from '../../data/predefinedFoods';
 
 export default function CommandPalette({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
@@ -26,28 +25,26 @@ export default function CommandPalette({ isOpen, onClose }) {
   const navigate = useNavigate();
 
   const navigationItems = [
-    { name: 'Dashboard', path: '/', icon: Sparkles, category: 'Core', color: 'text-tomato' },
-    { name: 'Food Recognition & Calories', path: '/food-scan', icon: Utensils, category: 'Core', color: 'text-tomato' },
-    { name: 'Freshness & Spoilage Check', path: '/freshness', icon: ShieldCheck, category: 'Core', color: 'text-mint' },
-    { name: 'Restaurant Kitchen Hygiene', path: '/hygiene', icon: Video, category: 'Core', color: 'text-teal' },
-    { name: 'Smart Cooking Assistant', path: '/cooking', icon: ChefHat, category: 'Kitchen', color: 'text-sunny' },
-    { name: 'Personalized Meal Planner', path: '/meal-planner', icon: Calendar, category: 'Kitchen', color: 'text-grape' },
-    { name: 'Pantry & Expiry Tracker', path: '/pantry', icon: Package, category: 'Kitchen', color: 'text-peach' },
-    { name: 'Food Explorer (FTS5 Database)', path: '/food-explorer', icon: Compass, category: 'Kitchen', color: 'text-teal' },
-    { name: 'Gym Mode & Athletic Macros', path: '/gym', icon: Dumbbell, category: 'Fitness', color: 'text-grape' },
-    { name: 'Did You Know? (Food Science)', path: '/did-you-know', icon: Lightbulb, category: 'Learn', color: 'text-sunny' },
-    { name: 'Scan History & Reports', path: '/history', icon: History, category: 'Account', color: 'text-ink-muted' },
-    { name: 'Settings & Privacy Policy', path: '/settings', icon: Settings, category: 'Account', color: 'text-ink-muted' },
-    { name: 'About FoodVerse AI (Anshika Gupta)', path: '/about', icon: Info, category: 'Account', color: 'text-tomato' },
+    { name: 'Dashboard', path: '/', icon: LayoutDashboard, category: 'Core' },
+    { name: 'Food Recognition & Portion Scanner', path: '/food-scan', icon: Scan, category: 'Core' },
+    { name: 'Spoilage & Freshness Detector', path: '/freshness', icon: ShieldAlert, category: 'Core' },
+    { name: 'Hygiene Detector & Inspection', path: '/hygiene', icon: Video, category: 'Core' },
+    { name: 'Adaptive Meal Planner', path: '/meal-planner', icon: Calendar, category: 'Kitchen' },
+    { name: 'Pantry & Expiry Tracker', path: '/pantry', icon: Package, category: 'Kitchen' },
+    { name: 'Food Explorer Database', path: '/food-explorer', icon: Compass, category: 'Kitchen' },
+    { name: 'Gym Mode & Macro Fuel', path: '/gym', icon: Dumbbell, category: 'Fitness' },
+    { name: 'Food Science & Facts', path: '/did-you-know', icon: Lightbulb, category: 'Learn' },
+    { name: 'Scan History & Reports', path: '/history', icon: History, category: 'Account' },
+    { name: 'Settings & Privacy Preferences', path: '/settings', icon: Settings, category: 'Account' },
+    { name: 'About Creator (Anshika Gupta)', path: '/about', icon: Info, category: 'Account' },
   ];
 
-  // Also include food doodles in search
-  const foodItems = ALL_DOODLES.map((d) => ({
-    name: `${d.name} (${d.cal} kcal, ${d.protein})`,
-    path: `/gym?food=${d.id}`,
-    icon: d.Component,
-    category: 'Quick Food',
-    isDoodle: true,
+  // Include top predefined foods in search results
+  const foodItems = PREDEFINED_FOODS.map((f) => ({
+    name: `${f.name} (${f.calories} kcal, ${f.protein_g}g protein)`,
+    path: `/food-explorer?q=${encodeURIComponent(f.name)}`,
+    icon: Compass,
+    category: 'Food Record',
   }));
 
   const allItems = [...navigationItems, ...foodItems];
@@ -90,82 +87,71 @@ export default function CommandPalette({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-ink/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-xl rounded-3xl bg-card dark:bg-dusk-card border-3 border-ink shadow-sticker-lg overflow-hidden animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/40 backdrop-blur-xs">
+      <div className="w-full max-w-lg rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-xl overflow-hidden">
         {/* Search Bar Input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b-2 border-ink bg-white dark:bg-dusk-surface">
-          <Search className="w-5 h-5 text-ink-muted" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-card)]">
+          <Search className="w-4 h-4 text-[var(--text-faint)]" strokeWidth={1.5} />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search food, modules, recipes, or gym staples... (Esc to close)"
+            placeholder="Search foods, modules, nutrition... (Esc to close)"
             autoFocus
-            className="w-full bg-transparent text-sm font-display font-bold text-ink dark:text-dusk-text placeholder:text-ink-muted/60 focus:outline-hidden"
+            className="w-full bg-transparent text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] focus:outline-none"
           />
           {query && (
             <button
+              type="button"
               onClick={() => setQuery('')}
-              className="p-1 rounded-full text-ink-muted hover:text-ink cursor-pointer"
+              className="p-1 rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" strokeWidth={1.5} />
             </button>
           )}
-          <kbd className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-sky-100 dark:bg-dusk-card border border-ink/40 text-[10px] font-mono font-bold text-ink-muted">
+          <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[10px] font-mono text-[var(--text-muted)]">
             ESC
           </kbd>
         </div>
 
         {/* Results List */}
-        <div className="max-h-80 overflow-y-auto p-3 divide-y divide-ink/10">
+        <div className="max-h-80 overflow-y-auto p-2 divide-y divide-[var(--border-color)]">
           {filteredItems.length === 0 ? (
-            <div className="py-8 text-center text-xs font-semibold text-ink-muted">
-              No matching pages or foods found for "{query}".
+            <div className="py-8 text-center text-xs text-[var(--text-muted)]">
+              No results found for "{query}".
             </div>
           ) : (
             filteredItems.map((item, idx) => {
-              const isSelected = idx === selectedIndex;
               const Icon = item.icon;
+              const isSelected = selectedIndex === idx;
 
               return (
-                <button
-                  key={item.name}
+                <div
+                  key={idx}
                   onClick={() => {
                     navigate(item.path);
                     onClose();
                   }}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full p-2.5 rounded-2xl flex items-center justify-between text-left transition-all cursor-pointer ${
+                  className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-sky-200 dark:bg-dusk-surface border-2 border-ink shadow-sticker-sm text-ink dark:text-dusk-text'
-                      : 'text-ink-muted hover:text-ink border-2 border-transparent'
+                      ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'
+                      : 'hover:bg-[var(--bg-card-subtle)] text-[var(--text-primary)]'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-card dark:bg-dusk-card border border-ink/40 flex items-center justify-center shrink-0">
-                      {item.isDoodle ? <Icon size={22} /> : <Icon className={`w-4 h-4 ${item.color}`} />}
+                  <div className="flex items-center gap-3 truncate">
+                    <div className="w-7 h-7 rounded-lg bg-[var(--bg-card-subtle)] flex items-center justify-center shrink-0 border border-[var(--border-color)]">
+                      <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
                     </div>
-                    <div>
-                      <strong className="text-xs font-display font-bold block truncate">
-                        {item.name}
-                      </strong>
-                      <span className="text-[10px] text-ink-muted/80 block">
-                        {item.category}
-                      </span>
+                    <div className="truncate">
+                      <p className="text-xs font-semibold truncate">{item.name}</p>
+                      <span className="text-[10px] text-[var(--text-muted)]">{item.category}</span>
                     </div>
                   </div>
-
-                  <ArrowRight className={`w-4 h-4 ${isSelected ? 'opacity-100 translate-x-1' : 'opacity-0'} transition-all`} />
-                </button>
+                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-faint)] shrink-0" strokeWidth={1.5} />
+                </div>
               );
             })
           )}
-        </div>
-
-        {/* Footer shortcuts */}
-        <div className="px-5 py-2.5 bg-sky-100/70 dark:bg-dusk-surface border-t-2 border-ink flex items-center justify-between text-[11px] font-bold text-ink-muted">
-          <span>Use ↑ ↓ to navigate</span>
-          <span>↵ to select</span>
         </div>
       </div>
     </div>

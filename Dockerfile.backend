@@ -2,10 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies including curl for healthchecks
+# Install system dependencies including curl for healthchecks and ffmpeg
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     build-essential \
+    ffmpeg \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements and install

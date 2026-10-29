@@ -8,6 +8,24 @@ from app.api.v1.privacy import get_current_user_id
 router = APIRouter(prefix="/hygiene", tags=["Restaurant Kitchen Hygiene & Safety Monitoring"])
 hygiene_service = HygieneService()
 
+@router.post("/analyze-photo")
+async def analyze_kitchen_photo(
+    photo: UploadFile = File(...),
+    lang: str = Form("en"),
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Audits a commercial or home kitchen/prep area photo for cleanliness, cross-contamination, and food safety."""
+    photo_bytes = await photo.read()
+    result = await hygiene_service.analyze_kitchen_photo(
+        db=db,
+        user_id=user_id,
+        photo_bytes=photo_bytes,
+        filename=photo.filename,
+        lang=lang
+    )
+    return result
+
 @router.post("/analyze-video")
 async def analyze_kitchen_video(
     video: UploadFile = File(...),

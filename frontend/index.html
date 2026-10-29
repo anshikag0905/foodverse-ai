@@ -4,14 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#BFE6FF" />
-    <title>FoodVerse AI – Your Food, Made Simple</title>
-    <!-- Display & Body Google Fonts: Fredoka (chunky rounded display), Baloo 2 (chunky rounded + Devanagari Hindi), Nunito (clean body) -->
+    <meta name="theme-color" content="#2563EB" />
+    <title>FoodVerse AI – Multimodal Food & Kitchen Intelligence</title>
+    <!-- Modern Health & Fintech Typography: Inter (body & data), Plus Jakarta Sans (bold friendly headlines), Noto Sans Devanagari (Hindi) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('foodverse_theme') || 'blue';
+          if (!['blue', 'white', 'black'].includes(saved)) {
+            saved = (saved === 'dark') ? 'black' : 'blue';
+          }
+          document.documentElement.setAttribute('data-theme', saved);
+          if (saved === 'black') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-[#BFE6FF] text-[#0F1B3D] dark:bg-[#0A1128] dark:text-[#F0F4FF] min-h-screen antialiased selection:bg-[#FF5A5F] selection:text-white transition-colors duration-200">
+  <body class="min-h-screen antialiased transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

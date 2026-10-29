@@ -5,7 +5,6 @@ from app.models.user import User
 from app.services.recognition_service import RecognitionService
 from app.services.freshness_service import FreshnessService
 from app.services.hygiene_service import HygieneService
-from app.services.cooking_service import CookingService
 from app.services.meal_plan_service import MealPlanService
 from tests.conftest import run_sync
 
@@ -77,23 +76,6 @@ def test_module_3_hygiene_video_processing(setup_db):
         report_data = service.generate_downloadable_report(db=db, report_id=status_data["id"])
         assert report_data is not None
         assert report_data["job_id"] == job_id
-
-# Module 4: Smart Cooking Assistant
-def test_module_4_cooking_assistant(setup_db):
-    user_id = setup_db
-    service = CookingService()
-
-    with SessionLocal() as db:
-        chat_res = run_sync(service.handle_chat(
-            db=db,
-            user_id=user_id,
-            query="What can I cook with tomatoes and oats?",
-            use_pantry=True
-        ))
-        assert chat_res["suggested_recipe_title"] is not None
-        assert len(chat_res["instructions"]) > 0
-        assert chat_res["timer_minutes"] is not None
-        assert len(chat_res["messages"]) >= 2
 
 # Module 5: Personalized Meal Planning & Safety Floor
 def test_module_5_meal_planner(setup_db):

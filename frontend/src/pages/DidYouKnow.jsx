@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Lightbulb, Shuffle, Heart, Search, Filter, Sparkles, BookOpen } from 'lucide-react';
 import FactCard from '../components/common/FactCard';
 import Loader from '../components/common/Loader';
-import { DoodlePopcorn, DoodleAvocado } from '../assets/doodles';
 
 export const COMPREHENSIVE_FACTS = [
   {
@@ -249,41 +248,37 @@ export default function DidYouKnow() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* =========================================================================
-          MODULE HEADER BAND (SUNNY ACCENT + DOODLE POPCORN)
-          ========================================================================= */}
-      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-sunny/20 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
-            <DoodlePopcorn size={46} className="animate-float" />
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Module Header */}
+      <div className="card-base p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200 dark:border-amber-900">
+            <Lightbulb className="w-5 h-5" strokeWidth={1.5} />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sunny/20 border border-ink text-[11px] font-black uppercase text-amber-800 dark:text-sunny">
-              <span>Culinary Science & Longevity</span>
-            </div>
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
-              Did You Know? Food Intelligence
+            <h1 className="font-display font-bold text-xl sm:text-2xl text-[var(--text-primary)]">
+              Food Science & Nutrition Facts
             </h1>
-            <p className="text-xs font-semibold text-ink-muted mt-0.5">
-              Verified food science facts from Indian Ayurveda 🇮🇳, Japanese Longevity 🇯🇵, and Bodybuilding Biochemistry 🏋️.
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Evidence-based food science from Indian culinary traditions, Japanese longevity diets, and sports biochemistry.
             </p>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={handleShuffle}
-          className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sunny text-ink border-2 border-ink text-xs font-display font-black shadow-sticker-xs cursor-pointer hover:shadow-sticker self-end md:self-auto"
+          className="pill-btn-secondary text-xs py-1.5 px-3.5 cursor-pointer self-end md:self-auto"
         >
-          <Shuffle className="w-4 h-4" />
-          <span>Shuffle Spotlight Fact</span>
+          <Shuffle className="w-3.5 h-3.5 text-amber-600" strokeWidth={1.5} />
+          <span>Shuffle Fact</span>
         </button>
       </div>
 
       {/* Spotlight Fact Hero Card */}
       {randomFact && (
-        <div className="rounded-3xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-dusk-card dark:to-dusk-surface border-3 border-ink p-6 sm:p-8 shadow-sticker relative overflow-hidden">
-          <div className="flex items-start gap-4">
+        <div className="card-base p-6 space-y-3 bg-amber-50/40 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/40">
+          <div className="flex items-start gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-sunny border-2 border-ink flex items-center justify-center flex-shrink-0 shadow-sticker-xs">
               <Lightbulb className="w-6 h-6 text-ink" />
             </div>

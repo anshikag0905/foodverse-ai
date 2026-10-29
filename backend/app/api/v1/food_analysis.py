@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 from app.core.database import get_db
 from app.services.recognition_service import RecognitionService
@@ -13,6 +13,9 @@ class FoodCorrectionRequest(BaseModel):
     original_name: str
     corrected_name: str
     input_path: Optional[str] = None
+
+class RecalculateRequest(BaseModel):
+    items: List[Dict[str, Any]]
 
 @router.post("/analyze")
 async def analyze_food(
@@ -38,6 +41,14 @@ async def analyze_food(
         lang=lang
     )
     return result
+
+@router.post("/recalculate")
+def recalculate_plate_totals(
+    req: RecalculateRequest,
+    user_id: int = Depends(get_current_user_id)
+):
+    """Recalculates plate calories and macros when user adjusts grams or changes food."""
+    return rec_service.recalculate_plate(items=req.items)
 
 @router.post("/correct")
 def submit_food_correction(

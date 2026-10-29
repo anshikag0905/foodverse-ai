@@ -1,156 +1,234 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function AnimatedGirlFace({ size = 110, className = "" }) {
+export default function AnimatedGirlFace({ size = 120, className = "" }) {
+  const [isWinking, setIsWinking] = useState(false);
+
   return (
     <div
-      className={`relative inline-flex items-center justify-center select-none ${className}`}
+      className={`relative inline-flex items-center justify-center select-none cursor-pointer group ${className}`}
       style={{ width: size, height: size }}
+      onMouseEnter={() => setIsWinking(true)}
+      onMouseLeave={() => setIsWinking(false)}
+      title="Anshika Gupta - AI / ML Engineer"
+      aria-label="Cute college girl character avatar"
     >
       <svg
-        viewBox="0 0 120 120"
+        viewBox="0 0 140 140"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-md"
+        className="w-full h-full drop-shadow-md transition-transform duration-300 group-hover:scale-105"
       >
         <defs>
           <style>
             {`
-              @keyframes blink-eyes {
-                0%, 90%, 100% { transform: scaleY(1); }
-                95% { transform: scaleY(0.1); }
-              }
-              @keyframes float-girl {
+              @keyframes cute-bob {
                 0%, 100% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-3px) rotate(1.5deg); }
+                50% { transform: translateY(-3px) rotate(1.2deg); }
+              }
+              @keyframes hair-sway {
+                0%, 100% { transform: rotate(0deg); }
+                50% { transform: rotate(-3deg); }
+              }
+              @keyframes blink-animation {
+                0%, 88%, 94%, 100% { transform: scaleY(1); }
+                91% { transform: scaleY(0.08); }
+              }
+              @keyframes blush-pulse {
+                0%, 100% { opacity: 0.65; transform: scale(1); }
+                50% { opacity: 0.85; transform: scale(1.08); }
               }
               @keyframes sparkle-twinkle {
                 0%, 100% { opacity: 0.3; transform: scale(0.8); }
                 50% { opacity: 1; transform: scale(1.2); }
               }
-              .girl-head {
-                animation: float-girl 3.5s ease-in-out infinite;
-                transform-origin: 60px 100px;
+              .head-group {
+                animation: cute-bob 3.6s ease-in-out infinite;
+                transform-origin: 70px 115px;
               }
-              .blinking-eyes {
-                animation: blink-eyes 4s infinite;
-                transform-origin: 60px 58px;
+              .ponytail {
+                animation: hair-sway 2.8s ease-in-out infinite;
+                transform-origin: 88px 52px;
               }
-              .sparkle-star {
+              .eye-blink {
+                animation: blink-animation 4.2s infinite;
+                transform-origin: 70px 68px;
+              }
+              .blush {
+                animation: blush-pulse 2.5s ease-in-out infinite;
+                transform-origin: 50px 76px;
+              }
+              .blush-right {
+                animation: blush-pulse 2.5s ease-in-out infinite;
+                transform-origin: 90px 76px;
+              }
+              .sparkle {
                 animation: sparkle-twinkle 2s ease-in-out infinite;
               }
             `}
           </style>
+
+          <linearGradient id="bgGlow" x1="0" y1="0" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#EEF2FF" />
+            <stop offset="1" stopColor="#E0E7FF" />
+          </linearGradient>
+
+          <linearGradient id="hoodieGrad" x1="40" y1="95" x2="100" y2="135" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#3B82F6" />
+            <stop offset="1" stopColor="#1D4ED8" />
+          </linearGradient>
+
+          <linearGradient id="hairGrad" x1="40" y1="20" x2="100" y2="90" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#334155" />
+            <stop offset="1" stopColor="#1E293B" />
+          </linearGradient>
+
+          <linearGradient id="skinGrad" x1="70" y1="40" x2="70" y2="95" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#FFE0CE" />
+            <stop offset="1" stopColor="#FCD5BD" />
+          </linearGradient>
         </defs>
 
-        {/* Background Soft Glow / Sticker Backing */}
-        <circle cx="60" cy="60" r="54" fill="#FFE5EC" stroke="#0F1B3D" strokeWidth="3" />
+        {/* Soft Circular Backdrop with Gradient Border */}
+        <circle cx="70" cy="70" r="66" fill="url(#bgGlow)" stroke="#C7D2FE" strokeWidth="2" />
 
-        {/* Twinkling Stars */}
-        <g className="sparkle-star">
-          <path d="M18 28 L20 22 L26 20 L20 18 L18 12 L16 18 L10 20 L16 22 Z" fill="#FFC93C" />
-          <path d="M102 36 L104 31 L109 29 L104 27 L102 22 L100 27 L95 29 L100 31 Z" fill="#FF5A5F" />
+        {/* Floating Sparkles around avatar */}
+        <g className="sparkle">
+          <path d="M24 38 L26 44 L32 46 L26 48 L24 54 L22 48 L16 46 L22 44 Z" fill="#FBBF24" />
+          <circle cx="118" cy="34" r="2.5" fill="#EC4899" />
+          <circle cx="112" cy="100" r="2" fill="#3B82F6" />
         </g>
 
-        {/* Animated Girl Head Group */}
-        <g className="girl-head">
-          {/* Back Ponytail */}
-          <path
-            d="M72 44 C88 38 98 52 95 72 C92 84 82 86 74 74 Z"
-            fill="#23192D"
-            stroke="#0F1B3D"
-            strokeWidth="3.5"
-            strokeLinejoin="round"
-          />
-          {/* Cute Yellow Ponytail Scrunchie */}
-          <ellipse cx="74" cy="46" rx="6" ry="8" fill="#FFC93C" stroke="#0F1B3D" strokeWidth="2.5" />
-
-          {/* Neck */}
-          <rect x="54" y="80" width="12" height="15" rx="3" fill="#FAD2B8" stroke="#0F1B3D" strokeWidth="3" />
-
-          {/* Collar / Hoodie Top */}
-          <path
-            d="M40 92 C46 88 56 86 60 86 C64 86 74 88 80 92 L86 108 L34 108 Z"
-            fill="#FF5A5F"
-            stroke="#0F1B3D"
-            strokeWidth="3.5"
-            strokeLinejoin="round"
-          />
-          {/* Inner Teal Shirt Accent */}
-          <polygon points="54,86 66,86 60,96" fill="#3DDC97" stroke="#0F1B3D" strokeWidth="2" />
-
-          {/* Head Shape */}
-          <ellipse
-            cx="60"
-            cy="60"
-            rx="25"
-            ry="27"
-            fill="#FAD2B8"
-            stroke="#0F1B3D"
-            strokeWidth="3.5"
-          />
-
-          {/* Ears */}
-          <circle cx="35" cy="62" r="5" fill="#FAD2B8" stroke="#0F1B3D" strokeWidth="2.5" />
-          <circle cx="85" cy="62" r="5" fill="#FAD2B8" stroke="#0F1B3D" strokeWidth="2.5" />
-          {/* Tiny Cute Earring */}
-          <circle cx="34" cy="65" r="1.8" fill="#FFC93C" stroke="#0F1B3D" strokeWidth="1" />
-          <circle cx="86" cy="65" r="1.8" fill="#FFC93C" stroke="#0F1B3D" strokeWidth="1" />
-
-          {/* Front Hair Bangs */}
-          <path
-            d="M36 54 C35 38 48 32 60 32 C72 32 85 38 84 54 C79 46 72 44 65 47 C57 44 48 46 36 54 Z"
-            fill="#23192D"
-            stroke="#0F1B3D"
-            strokeWidth="3.5"
-            strokeLinejoin="round"
-          />
-          {/* Hair Side Fringe */}
-          <path
-            d="M36 52 C35 60 37 68 39 72 C40 68 40 60 41 54 Z"
-            fill="#23192D"
-          />
-          <path
-            d="M84 52 C85 60 83 68 81 72 C80 68 80 60 79 54 Z"
-            fill="#23192D"
-          />
-
-          {/* Eyebrows */}
-          <path d="M47 50 Q52 47 56 49" stroke="#0F1B3D" strokeWidth="2" strokeLinecap="round" />
-          <path d="M64 49 Q68 47 73 50" stroke="#0F1B3D" strokeWidth="2" strokeLinecap="round" />
-
-          {/* Eyes (Smooth blinking animation) */}
-          <g className="blinking-eyes">
-            {/* Left Eye */}
-            <ellipse cx="51" cy="58" rx="4.5" ry="5.5" fill="#0F1B3D" />
-            <circle cx="49.5" cy="56" r="1.8" fill="#FFFFFF" />
-            <circle cx="52.5" cy="59.5" r="0.9" fill="#FFFFFF" />
-
-            {/* Right Eye */}
-            <ellipse cx="69" cy="58" rx="4.5" ry="5.5" fill="#0F1B3D" />
-            <circle cx="67.5" cy="56" r="1.8" fill="#FFFFFF" />
-            <circle cx="70.5" cy="59.5" r="0.9" fill="#FFFFFF" />
+        {/* Main Head & Torso Group */}
+        <g className="head-group">
+          {/* Back Ponytail with soft bounce */}
+          <g className="ponytail">
+            <path
+              d="M86 50 C106 42 120 58 116 84 C112 100 98 102 90 86 C88 78 86 64 86 50 Z"
+              fill="url(#hairGrad)"
+            />
+            {/* Cute Yellow Star Scrunchie */}
+            <circle cx="88" cy="52" r="7" fill="#F59E0B" />
+            <circle cx="88" cy="52" r="4.5" fill="#FBBF24" />
           </g>
 
-          {/* Cute Round Glasses */}
-          <circle cx="51" cy="58" r="9" fill="none" stroke="#8B5CF6" strokeWidth="2.5" opacity="0.95" />
-          <circle cx="69" cy="58" r="9" fill="none" stroke="#8B5CF6" strokeWidth="2.5" opacity="0.95" />
-          <path d="M60 58 L60 58" stroke="#8B5CF6" strokeWidth="2.5" strokeLinecap="round" />
-          <line x1="59.5" y1="58" x2="60.5" y2="58" stroke="#8B5CF6" strokeWidth="3" />
+          {/* Neck */}
+          <path d="M63 90 L63 104 C63 105 77 105 77 104 L77 90 Z" fill="url(#skinGrad)" />
+          {/* Neck Shadow */}
+          <path d="M63 90 C68 94 72 94 77 90 L77 94 C72 98 68 98 63 94 Z" fill="#E8BBA0" opacity="0.6" />
 
-          {/* Rosy Cheeks */}
-          <ellipse cx="43" cy="65" rx="4.5" ry="2.8" fill="#FF8BA7" opacity="0.7" />
-          <ellipse cx="77" cy="65" rx="4.5" ry="2.8" fill="#FF8BA7" opacity="0.7" />
-
-          {/* Cute Nose */}
-          <path d="M59 62 Q60 65 62 64" stroke="#D39879" strokeWidth="2" strokeLinecap="round" fill="none" />
-
-          {/* Cheerful Friendly Smile */}
+          {/* College Campus Hoodie */}
           <path
-            d="M54 69 Q60 76 66 69"
-            stroke="#0F1B3D"
-            strokeWidth="2.5"
+            d="M38 108 C46 102 58 100 70 100 C82 100 94 102 102 108 L110 136 L30 136 Z"
+            fill="url(#hoodieGrad)"
+          />
+
+          {/* White Drawstrings */}
+          <path d="M62 104 Q60 118 63 124" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="63" cy="124" r="1.5" fill="#93C5FD" />
+          <path d="M78 104 Q80 118 77 124" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="77" cy="124" r="1.5" fill="#93C5FD" />
+
+          {/* Headphones around neck */}
+          <path
+            d="M48 94 C48 108 92 108 92 94"
+            fill="none"
+            stroke="#0F172A"
+            strokeWidth="4"
             strokeLinecap="round"
-            fill="#FF5A5F"
+          />
+          <rect x="42" y="86" width="9" height="15" rx="4.5" fill="#EC4899" />
+          <rect x="89" y="86" width="9" height="15" rx="4.5" fill="#EC4899" />
+
+          {/* Face Shape */}
+          <path
+            d="M44 64 C44 46 52 38 70 38 C88 38 96 46 96 64 C96 82 86 96 70 96 C54 96 44 82 44 64 Z"
+            fill="url(#skinGrad)"
+          />
+
+          {/* Ears with Cute Pearl Studs */}
+          <ellipse cx="42" cy="68" rx="4.5" ry="6.5" fill="url(#skinGrad)" />
+          <circle cx="41" cy="71" r="1.5" fill="#FFFFFF" />
+          <ellipse cx="98" cy="68" rx="4.5" ry="6.5" fill="url(#skinGrad)" />
+          <circle cx="99" cy="71" r="1.5" fill="#FFFFFF" />
+
+          {/* Hair Side Bangs & Fringe */}
+          <path
+            d="M44 62 C42 42 54 32 70 32 C86 32 98 42 96 62 C94 50 88 44 80 47 C72 44 64 43 56 47 C50 44 46 50 44 62 Z"
+            fill="url(#hairGrad)"
+          />
+          {/* Soft Hair Wisps */}
+          <path d="M44 58 C42 68 45 78 47 84 C48 76 49 68 46 58 Z" fill="url(#hairGrad)" />
+          <path d="M96 58 C98 68 95 78 93 84 C92 76 91 68 94 58 Z" fill="url(#hairGrad)" />
+
+          {/* Cute Strawberry Hair Clip */}
+          <path d="M51 40 L55 36 L59 40 Z" fill="#EF4444" />
+          <circle cx="55" cy="38" r="1" fill="#FFFFFF" />
+
+          {/* Soft Curved Eyebrows */}
+          <path d="M54 57 C58 54 63 55 65 57" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+          <path d="M75 57 C77 55 82 54 86 57" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+
+          {/* Eyes (Anime / Chibi Sparkling Eyes) */}
+          <g className={isWinking ? "" : "eye-blink"}>
+            {/* Left Eye */}
+            <g>
+              <ellipse cx="59" cy="68" rx="5.5" ry="7" fill="#1E293B" />
+              {/* Highlight Sparkles */}
+              <circle cx="57" cy="65.5" r="2.4" fill="#FFFFFF" />
+              <circle cx="61" cy="71" r="1.2" fill="#FFFFFF" />
+              {/* Top Eyelash */}
+              <path d="M52 64 C56 62 63 62 66 65" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
+              <path d="M64 63 L67 60.5" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+            </g>
+
+            {/* Right Eye (Winks on Hover) */}
+            {isWinking ? (
+              <path
+                d="M75 69 Q81 63 87 69"
+                stroke="#0F172A"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+            ) : (
+              <g>
+                <ellipse cx="81" cy="68" rx="5.5" ry="7" fill="#1E293B" />
+                {/* Highlight Sparkles */}
+                <circle cx="79" cy="65.5" r="2.4" fill="#FFFFFF" />
+                <circle cx="83" cy="71" r="1.2" fill="#FFFFFF" />
+                {/* Top Eyelash */}
+                <path d="M74 65 C77 62 84 62 88 64" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
+                <path d="M86 63 L89 60.5" stroke="#0F172A" strokeWidth="1.5" strokeLinecap="round" />
+              </g>
+            )}
+          </g>
+
+          {/* Modern Lightweight Round Glasses */}
+          <circle cx="59" cy="68" r="10.5" fill="none" stroke="#3B82F6" strokeWidth="1.75" opacity="0.9" />
+          <circle cx="81" cy="68" r="10.5" fill="none" stroke="#3B82F6" strokeWidth="1.75" opacity="0.9" />
+          <line x1="69.5" y1="68" x2="70.5" y2="68" stroke="#3B82F6" strokeWidth="2" />
+          {/* Glass Lense Glint */}
+          <path d="M53 62 L57 66" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
+          <path d="M75 62 L79 66" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
+
+          {/* Rosy Glowing Blushing Cheeks */}
+          <ellipse cx="50" cy="76" rx="5.5" ry="3.5" fill="#FB7185" className="blush" />
+          <ellipse cx="90" cy="76" rx="5.5" ry="3.5" fill="#FB7185" className="blush-right" />
+
+          {/* Tiny Cute Button Nose */}
+          <circle cx="70" cy="73" r="1.2" fill="#F43F5E" opacity="0.75" />
+
+          {/* Joyful Open Smile */}
+          <path
+            d="M64 78 Q70 87 76 78 Z"
+            fill="#E11D48"
+            stroke="#9F1239"
+            strokeWidth="1"
+          />
+          {/* Tongue inside smile */}
+          <path
+            d="M66 82 Q70 80 74 82 Q70 86 66 82 Z"
+            fill="#FDA4AF"
           />
         </g>
       </svg>
