@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import List, Union
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,13 +29,13 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
 
-    # Databases
-    DATABASE_URL: str = "sqlite:///./backend/data/foodverse.db"
-    FOOD_DATABASE_PATH: str = "./backend/data/food_database.sqlite"
+    # Databases (Absolute paths relative to backend directory)
+    DATABASE_URL: str = f"sqlite:///{Path(__file__).resolve().parent.parent.parent / 'data' / 'foodverse.db'}"
+    FOOD_DATABASE_PATH: str = str(Path(__file__).resolve().parent.parent.parent / "data" / "food_database.sqlite")
 
     # Storage
     STORAGE_TYPE: str = "local"
-    UPLOAD_DIR: str = "./storage/uploads"
+    UPLOAD_DIR: str = str(Path(__file__).resolve().parent.parent.parent / "storage" / "uploads")
     MAX_UPLOAD_SIZE_MB: int = 50
     KITCHEN_VIDEO_RETENTION_HOURS: int = 24
 

@@ -292,18 +292,106 @@ class MockAIProvider(AIProvider):
         pantry_items: Optional[List[Dict[str, Any]]] = None,
         lang: str = "en"
     ) -> CookingChatResult:
-        # Check for expiring items in pantry
+        q_clean = query.lower()
+
+        # 1. Maggi / Maggie Noodles
+        if "maggi" in q_clean or "maggie" in q_clean or "noodle" in q_clean:
+            return CookingChatResult(
+                reply="Here is how to prepare delicious, steaming Street-Style Masala Maggi! Follow these steps with the 2-minute timer for peak texture.",
+                suggested_recipe_title="Street-Style Masala Maggi 🍜",
+                ingredients=[
+                    "1 packet Maggi 2-Minute Noodles with Tastemaker",
+                    "1.5 cups (350ml) clean water",
+                    "1/4 small onion (finely chopped)",
+                    "1/4 small tomato (diced)",
+                    "1 small green chili (optional for spice)",
+                    "1/2 tsp butter or ghee",
+                    "Fresh coriander leaves for garnish"
+                ],
+                instructions=[
+                    "Step 1: Heat 1/2 tsp butter in a small saucepan over medium heat; sauté onions and green chili for 1 minute.",
+                    "Step 2: Add diced tomatoes and cook for 1 minute until soft and aromatic.",
+                    "Step 3: Pour in 1.5 cups of water and bring to a rolling boil.",
+                    "Step 4: Break the noodle cake into halves, stir in the Maggi Tastemaker spice blend.",
+                    "Step 5: Cook on medium flame for exactly 2 minutes, stirring gently until noodles absorb the savory broth.",
+                    "Step 6: Garnish with fresh coriander and enjoy piping hot!"
+                ],
+                timer_minutes=2,
+                substitutions={
+                    "butter": "ghee or olive oil",
+                    "green chili": "cracked black pepper"
+                },
+                missing_pantry_items=["Maggi 2-Minute Noodles", "fresh coriander"]
+            )
+
+        # 2. Paneer dishes (Paneer Tikka, Paneer Butter Masala)
+        elif "paneer" in q_clean:
+            return CookingChatResult(
+                reply="Here is an aromatic, restaurant-style Quick Tawa Paneer recipe rich in muscle-building protein!",
+                suggested_recipe_title="High-Protein Tawa Paneer Sauté 🧀",
+                ingredients=[
+                    "200g low-fat fresh paneer (cut into cubes)",
+                    "1 capsicum / bell pepper (sliced)",
+                    "1 medium onion (sliced)",
+                    "1 tbsp olive oil or butter",
+                    "1/2 tsp cumin, turmeric, and garam masala",
+                    "Salt and kasuri methi (fenugreek leaves) to taste"
+                ],
+                instructions=[
+                    "Step 1: Heat oil in a flat tawa or skillet over medium flame.",
+                    "Step 2: Add sliced onions and capsicum; toss for 3 minutes on high heat for a smoky char.",
+                    "Step 3: Add turmeric, garam masala, and salt; mix well.",
+                    "Step 4: Add paneer cubes gently and toss for 2 to 3 minutes until slightly golden on edges.",
+                    "Step 5: Crush kasuri methi between palms and sprinkle on top with a squeeze of fresh lemon."
+                ],
+                timer_minutes=3,
+                substitutions={
+                    "paneer": "firm tofu for vegan alternative",
+                    "kasuri methi": "fresh chopped cilantro"
+                },
+                missing_pantry_items=["kasuri methi", "fresh lemon"]
+            )
+
+        # 3. Pasta / Macaroni
+        elif "pasta" in q_clean or "macaroni" in q_clean:
+            return CookingChatResult(
+                reply="Here is a simple, mouthwatering Creamy Garlic & Herb Pasta that comes together in 15 minutes!",
+                suggested_recipe_title="Garlic Herb Penne Pasta 🍝",
+                ingredients=[
+                    "200g penne or macaroni pasta",
+                    "2 tbsp extra virgin olive oil",
+                    "4 cloves garlic (minced)",
+                    "1/2 cup grated parmesan or mozzarella",
+                    "1/4 cup reserved pasta boiling water",
+                    "Chili flakes and dried oregano"
+                ],
+                instructions=[
+                    "Step 1: Boil salted water in a pot, add pasta and cook for 8-10 minutes until al dente.",
+                    "Step 2: Reserve 1/4 cup of starchy pasta water, then drain pasta.",
+                    "Step 3: In a pan, warm olive oil and sauté minced garlic on low flame for 1 minute until fragrant.",
+                    "Step 4: Toss cooked pasta and reserved water into the garlic oil; stir vigorously to create a silky sauce.",
+                    "Step 5: Stir in cheese, chili flakes, and herbs. Serve warm!"
+                ],
+                timer_minutes=8,
+                substitutions={
+                    "parmesan": "nutritional yeast or cheddar",
+                    "olive oil": "unsalted butter"
+                },
+                missing_pantry_items=["parmesan cheese", "fresh basil"]
+            )
+
+        # Check for expiring items in pantry or general fallback
         expiring = []
         if pantry_items:
             for item in pantry_items:
                 if item.get("status") in ["use_soon", "fresh"]:
                     expiring.append(item.get("name"))
 
-        expiring_text = ", ".join(expiring[:3]) if expiring else "staple pantry ingredients"
+        expiring_text = ", ".join(expiring[:3]) if expiring else "fresh ingredients"
 
         return CookingChatResult(
-            reply=f"Here is a nutritious recipe created from your ingredients ({expiring_text}): A savory and aromatic Quick Skillet Bowl!",
-            suggested_recipe_title="Quick Skillet Sauté",
+            reply=f"Here is a chef-crafted recipe designed to turn your ingredients ({expiring_text}) into a wholesome meal!",
+            suggested_recipe_title="Nutrient-Rich Skillet Sauté 🍲",
             ingredients=[
                 f"2 cups of {expiring[0] if expiring else 'mixed vegetables'}",
                 "1 tbsp extra virgin olive oil",

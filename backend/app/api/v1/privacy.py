@@ -8,11 +8,25 @@ from app.core.config import settings
 router = APIRouter(prefix="/privacy", tags=["Privacy & Data Governance"])
 
 def get_current_user_id(db: Session = Depends(get_db)) -> int:
-    # Single-user demo mode or token authenticated user
+    # Single-user demo mode or token authenticated user; ensures user row exists
     user = db.query(User).filter(User.email == settings.DEFAULT_USER_EMAIL).first()
-    if user:
-        return user.id
-    return 1
+    if not user:
+        try:
+            user = User(
+                email=settings.DEFAULT_USER_EMAIL,
+                hashed_password="demo_hashed_password",
+                is_active=True,
+                is_demo=True,
+                allergies="[]",
+                diet_type="omnivore"
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        except Exception:
+            db.rollback()
+            user = db.query(User).first()
+    return user.id if user else 1
 
 @router.get("/notice")
 def get_privacy_notice():
