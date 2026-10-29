@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Image as ImageIcon, Video, Mic, MicOff, FileText, CheckCircle2, AlertCircle, X, Sparkles } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Video, Mic, MicOff, FileText, CheckCircle2, AlertCircle, X, Sparkles, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function UploadDropzone({
@@ -72,27 +72,19 @@ export default function UploadDropzone({
     setErrorMessage("");
     if (!file) return;
 
-    // Size validation
-    const sizeInMB = file.size / (1024 * 1024);
-    if (sizeInMB > maxSizeMB) {
-      setErrorMessage(`File exceeds ${maxSizeMB} MB limit.`);
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      setErrorMessage(`File exceeds max size limit of ${maxSizeMB} MB`);
       return;
     }
 
-    const processedFile = await compressImageIfNeeded(file);
-
-    setSelectedFile(processedFile);
-
-    // Create preview for images and videos
-    if (processedFile.type.startsWith("image/") || processedFile.type.startsWith("video/")) {
-      const url = URL.createObjectURL(processedFile);
+    try {
+      const processed = await compressImageIfNeeded(file);
+      setSelectedFile(processed);
+      const url = URL.createObjectURL(processed);
       setPreviewUrl(url);
-    } else {
-      setPreviewUrl(null);
-    }
-
-    if (onFileSelect) {
-      onFileSelect(processedFile);
+      if (onFileSelect) onFileSelect(processed);
+    } catch (e) {
+      setErrorMessage("Error processing media file.");
     }
   };
 
@@ -175,10 +167,10 @@ export default function UploadDropzone({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => !selectedFile && fileInputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-3xl p-6 md:p-8 text-center transition-all cursor-pointer ${
+        className={`relative border-3 border-dashed rounded-3xl p-6 md:p-8 text-center transition-all cursor-pointer shadow-sticker ${
           isDragging
-            ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 scale-[1.01]'
-            : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-emerald-400 dark:hover:border-emerald-500/70'
+            ? 'border-tomato bg-tomato/10 scale-[1.01]'
+            : 'border-ink bg-white dark:bg-dusk-card hover:border-tomato hover:shadow-sticker-lg'
         } ${selectedFile ? 'cursor-default' : ''}`}
       >
         <input
@@ -191,7 +183,7 @@ export default function UploadDropzone({
 
         {selectedFile ? (
           <div className="space-y-4">
-            <div className="relative inline-block max-w-sm mx-auto overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 shadow-md">
+            <div className="relative inline-block max-w-sm mx-auto overflow-hidden rounded-2xl border-2.5 border-ink shadow-sticker-sm">
               {selectedFile.type.startsWith("image/") ? (
                 <img
                   src={previewUrl}
@@ -205,37 +197,38 @@ export default function UploadDropzone({
                   className="w-full max-h-64 object-cover"
                 />
               ) : (
-                <div className="p-8 flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800">
-                  <FileText className="w-8 h-8 text-emerald-600" />
-                  <span className="font-semibold text-sm">{selectedFile.name}</span>
+                <div className="p-8 flex items-center justify-center gap-3 bg-sky-100 dark:bg-dusk-surface">
+                  <FileText className="w-8 h-8 text-tomato" />
+                  <span className="font-bold text-sm text-ink">{selectedFile.name}</span>
                 </div>
               )}
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   clearSelection();
                 }}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 text-white hover:bg-rose-600 transition-colors shadow-lg"
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-white dark:bg-dusk-card border-2 border-ink text-ink hover:bg-tomato hover:text-white transition-colors shadow-sticker-xs cursor-pointer"
                 title="Remove selection"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <div className="flex items-center justify-center gap-2 text-xs font-bold text-ink dark:text-dusk-text">
+              <CheckCircle2 className="w-4 h-4 text-mint" />
               <span>{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
             </div>
 
             {isUploading && (
               <div className="w-full max-w-xs mx-auto space-y-1.5">
-                <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-sky-100 dark:bg-dusk-surface rounded-full h-2.5 border border-ink overflow-hidden">
                   <div
-                    className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-tomato h-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs font-black text-ink dark:text-dusk-text">
                   {t('common.analyzing')} {uploadProgress > 0 ? `${uploadProgress}%` : ''}
                 </p>
               </div>
@@ -243,27 +236,27 @@ export default function UploadDropzone({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-sky-100 dark:bg-dusk-surface border-2.5 border-ink flex items-center justify-center text-ink dark:text-dusk-text shadow-sticker-sm">
               {mediaType === "video" ? (
-                <Video className="w-8 h-8" />
+                <Video className="w-8 h-8 text-teal" />
               ) : (
-                <UploadCloud className="w-8 h-8" />
+                <UploadCloud className="w-8 h-8 text-tomato" />
               )}
             </div>
 
             <div>
-              <p className="text-base font-semibold text-slate-800 dark:text-slate-200">
-                Click to browse or drag and drop your {mediaType}
+              <p className="font-display font-black text-base text-ink dark:text-dusk-text">
+                Click to browse or drop your {mediaType} here
               </p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                Supported formats: {accept} (Max {maxSizeMB} MB)
+              <p className="text-xs font-semibold text-ink-muted mt-1">
+                Supported: {accept} (Max {maxSizeMB} MB)
               </p>
             </div>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mt-3 flex items-center justify-center gap-2 text-xs text-rose-500 font-medium">
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-tomato/20 border-2 border-tomato text-xs font-bold text-tomato">
             <AlertCircle className="w-4 h-4" />
             <span>{errorMessage}</span>
           </div>
@@ -278,45 +271,46 @@ export default function UploadDropzone({
               type="text"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Or type a dish name, ingredient query, or recipe request..."
-              className="w-full pl-4 pr-10 py-2.5 rounded-2xl text-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm"
+              placeholder="Or type a dish name (e.g. Fresh Apple, Paneer Tikka, Oatmeal)..."
+              className="w-full pl-4 pr-10 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold border-2.5 border-ink bg-white dark:bg-dusk-card text-ink dark:text-dusk-text placeholder:text-ink-muted shadow-sticker-xs focus:outline-none focus:border-tomato"
             />
             <button
               type="button"
               onClick={toggleSpeechRecognition}
-              className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl transition-all ${
+              className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl border border-ink transition-all ${
                 isRecording
-                  ? 'bg-rose-500 text-white animate-pulse'
-                  : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+                  ? 'bg-tomato text-white animate-pulse'
+                  : 'bg-sky-100 dark:bg-dusk-surface text-ink hover:bg-sunny'
               }`}
               title={isRecording ? "Listening... click to stop" : "Speak voice query"}
             >
-              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
             </button>
           </div>
           <button
             type="submit"
             disabled={!textInput.trim()}
-            className="px-5 py-2.5 rounded-2xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white shadow-sm transition-all"
+            className="btn-squish inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl text-xs font-display font-black bg-tomato hover:bg-tomato/90 disabled:opacity-50 text-white border-2 border-ink shadow-sticker-xs cursor-pointer"
           >
-            Ask
+            <Send className="w-3.5 h-3.5" />
+            <span>Ask</span>
           </button>
         </form>
       )}
 
-      {/* Try a Sample Action (Demo Mode) */}
+      {/* Try a Sample Action */}
       {sampleOptions.length > 0 && onSampleSelect && (
-        <div className="pt-2 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>{t('common.try_sample')}:</span>
+        <div className="pt-1 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-black text-ink-muted flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 text-sunny" />
+            <span>Try sample:</span>
           </span>
           {sampleOptions.map((sample, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => onSampleSelect(sample)}
-              className="px-3 py-1 rounded-xl text-xs font-medium border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-500 dark:hover:border-emerald-500 text-slate-700 dark:text-slate-300 transition-all shadow-xs"
+              className="btn-squish px-3 py-1 rounded-full text-xs font-bold border-2 border-ink bg-white dark:bg-dusk-surface hover:bg-sunny/30 text-ink dark:text-dusk-text shadow-sticker-xs cursor-pointer transition-all"
             >
               {sample.label}
             </button>

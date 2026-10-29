@@ -1,44 +1,115 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, RefreshCw, AlertTriangle } from 'lucide-react';
+import { DoodleDonut, DoodlePancakes, DoodlePizza, DoodleSalad } from '../../assets/doodles';
 
-export function Loader({ message = "Processing multimodal inputs...", className = "" }) {
+export function Loader({
+  message = 'Cooking up answers...',
+  subtext = 'Analyzing food with multimodal intelligence ✨',
+  type = 'donut', // 'donut' | 'pancake'
+  className = ''
+}) {
   return (
-    <div className={`flex flex-col items-center justify-center p-8 space-y-3 ${className}`}>
-      <div className="relative w-12 h-12">
-        <div className="w-12 h-12 rounded-full border-4 border-emerald-200 dark:border-emerald-950 border-t-emerald-600 dark:border-t-emerald-400 animate-spin"></div>
-        <div className="absolute inset-0 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-          <Sparkles className="w-4 h-4" />
+    <div className={`flex flex-col items-center justify-center p-8 space-y-4 text-center ${className}`}>
+      <div className="relative">
+        <div className="w-20 h-20 rounded-3xl bg-white dark:bg-dusk-surface border-3 border-ink flex items-center justify-center p-2.5 shadow-sticker">
+          {type === 'pancake' ? (
+            <div className="animate-pancake-flip">
+              <DoodlePancakes size={52} />
+            </div>
+          ) : (
+            <div className="animate-donut-spin">
+              <DoodleDonut size={52} />
+            </div>
+          )}
+        </div>
+        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-sunny border-2 border-ink flex items-center justify-center shadow-xs">
+          <Sparkles className="w-3 h-3 text-ink" />
         </div>
       </div>
-      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 animate-pulse">
-        {message}
-      </p>
+      <div>
+        <p className="font-display font-black text-sm text-ink dark:text-dusk-text">
+          {message}
+        </p>
+        {subtext && (
+          <p className="text-xs font-semibold text-ink-muted mt-0.5">
+            {subtext}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
 
-export function Skeleton({ className = "" }) {
+export function DoodleEmptyState({
+  title = 'Nothing here yet!',
+  description = 'Snap a photo or add an item to start tracking.',
+  actionLabel = 'Get Started',
+  onAction,
+  Doodle = DoodleSalad,
+  className = ''
+}) {
   return (
-    <div className={`animate-pulse bg-slate-200 dark:bg-slate-800 rounded-2xl ${className}`} />
+    <div className={`rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-8 text-center shadow-sticker flex flex-col items-center justify-center max-w-md mx-auto space-y-4 ${className}`}>
+      <div className="w-20 h-20 rounded-3xl bg-sky-100 dark:bg-dusk-surface border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm animate-float">
+        <Doodle size={52} />
+      </div>
+      <div>
+        <h4 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+          {title}
+        </h4>
+        <p className="text-xs font-semibold text-ink-muted mt-1 max-w-xs">
+          {description}
+        </p>
+      </div>
+      {actionLabel && onAction && (
+        <button
+          type="button"
+          onClick={onAction}
+          className="btn-squish inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-tomato text-white border-2 border-ink text-xs font-display font-black shadow-sticker-xs cursor-pointer hover:shadow-sticker"
+        >
+          <span>{actionLabel}</span>
+        </button>
+      )}
+    </div>
   );
 }
 
-export function CardSkeleton() {
+export function DoodleErrorState({
+  title = 'Oops, something went sideways!',
+  description = 'We encountered a momentary glitch. Tap retry to run local deterministic AI.',
+  onRetry,
+  className = ''
+}) {
   return (
-    <div className="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
-      <div className="flex items-center gap-4">
-        <Skeleton className="w-14 h-14 rounded-2xl" />
-        <div className="space-y-2 flex-1">
-          <Skeleton className="h-5 w-1/3" />
-          <Skeleton className="h-3 w-1/4" />
-        </div>
+    <div className={`rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-8 text-center shadow-sticker flex flex-col items-center justify-center max-w-md mx-auto space-y-4 ${className}`}>
+      <div className="w-20 h-20 rounded-3xl bg-tomato/20 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
+        <DoodlePizza size={52} className="rotate-12" />
       </div>
-      <Skeleton className="h-28 w-full rounded-2xl" />
-      <div className="grid grid-cols-2 gap-3">
-        <Skeleton className="h-10 rounded-xl" />
-        <Skeleton className="h-10 rounded-xl" />
+      <div>
+        <h4 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+          {title}
+        </h4>
+        <p className="text-xs font-semibold text-ink-muted mt-1 max-w-xs">
+          {description}
+        </p>
       </div>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="btn-squish inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sunny text-ink border-2 border-ink text-xs font-display font-black shadow-sticker-xs cursor-pointer"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span>Try Again</span>
+        </button>
+      )}
     </div>
+  );
+}
+
+export function Skeleton({ className = '' }) {
+  return (
+    <div className={`animate-pulse bg-sky-200/50 dark:bg-dusk-surface rounded-2xl border border-ink/20 ${className}`} />
   );
 }
 

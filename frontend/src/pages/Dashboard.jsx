@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Utensils,
   ShieldCheck,
@@ -16,102 +17,108 @@ import {
   TrendingUp,
   Clock,
   CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  Zap,
+  Droplets,
+  Camera
 } from 'lucide-react';
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid
-} from 'recharts';
-import Loader from '../components/common/Loader';
-import ScoreGauge from '../components/common/ScoreGauge';
+import FoodStickerPicker from '../components/common/FoodStickerPicker';
 import ExpiryBadge from '../components/common/ExpiryBadge';
-import CuteFoodPlayground from '../components/common/CuteFoodPlayground';
+import {
+  DoodleBanana,
+  DoodlePancakes,
+  DoodleBurrito,
+  DoodlePizza,
+  DoodleBurger,
+  DoodleHotdog,
+  DoodleRamen,
+  DoodleSalad,
+  DoodleTaco,
+  DoodlePopcorn,
+  DoodleDonut,
+  DoodleAvocado,
+  DoodleStrawberry,
+  DoodlePie,
+  DoodleDrumstick
+} from '../assets/doodles';
 
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [gymSummary, setGymSummary] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
 
   useEffect(() => {
     fetchDashboardSummary();
   }, []);
 
-  const fetchDashboardSummary = async () => {
-    setLoading(true);
+  const calculateLiveGymMacros = () => {
     try {
-      const res = await axios.get('/api/v1/dashboard/summary');
-      setData(res.data);
-    } catch (err) {
-      console.warn('Dashboard summary using local fallback:', err);
-      // Graceful local data synthesis
       const todayStr = new Date().toISOString().split('T')[0];
       const localLogsRaw = localStorage.getItem(`foodverse_gym_logs_${todayStr}`);
-      const localLogs = localLogsRaw ? JSON.parse(localLogsRaw) : [];
-      const actCal = localLogs.reduce((acc, l) => acc + (parseFloat(l.calories) || 0), 0);
-      const actProt = localLogs.reduce((acc, l) => acc + (parseFloat(l.protein_g) || 0), 0);
+      const logs = localLogsRaw ? JSON.parse(localLogsRaw) : [];
+      const cal = logs.reduce((acc, l) => acc + (parseFloat(l.calories) || 0), 0);
+      const prot = logs.reduce((acc, l) => acc + (parseFloat(l.protein_g) || 0), 0);
+      const carbs = logs.reduce((acc, l) => acc + (parseFloat(l.carbs_g) || 0), 0);
+      const fat = logs.reduce((acc, l) => acc + (parseFloat(l.fat_g) || 0), 0);
+      setGymSummary({ calories: Math.round(cal), protein: Math.round(prot), carbs: Math.round(carbs), fat: Math.round(fat) });
+      return { cal, prot, carbs, fat, count: logs.length };
+    } catch {
+      return { cal: 0, prot: 0, carbs: 0, fat: 0, count: 0 };
+    }
+  };
 
+  const fetchDashboardSummary = async () => {
+    setLoading(true);
+    const liveGym = calculateLiveGymMacros();
+
+    try {
+      const res = await axios.get('/api/v1/dashboard/summary', { timeout: 4000 });
+      setData(res.data);
+    } catch (err) {
+      console.warn('Dashboard summary using offline fallback:', err);
+      // Fallback data
       setData({
         stats: {
-          total_scans: 12 + localLogs.length,
-          today_scans: localLogs.length || 1,
+          total_scans: 14 + liveGym.count,
+          today_scans: liveGym.count || 2,
           active_pantry_items: 8,
           expiring_pantry_count: 2,
-          food_waste_rate: 0,
-          gym_calorie_adherence: Math.min(100, Math.round((actCal / 2300) * 100)),
-          gym_protein_adherence: Math.min(100, Math.round((actProt / 140) * 100)),
         },
         alerts: [
           {
-            id: 'alert-welcome',
+            id: 'alert-1',
             severity: 'warning',
-            title: '2 Food Items Expiring Soon (Milk, Baby Spinach)',
-            message: 'Use "Cook from my Pantry" to prepare delicious zero-waste recipes before expiry.',
-            link: '/pantry',
-            created_at: new Date().toISOString()
+            title: '2 Pantry Items Expiring Soon (Whole Milk, Baby Spinach)',
+            message: 'Tap "Cook from Pantry" to turn expiring foods into zero-waste meals.',
+            link: '/cooking'
           }
-        ],
-        nutrition_trends: [
-          { date: 'Mon', calories: 2100, protein: 130, carbs: 240, fat: 65 },
-          { date: 'Tue', calories: 2250, protein: 145, carbs: 250, fat: 70 },
-          { date: 'Wed', calories: 1980, protein: 125, carbs: 220, fat: 60 },
-          { date: 'Thu', calories: 2320, protein: 150, carbs: 260, fat: 72 },
-          { date: 'Fri', calories: 2400, protein: 155, carbs: 270, fat: 75 },
-          { date: 'Sat', calories: 2180, protein: 138, carbs: 245, fat: 68 },
-          { date: 'Sun', calories: Math.max(actCal, 2280), protein: Math.max(actProt, 142), carbs: 255, fat: 70 },
         ],
         recent_analyses: [
           {
             id: 1,
             analysis_type: 'food_scan',
-            item_name: 'Steamed Edamame & Brown Rice',
-            confidence: 0.96,
-            score: 92,
-            data_source: 'database',
-            model_provider: 'mock',
-            created_at: new Date().toISOString()
+            item_name: 'Grilled Salmon with Brown Rice',
+            score: 95,
+            data_source: 'Database verified',
+            time: '15m ago'
           },
           {
             id: 2,
             analysis_type: 'freshness',
             item_name: 'Fresh Red Apple',
-            confidence: 0.94,
-            score: 88,
-            data_source: 'database',
-            model_provider: 'mock',
-            created_at: new Date().toISOString()
+            score: 91,
+            data_source: 'Biomarker AI',
+            time: '2h ago'
           }
         ],
         expiring_items: [
-          { id: 1, name: 'Whole Milk', storage_location: 'fridge', expiry_date: new Date(Date.now() + 86400000).toISOString(), days_remaining: 1, status: 'use_soon' },
-          { id: 2, name: 'Fresh Baby Spinach', storage_location: 'fridge', expiry_date: new Date(Date.now() + 172800000).toISOString(), days_remaining: 2, status: 'use_soon' },
+          { id: 1, name: 'Whole Milk', storage_location: 'Fridge', days_remaining: 1, status: 'use_soon' },
+          { id: 2, name: 'Baby Spinach', storage_location: 'Fridge', days_remaining: 2, status: 'use_soon' },
         ],
         featured_fact: {
-          fact: 'Bananas produce natural ethylene gas that speeds up the ripening of adjacent fruits like avocados and mangoes.',
-          category: 'Freshness & Storage'
+          fact: 'Air-popped popcorn contains more polyphenol antioxidants than apples, because whole corn hull protects nutrient density.',
+          category: 'Food Science'
         }
       });
     } finally {
@@ -119,93 +126,229 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="py-24 flex justify-center">
-        <Loader message="Synthesizing multimodal food intelligence..." />
-      </div>
-    );
-  }
+  const scrollToPicker = () => {
+    const el = document.getElementById('food-sticker-picker');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const isHindi = i18n?.language === 'hi';
 
   const stats = data?.stats || {};
   const alerts = data?.alerts || [];
-  const trends = data?.nutrition_trends || [];
   const recent = data?.recent_analyses || [];
   const expiring = data?.expiring_items || [];
   const fact = data?.featured_fact;
 
+  // 6 Primary Modules
+  const MODULES = [
+    {
+      title: 'Food Recognition',
+      desc: 'Snap any dish to get instant calibrated calories, macros & allergen guardrails.',
+      to: '/food-scan',
+      accent: 'bg-tomato',
+      accentSoft: 'bg-tomato/15',
+      textColor: 'text-tomato',
+      Doodle: DoodlePizza,
+      tag: 'Snap & Track'
+    },
+    {
+      title: 'Freshness Check',
+      desc: 'Inspect fruit and veggie freshness with visual decay and shelf-life prediction.',
+      to: '/freshness',
+      accent: 'bg-mint',
+      accentSoft: 'bg-mint/20',
+      textColor: 'text-emerald-600',
+      Doodle: DoodleAvocado,
+      tag: 'Zero Waste'
+    },
+    {
+      title: 'Kitchen Hygiene',
+      desc: 'Inspect cooking surfaces, food safety habits, and kitchen sanitation scores.',
+      to: '/hygiene',
+      accent: 'bg-teal',
+      accentSoft: 'bg-teal/20',
+      textColor: 'text-teal',
+      Doodle: DoodleSalad,
+      tag: 'Sanitation'
+    },
+    {
+      title: 'Smart Cooking',
+      desc: 'Get tasty, step-by-step recipes and hands-free timers from your pantry items.',
+      to: '/cooking',
+      accent: 'bg-sunny',
+      accentSoft: 'bg-sunny/25',
+      textColor: 'text-amber-600',
+      Doodle: DoodleRamen,
+      tag: 'Chef AI'
+    },
+    {
+      title: 'Meal Planner',
+      desc: 'Plan healthy weekly meals tailored to your diet, goals, and grocery shopping list.',
+      to: '/meal-planner',
+      accent: 'bg-grape',
+      accentSoft: 'bg-grape/20',
+      textColor: 'text-grape',
+      Doodle: DoodlePancakes,
+      tag: 'Weekly Diet'
+    },
+    {
+      title: 'Pantry & Expiry',
+      desc: 'Track groceries in your fridge & pantry with automatic spoilage countdowns.',
+      to: '/pantry',
+      accent: 'bg-peach',
+      accentSoft: 'bg-peach/25',
+      textColor: 'text-orange-600',
+      Doodle: DoodlePopcorn,
+      tag: 'Inventory'
+    }
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* Welcome & Quick Action Shortcuts */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            Executive Nutrition & Hygiene Command Center
+    <div className="space-y-10">
+      {/* =========================================================================
+          HERO SECTION (DIRECT TARGET REFERENCE MATCH - IMAGE 5)
+          Sky blue canvas, floating food doodles, big bold friendly headline & pill buttons
+          ========================================================================= */}
+      <section className="relative overflow-hidden rounded-3xl sm:rounded-[36px] bg-gradient-to-b from-[#BFE6FF] via-[#A6DDFF] to-[#8FD3FF] dark:from-[#111C3A] dark:via-[#16254E] dark:to-[#0E172F] border-3 border-ink p-6 sm:p-10 lg:p-14 shadow-sticker-lg text-center select-none">
+        {/* Confetti-like pastel dots */}
+        <div className="absolute top-6 left-12 w-3 h-3 rounded-full bg-tomato/70 border border-ink/40 pointer-events-none" />
+        <div className="absolute top-16 right-20 w-2.5 h-2.5 rounded-full bg-sunny border border-ink/40 pointer-events-none" />
+        <div className="absolute bottom-8 left-28 w-3 h-3 rounded-full bg-mint border border-ink/40 pointer-events-none" />
+        <div className="absolute bottom-14 right-32 w-2 h-2 rounded-full bg-grape/70 border border-ink/40 pointer-events-none" />
+        <div className="absolute top-28 left-1/4 w-2 h-2 rounded-full bg-peach border border-ink/40 pointer-events-none" />
+        <div className="absolute bottom-20 right-1/4 w-2.5 h-2.5 rounded-full bg-sky-300 border border-ink/40 pointer-events-none" />
+
+        {/* Floating Cute Doodles Scattered Around Hero (as seen in Image 5) */}
+        <div className="hidden md:block absolute top-4 left-6 pointer-events-none animate-float opacity-90 hover:opacity-100 transition-opacity">
+          <DoodlePancakes size={72} />
+        </div>
+        <div className="hidden lg:block absolute top-3 left-1/4 pointer-events-none -rotate-12 opacity-85">
+          <DoodleBurrito size={64} />
+        </div>
+        <div className="hidden md:block absolute top-4 right-8 pointer-events-none animate-float opacity-90" style={{ animationDelay: '1s' }}>
+          <DoodlePie size={70} />
+        </div>
+        <div className="hidden lg:block absolute top-2 right-1/4 pointer-events-none rotate-12 opacity-85">
+          <DoodleRamen size={68} />
+        </div>
+
+        <div className="hidden md:block absolute top-1/2 -translate-y-1/2 left-4 pointer-events-none -rotate-6 opacity-95">
+          <DoodlePizza size={78} />
+        </div>
+        <div className="hidden md:block absolute top-1/2 -translate-y-1/2 right-4 pointer-events-none rotate-12 opacity-95">
+          <DoodleHotdog size={74} />
+        </div>
+
+        <div className="hidden md:block absolute bottom-4 left-8 pointer-events-none rotate-6 opacity-90">
+          <DoodleBurger size={70} />
+        </div>
+        <div className="hidden lg:block absolute bottom-3 left-1/3 pointer-events-none -rotate-6 opacity-85">
+          <DoodleTaco size={64} />
+        </div>
+        <div className="hidden md:block absolute bottom-4 right-8 pointer-events-none -rotate-6 opacity-90">
+          <DoodleDonut size={68} />
+        </div>
+        <div className="hidden lg:block absolute bottom-3 right-1/3 pointer-events-none rotate-6 opacity-85">
+          <DoodlePopcorn size={66} />
+        </div>
+
+        {/* Central Hero Headline and Call to Action */}
+        <div className="relative z-10 max-w-2xl mx-auto space-y-4 sm:space-y-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 dark:bg-dusk-surface/90 border-2 border-ink text-xs font-black shadow-sticker-sm text-ink dark:text-dusk-text">
+            <Sparkles className="w-3.5 h-3.5 text-sunny" />
+            <span>FoodVerse AI ✨ Your food, made simple</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            FoodVerse AI Dashboard
+
+          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-ink dark:text-white tracking-tight leading-tight">
+            {isHindi ? 'भूख लगी है?' : 'Hungry?'}
+            <br />
+            <span className="text-tomato">
+              {isHindi ? 'आपकी थाली में क्या है?' : "What's on your plate?"}
+            </span>
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-            Real-time multisensory telemetry, kitchen safety audits, and predictive dietary insights.
+
+          <p className="font-sans font-bold text-sm sm:text-base text-ink/80 dark:text-slate-200 max-w-lg mx-auto">
+            {isHindi
+              ? 'किसी भी खाने की फोटो लें या नीचे दिए गए फूड आइकॉन को टैप करें। तुरंत कैलोरी, ताजगी और रेसिपी पाएं!'
+              : 'Snap a meal photo or pick a food icon below for instant calories, freshness ratings, and zero-waste recipes.'}
+          </p>
+
+          {/* Two Pill Buttons: Filled + Dashed Outline (Like Image 5) */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <Link
+              to="/food-scan"
+              className="btn-squish w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-tomato text-white border-2.5 border-ink font-display font-black text-sm tracking-wide shadow-sticker hover:shadow-sticker-lg cursor-pointer transition-all"
+            >
+              <Camera className="w-4 h-4" />
+              <span>{isHindi ? 'खाना स्कैन करें' : 'SCAN A MEAL'}</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={scrollToPicker}
+              className="btn-squish w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white/95 dark:bg-dusk-card text-ink dark:text-dusk-text border-2.5 border-dashed border-ink font-display font-black text-sm tracking-wide shadow-sticker hover:shadow-sticker-lg cursor-pointer transition-all"
+            >
+              <span>🍌</span>
+              <span>{isHindi ? 'फूड आइकॉन चुनें' : 'SELECT A FOOD ICON'}</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          FOOD STICKER PICKER SECTION
+          15 Hand-drawn SVG doodle stickers with wrapped text & macro popup
+          ========================================================================= */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sunny/30 border border-ink text-[11px] font-black uppercase text-ink">
+              <span>Quick Tap Food Picker</span>
+            </div>
+            <h2 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+              Tap Any Food to Inspect & Log
+            </h2>
+          </div>
+          <p className="text-xs font-bold text-ink-muted">
+            Tap a card to view macros, facts & 1-click log to Gym or Pantry
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link
-            to="/food-scan"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-2xl bg-rose-500 hover:bg-rose-600 text-white shadow-md shadow-rose-500/20 transition"
-          >
-            <Utensils className="w-3.5 h-3.5" />
-            Scan Meal
-          </Link>
-          <Link
-            to="/freshness"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-md shadow-amber-500/20 transition"
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Check Freshness
-          </Link>
-          <Link
-            to="/gym"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-2xl bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20 transition"
-          >
-            <Dumbbell className="w-3.5 h-3.5" />
-            Gym Mode
-          </Link>
-        </div>
-      </div>
+        {/* 15 Sticker Cards Grid */}
+        <FoodStickerPicker onFoodLogged={calculateLiveGymMacros} />
+      </section>
 
-      {/* Cute Interactive Food Playground (Directly matches user uploaded reference design) */}
-      <CuteFoodPlayground onLoggedFood={() => fetchDashboardSummary()} />
-
-      {/* Active High-Priority Alerts */}
+      {/* =========================================================================
+          ACTIVE HIGH-PRIORITY ALERTS (IF ANY)
+          ========================================================================= */}
       {alerts.length > 0 && (
         <div className="space-y-3">
           {alerts.map((alert) => (
             <div
               key={alert.id}
-              className={`p-4 rounded-2xl border flex items-start justify-between gap-3 ${
-                alert.severity === 'danger'
-                  ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-200'
-                  : alert.severity === 'warning'
-                  ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200'
-                  : 'bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900 text-blue-900 dark:text-blue-200'
-              }`}
+              className="p-4 rounded-3xl bg-amber-100 dark:bg-amber-950/60 border-2.5 border-ink shadow-sticker-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
             >
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-2xl bg-sunny border-2 border-ink">
+                  <AlertTriangle className="w-5 h-5 text-ink flex-shrink-0" />
+                </div>
                 <div>
-                  <h4 className="font-bold text-sm">{alert.title}</h4>
-                  <p className="text-xs opacity-90 mt-0.5">{alert.message}</p>
+                  <h4 className="font-display font-black text-sm text-ink dark:text-amber-200">
+                    {alert.title}
+                  </h4>
+                  <p className="text-xs font-semibold text-ink/80 dark:text-amber-300 mt-0.5">
+                    {alert.message}
+                  </p>
                 </div>
               </div>
               {alert.link && (
                 <Link
                   to={alert.link}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-900/80 text-xs font-bold shadow-2xs hover:opacity-90 whitespace-nowrap"
+                  className="btn-squish inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white dark:bg-dusk-surface border-2 border-ink text-xs font-black text-ink shadow-sticker-xs hover:shadow-sticker cursor-pointer whitespace-nowrap self-end sm:self-auto"
                 >
-                  View Details <ArrowRight className="w-3.5 h-3.5" />
+                  Cook Zero-Waste <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               )}
             </div>
@@ -213,260 +356,255 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Top 4 KPI Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Multimodal Scans</span>
-            <Utensils className="w-4 h-4 text-emerald-500" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 dark:text-white">
-              {stats.total_scans || 0}
-            </span>
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              +{stats.today_scans || 0} today
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400">Image, video, audio & barcode records</p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Pantry Inventory</span>
-            <Package className="w-4 h-4 text-sky-500" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 dark:text-white">
-              {stats.active_pantry_items || 0}
-            </span>
-            {stats.expiring_pantry_count > 0 && (
-              <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
-                {stats.expiring_pantry_count} urgent
-              </span>
-            )}
-          </div>
-          <p className="text-[11px] text-slate-400">Tracked items in fridge, freezer & shelf</p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Kitchen Waste Rate</span>
-            <Flame className="w-4 h-4 text-rose-500" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 dark:text-white">
-              {stats.food_waste_rate || 0}%
-            </span>
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              Optimal &lt;15%
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400">Pantry items discarded vs consumed</p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Gym Target Adherence</span>
-            <Dumbbell className="w-4 h-4 text-violet-500" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 dark:text-white">
-              {stats.gym_calorie_adherence || 0}%
-            </span>
-            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
-              {stats.gym_protein_adherence || 0}% Prot
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400">Today's calorie & protein completion</p>
-        </div>
-      </div>
-
-      {/* Main Analytics Row: 7-Day Trends & Featured Science Fact */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Weekly Nutrition Trends Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
+      {/* =========================================================================
+          TODAY'S LIVE GYM MACROS STRIP
+          Reflects logged items instantly with live totals & target indicators
+          ========================================================================= */}
+      <section className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-5 sm:p-6 shadow-sticker space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-2xl bg-grape/20 border-2 border-ink flex items-center justify-center">
+              <Dumbbell className="w-5 h-5 text-grape" />
+            </div>
             <div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                7-Day Calorie & Macro Trajectory
+              <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+                Today's Gym & Macro Fuel
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Daily nutritional volume logged across meals and athletic logs.
+              <p className="text-xs font-semibold text-ink-muted">
+                Live daily intake from food scans and logged stickers
               </p>
             </div>
           </div>
-
-          <div className="h-64 w-full pt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="calorieGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="proteinGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
-                <XAxis dataKey="date" tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                <YAxis tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '12px',
-                    color: '#fff',
-                    fontSize: '12px'
-                  }}
-                />
-                <Area type="monotone" dataKey="calories" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#calorieGrad)" name="Calories (kcal)" />
-                <Area type="monotone" dataKey="protein" stroke="#8b5cf6" strokeWidth={2.5} fillOpacity={1} fill="url(#proteinGrad)" name="Protein (g)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <Link
+            to="/gym"
+            className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-grape text-white border-2 border-ink text-xs font-black shadow-sticker-xs cursor-pointer"
+          >
+            Open Gym Mode <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        {/* Featured Food Science Card */}
-        <div className="bg-gradient-to-br from-amber-500/15 via-emerald-500/10 to-transparent rounded-3xl border border-amber-500/25 p-6 shadow-sm flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-xl bg-amber-500 text-slate-950">
-                <Lightbulb className="w-4 h-4" />
-              </span>
-              <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wide">
-                Food Science Insight
-              </span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-3.5 rounded-2xl bg-tomato/15 border-2 border-ink">
+            <div className="flex items-center justify-between text-tomato mb-1">
+              <span className="text-xs font-extrabold uppercase">Calories</span>
+              <Flame className="w-4 h-4" />
             </div>
-
-            <blockquote className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
-              "{fact?.fact || "Bananas produce natural ethylene gas that speeds up the ripening of adjacent fruits."}"
-            </blockquote>
-
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Category: <strong className="text-slate-700 dark:text-slate-300">{fact?.category || "Freshness & Storage"}</strong>
-            </p>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display font-black text-2xl text-ink">
+                {gymSummary.calories}
+              </span>
+              <span className="text-[11px] font-bold text-ink-muted">/ 2,300 kcal</span>
+            </div>
+            <div className="w-full bg-white dark:bg-dusk-surface rounded-full h-2 mt-2 border border-ink overflow-hidden">
+              <div
+                className="bg-tomato h-full transition-all duration-300"
+                style={{ width: `${Math.min(100, (gymSummary.calories / 2300) * 100)}%` }}
+              />
+            </div>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-amber-500/20 flex items-center justify-between">
-            <span className="text-[10px] text-slate-400">Verified by FoodVerse AI</span>
-            <Link
-              to="/did-you-know"
-              className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 dark:text-amber-300 hover:underline"
-            >
-              Explore Facts <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
+          <div className="p-3.5 rounded-2xl bg-grape/15 border-2 border-ink">
+            <div className="flex items-center justify-between text-grape mb-1">
+              <span className="text-xs font-extrabold uppercase">Protein</span>
+              <Dumbbell className="w-4 h-4" />
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display font-black text-2xl text-ink">
+                {gymSummary.protein}g
+              </span>
+              <span className="text-[11px] font-bold text-ink-muted">/ 140g target</span>
+            </div>
+            <div className="w-full bg-white dark:bg-dusk-surface rounded-full h-2 mt-2 border border-ink overflow-hidden">
+              <div
+                className="bg-grape h-full transition-all duration-300"
+                style={{ width: `${Math.min(100, (gymSummary.protein / 140) * 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-sunny/20 border-2 border-ink">
+            <div className="flex items-center justify-between text-amber-600 mb-1">
+              <span className="text-xs font-extrabold uppercase">Carbs</span>
+              <Zap className="w-4 h-4" />
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display font-black text-2xl text-ink">
+                {gymSummary.carbs}g
+              </span>
+              <span className="text-[11px] font-bold text-ink-muted">/ 250g target</span>
+            </div>
+            <div className="w-full bg-white dark:bg-dusk-surface rounded-full h-2 mt-2 border border-ink overflow-hidden">
+              <div
+                className="bg-sunny h-full transition-all duration-300"
+                style={{ width: `${Math.min(100, (gymSummary.carbs / 250) * 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-peach/20 border-2 border-ink">
+            <div className="flex items-center justify-between text-orange-600 mb-1">
+              <span className="text-xs font-extrabold uppercase">Fats</span>
+              <Droplets className="w-4 h-4" />
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display font-black text-2xl text-ink">
+                {gymSummary.fat}g
+              </span>
+              <span className="text-[11px] font-bold text-ink-muted">/ 70g target</span>
+            </div>
+            <div className="w-full bg-white dark:bg-dusk-surface rounded-full h-2 mt-2 border border-ink overflow-hidden">
+              <div
+                className="bg-peach h-full transition-all duration-300"
+                style={{ width: `${Math.min(100, (gymSummary.fat / 70) * 100)}%` }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Secondary Row: Recent Multimodal Activity & Expiring Items Action Center */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Multimodal Activity */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-slate-500" />
-              Recent Multimodal Inferences
-            </h3>
-            <Link
-              to="/history"
-              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
-            >
-              View Full History
-            </Link>
+      {/* =========================================================================
+          6 PRIMARY MODULE CARDS (STICKER STYLE WITH DOODLES)
+          Plain English, large tap targets, colorful borders
+          ========================================================================= */}
+      <section className="space-y-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-mint/30 border border-ink text-[11px] font-black uppercase text-ink">
+            <span>Explore All Consoles</span>
           </div>
+          <h2 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+            Multimodal Food Intelligence
+          </h2>
+        </div>
 
-          {recent.length === 0 ? (
-            <div className="py-12 text-center text-xs text-slate-400">
-              No recent scans recorded. Upload a food photo or scan a kitchen video to get started.
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {recent.map((rec) => (
-                <div key={rec.id} className="py-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400">
-                      {rec.analysis_type === 'freshness' ? (
-                        <ShieldCheck className="w-4 h-4 text-amber-500" />
-                      ) : (
-                        <Utensils className="w-4 h-4" />
-                      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {MODULES.map((mod) => {
+            const ModDoodle = mod.Doodle;
+            return (
+              <div
+                key={mod.title}
+                className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-5 shadow-sticker hover:shadow-sticker-lg hover:-translate-y-1 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div
+                      className={`w-14 h-14 rounded-2xl ${mod.accentSoft} border-2 border-ink flex items-center justify-center p-2 shadow-xs`}
+                    >
+                      <ModDoodle size={38} />
                     </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-slate-900 dark:text-white">
-                        {rec.item_name || 'Food Scan Item'}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {rec.analysis_type} • Confidence {Math.round(rec.confidence * 100)}% • {new Date(rec.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {rec.score !== null && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                        Score: {rec.score}
-                      </span>
-                    )}
-                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 capitalize">
-                      {rec.data_source}
+                    <span className="px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-dusk-surface border border-ink text-[10px] font-black uppercase text-ink dark:text-dusk-text">
+                      {mod.tag}
                     </span>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Expiring Pantry Widget */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4 flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-                <Package className="w-4 h-4 text-amber-500" />
-                Urgent Expirations
-              </h3>
-              <Link to="/pantry" className="text-xs font-semibold text-emerald-600 hover:underline">
-                Pantry
+                  <h3 className="font-display font-black text-xl text-ink dark:text-dusk-text">
+                    {mod.title}
+                  </h3>
+                  <p className="text-xs font-semibold text-ink-muted mt-1 leading-relaxed">
+                    {mod.desc}
+                  </p>
+                </div>
+
+                <div className="pt-4 mt-2 border-t-2 border-ink/10 flex items-center justify-between">
+                  <Link
+                    to={mod.to}
+                    className={`btn-squish inline-flex items-center gap-1.5 px-4 py-2 rounded-full ${mod.accent} text-white border-2 border-ink text-xs font-display font-black shadow-sticker-xs cursor-pointer`}
+                  >
+                    <span>Open Console</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* =========================================================================
+          PANTRY USE-SOON STRIP & DID YOU KNOW FOOD SCIENCE CARD
+          ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Pantry Use Soon Strip */}
+        <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-5 shadow-sticker flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-peach" />
+                <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+                  Use Soon From Pantry
+                </h3>
+              </div>
+              <Link to="/pantry" className="text-xs font-black text-peach hover:underline">
+                View all ({expiring.length})
               </Link>
             </div>
 
-            {expiring.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-400">
-                All pantry items are fresh! No items expiring within 3 days.
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {expiring.map((it) => (
-                  <div
-                    key={it.id}
-                    className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between"
-                  >
+            <div className="space-y-2">
+              {expiring.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-3 rounded-2xl bg-sky-50 dark:bg-dusk-surface border-2 border-ink flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-peach border border-ink" />
                     <div>
-                      <h5 className="font-bold text-xs text-slate-900 dark:text-white">{it.name}</h5>
-                      <span className="text-[10px] text-slate-500">{it.storage_location}</span>
+                      <h5 className="font-display font-bold text-xs text-ink dark:text-dusk-text">
+                        {item.name}
+                      </h5>
+                      <span className="text-[10px] font-semibold text-ink-muted">
+                        Stored in {item.storage_location}
+                      </span>
                     </div>
-                    <ExpiryBadge
-                      expiryDate={it.expiry_date}
-                      daysLeft={it.days_remaining}
-                      status={it.status}
-                    />
                   </div>
-                ))}
-              </div>
-            )}
+                  <ExpiryBadge daysLeft={item.days_remaining} status={item.status} />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <Link
-            to="/pantry"
-            className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs text-center shadow-sm transition block"
-          >
-            Cook Expiring Items Now
-          </Link>
+          <div className="pt-3 mt-3 border-t-2 border-ink/10 flex items-center justify-between">
+            <span className="text-xs font-semibold text-ink-muted">
+              Prevent spoilage with zero waste
+            </span>
+            <Link
+              to="/cooking"
+              className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sunny text-ink border-2 border-ink text-xs font-black shadow-sticker-xs cursor-pointer"
+            >
+              Cook These Now <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Rotating Did You Know Card */}
+        <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-5 shadow-sticker flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-amber-500" />
+                <h3 className="font-display font-black text-lg text-ink dark:text-dusk-text">
+                  Food Science Fact
+                </h3>
+              </div>
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-sunny/30 border border-ink text-ink">
+                {fact?.category || 'Nutrient Tip'}
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-sunny/15 border-2 border-ink text-xs font-medium text-ink dark:text-dusk-text leading-relaxed">
+              "{fact?.fact || 'Bananas produce natural ethylene gas that speeds up the ripening of adjacent fruits.'}"
+            </div>
+          </div>
+
+          <div className="pt-3 mt-3 border-t-2 border-ink/10 flex items-center justify-between">
+            <span className="text-xs font-semibold text-ink-muted">
+              Curated by Anshika Gupta
+            </span>
+            <Link
+              to="/did-you-know"
+              className="btn-squish inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-dusk-surface border-2 border-ink text-xs font-black text-ink shadow-sticker-xs cursor-pointer"
+            >
+              Explore 50+ Facts <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

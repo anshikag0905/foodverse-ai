@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChefHat, Sparkles } from 'lucide-react';
 import apiClient from '../services/api';
 import ChatPanel from '../components/common/ChatPanel';
+import { DoodleRamen } from '../assets/doodles';
 
 export default function CookingAssistant() {
   const { t, i18n } = useTranslation();
@@ -12,7 +13,6 @@ export default function CookingAssistant() {
 
   const handleSendMessage = async (query, usePantry = false) => {
     setIsLoading(true);
-    // Optimistic user bubble
     setMessages(prev => [...prev, { sender: 'user', text: query }]);
 
     try {
@@ -148,17 +148,54 @@ export default function CookingAssistant() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-          <ChefHat className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-          <span>{t('nav.cooking')}</span>
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-          Interactive recipe suggestions, step-by-step guidance with timers, and zero-waste pantry cooking.
-        </p>
+    <div className="space-y-8">
+      {/* =========================================================================
+          MODULE HEADER BAND (SUNNY ACCENT + DOODLE RAMEN)
+          ========================================================================= */}
+      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-3xl bg-sunny/25 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
+            <DoodleRamen size={46} className="animate-float" />
+          </div>
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sunny/30 border border-ink text-[11px] font-black uppercase text-amber-800 dark:text-sunny">
+              <span>Culinary AI</span>
+            </div>
+            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+              Smart Cooking Guide & Chef AI
+            </h1>
+            <p className="text-xs font-semibold text-ink-muted mt-0.5">
+              Pantry-aware recipe generator, step-by-step timers, and smart ingredient substitutions.
+            </p>
+          </div>
+        </div>
       </div>
 
+      {/* =========================================================================
+          3-STEP "HOW IT WORKS" STRIP
+          ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-ink dark:text-dusk-text">
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-sunny text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+            1
+          </span>
+          <span>Ask for any recipe or tap "Cook From My Pantry"</span>
+        </div>
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-peach text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+            2
+          </span>
+          <span>Chef AI synthesizes custom ingredient ratios & swaps</span>
+        </div>
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-tomato text-white border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+            3
+          </span>
+          <span>Follow along with integrated countdown cooking timers</span>
+        </div>
+      </div>
+
+      {/* Chat Panel with Timer & Voice Controls */}
       <ChatPanel
         messages={messages}
         onSendMessage={(q) => handleSendMessage(q, false)}

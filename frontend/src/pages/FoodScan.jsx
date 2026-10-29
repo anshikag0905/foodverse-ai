@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Utensils, Barcode, Sparkles, Check, AlertCircle } from 'lucide-react';
+import { Utensils, Barcode, Sparkles, Check, AlertCircle, Camera, Search, HelpCircle } from 'lucide-react';
 import apiClient from '../services/api';
 import UploadDropzone from '../components/common/UploadDropzone';
 import BarcodeScanner from '../components/common/BarcodeScanner';
 import ResultCard from '../components/common/ResultCard';
-import { Loader } from '../components/common/Loader';
+import { Loader, DoodleEmptyState } from '../components/common/Loader';
+import { DoodlePizza, DoodleSalad } from '../assets/doodles';
 
 // Deterministic fallback dictionary for sample items and offline image predictions
 const getDeterministicFoodResult = (str) => {
@@ -99,7 +100,7 @@ const getDeterministicFoodResult = (str) => {
     };
   }
   return {
-    name: "Nutritious Mixed Culinary Dish",
+    name: "Nutritious Mixed Dish",
     name_hi: "मिश्रित पौष्टिक आहार",
     confidence: 0.91,
     category: "Prepared Food",
@@ -158,7 +159,6 @@ export default function FoodScan() {
       setAnalysisResult(res);
     } catch (err) {
       console.warn('API analyze image fallback:', err);
-      // Fallback deterministic result for image upload
       const fallback = getDeterministicFoodResult(file.name);
       setAnalysisResult(fallback);
     } finally {
@@ -180,7 +180,6 @@ export default function FoodScan() {
       setAnalysisResult(res);
     } catch (err) {
       console.warn('API analyze query fallback:', err);
-      // Fallback deterministic result for query
       const fallback = getDeterministicFoodResult(query);
       setAnalysisResult(fallback);
     } finally {
@@ -199,7 +198,6 @@ export default function FoodScan() {
 
     try {
       const foodItem = await apiClient.get(`/foods/barcode/${barcode}`);
-      // Format as analysis result
       setAnalysisResult({
         name: foodItem.name,
         name_hi: foodItem.name_hi,
@@ -243,7 +241,6 @@ export default function FoodScan() {
         corrected_name: correctedName,
         input_path: analysisResult.image_url
       });
-      // Re-query database for corrected food
       handleTextQuery(correctedName);
     } catch (e) {
       console.error(e);
@@ -251,45 +248,81 @@ export default function FoodScan() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-            <Utensils className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-            <span>{t('nav.food_scan')}</span>
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            Multimodal dish identification, nutrition estimation, health scores, and allergen screening.
-          </p>
+    <div className="space-y-8">
+      {/* =========================================================================
+          MODULE HEADER BAND (TOMATO ACCENT + DOODLE PIZZA)
+          ========================================================================= */}
+      <div className="rounded-3xl bg-white dark:bg-dusk-card border-3 border-ink p-6 shadow-sticker flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-3xl bg-tomato/20 border-2.5 border-ink flex items-center justify-center p-2 shadow-sticker-sm">
+            <DoodlePizza size={46} className="animate-float" />
+          </div>
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-tomato/20 border border-ink text-[11px] font-black uppercase text-tomato">
+              <span>Vision AI Module</span>
+            </div>
+            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink dark:text-dusk-text mt-1">
+              Food Recognition & Calories
+            </h1>
+            <p className="text-xs font-semibold text-ink-muted mt-0.5">
+              Snap any meal, upload a photo, or scan a barcode to estimate calories & check allergens.
+            </p>
+          </div>
         </div>
 
-        {/* Input Modality Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+        {/* Input Modality Switcher */}
+        <div className="flex items-center gap-1.5 p-1 rounded-full bg-sky-100 dark:bg-dusk-surface border-2 border-ink self-stretch sm:self-auto justify-center">
           <button
             onClick={() => setActiveTab('image')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`btn-squish px-4 py-1.5 rounded-full text-xs font-display font-black transition-all cursor-pointer ${
               activeTab === 'image'
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-tomato text-white border-1.5 border-ink shadow-sticker-xs'
+                : 'text-ink dark:text-dusk-text hover:text-tomato'
             }`}
           >
             Photo & Query
           </button>
           <button
             onClick={() => setActiveTab('barcode')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`btn-squish flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-display font-black transition-all cursor-pointer ${
               activeTab === 'barcode'
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'bg-tomato text-white border-1.5 border-ink shadow-sticker-xs'
+                : 'text-ink dark:text-dusk-text hover:text-tomato'
             }`}
           >
             <Barcode className="w-3.5 h-3.5" />
-            <span>Barcode Scan</span>
+            <span>Barcode</span>
           </button>
         </div>
       </div>
 
-      {/* Input Zone */}
+      {/* =========================================================================
+          3-STEP "HOW IT WORKS" STRIP
+          ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-bold text-ink dark:text-dusk-text">
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-tomato text-white border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+            1
+          </span>
+          <span>Upload plate photo, search dish, or scan barcode</span>
+        </div>
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-sunny text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+            2
+          </span>
+          <span>AI detects visual textures & queries 20k+ food database</span>
+        </div>
+        <div className="p-3.5 rounded-2xl bg-white dark:bg-dusk-card border-2 border-ink shadow-sticker-xs flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-mint text-ink border border-ink flex items-center justify-center font-display font-black text-xs flex-shrink-0">
+            3
+          </span>
+          <span>Get calibrated calories, macros & allergen guardrails</span>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          INPUT AREA (DROPZONE / CAMERA OR BARCODE SCANNER)
+          ========================================================================= */}
       {activeTab === 'image' ? (
         <UploadDropzone
           accept="image/*"
@@ -301,22 +334,37 @@ export default function FoodScan() {
           isUploading={isAnalyzing}
         />
       ) : (
-        <div className="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft">
+        <div className="p-6 rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card shadow-sticker">
           <BarcodeScanner onScanSuccess={handleBarcodeScanned} />
         </div>
       )}
 
       {/* Error Callout */}
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2">
+        <div className="p-4 rounded-2xl bg-tomato/20 border-2.5 border-tomato text-tomato text-xs font-bold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading State with Cute Bouncing Donut */}
       {isAnalyzing && (
-        <Loader message="Multimodal Vision Engine is identifying food textures and looking up nutrition..." />
+        <Loader
+          message="Scanning food contours & calculating macros..."
+          subtext="Matching against USDA composition dataset ✨"
+          type="pancake"
+        />
+      )}
+
+      {/* Empty State before any analysis */}
+      {!analysisResult && !isAnalyzing && (
+        <DoodleEmptyState
+          Doodle={DoodleSalad}
+          title="No food analyzed yet"
+          description="Drop an image above, search by text, or tap a sample to view calibrated nutrition."
+          actionLabel="Try Sample Apple"
+          onAction={() => handleTextQuery('apple')}
+        />
       )}
 
       {/* Result Card Presentation */}

@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, MicOff, ChefHat, Play, Pause, RotateCcw, Clock, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { DoodleRamen } from '../../assets/doodles';
 
 export default function ChatPanel({
   messages = [],
   onSendMessage,
   onPantrySuggest,
   quickPrompts = [
-    "What can I cook with tomatoes, eggs, and spinach?",
-    "Suggest a high-protein quick breakfast under 400 kcal",
-    "How can I substitute buttermilk in pancakes?",
-    "Show Indian vegetarian dinner recipes with low sodium"
+    "How to make street-style Masala Maggi in 2 minutes?",
+    "Quick garlic herb pasta under 15 minutes",
+    "High-protein tawa paneer with veggies",
+    "What can I cook with eggs, tomatoes, and spinach?"
   ],
   isLoading = false,
   className = ""
@@ -39,7 +40,7 @@ export default function ChatPanel({
 
     try {
       const recognition = new SpeechRecognition();
-      recognition.lang = i18n.language.startsWith('hi') ? 'hi-IN' : 'en-US';
+      recognition.lang = i18n.language?.startsWith('hi') ? 'hi-IN' : 'en-US';
       recognition.interimResults = false;
       recognition.onstart = () => setIsRecording(true);
       recognition.onresult = (event) => {
@@ -73,7 +74,6 @@ export default function ChatPanel({
         const cur = prev[id];
         if (!cur || cur.secondsLeft <= 1) {
           clearInterval(interval);
-          alert(`Timer Complete: Step ${id}!`);
           return { ...prev, [id]: { secondsLeft: 0, isRunning: false, interval: null } };
         }
         return { ...prev, [id]: { ...cur, secondsLeft: cur.secondsLeft - 1, isRunning: true, interval } };
@@ -105,16 +105,16 @@ export default function ChatPanel({
   };
 
   return (
-    <div className={`flex flex-col h-[650px] rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft overflow-hidden ${className}`}>
+    <div className={`flex flex-col h-[650px] rounded-3xl border-3 border-ink bg-white dark:bg-dusk-card shadow-sticker overflow-hidden ${className}`}>
       {/* Cooking Assistant Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/70 flex items-center justify-between">
+      <div className="p-4 border-b-2 border-ink/10 bg-sunny/20 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <ChefHat className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-white dark:bg-dusk-surface border-2 border-ink flex items-center justify-center shadow-sticker-xs">
+            <ChefHat className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Smart Cooking Assistant</h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Contextual recipe advice, pantry-aware suggestions & timers</p>
+            <h3 className="font-display font-black text-sm text-ink dark:text-dusk-text">Smart Cooking Assistant</h3>
+            <p className="text-[11px] font-semibold text-ink-muted">Pantry-aware recipes, step timers & substitutions</p>
           </div>
         </div>
 
@@ -122,9 +122,9 @@ export default function ChatPanel({
           <button
             onClick={onPantrySuggest}
             type="button"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all"
+            className="btn-squish inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-display font-black bg-sunny text-ink border-2 border-ink shadow-sticker-xs cursor-pointer hover:shadow-sticker"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-ink" />
             <span>Cook From My Pantry</span>
           </button>
         )}
@@ -133,20 +133,22 @@ export default function ChatPanel({
       {/* Messages Thread */}
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 text-slate-400">
-            <ChefHat className="w-12 h-12 text-slate-300 dark:text-slate-700" />
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 text-ink-muted">
+            <div className="w-16 h-16 rounded-3xl bg-sunny/20 border-2 border-ink flex items-center justify-center p-2 shadow-sticker-sm animate-float">
+              <DoodleRamen size={42} />
+            </div>
             <div>
-              <p className="font-semibold text-sm text-slate-700 dark:text-slate-300">Ask the Cooking Assistant Anything</p>
-              <p className="text-xs text-slate-400 mt-1">Get custom recipes, substitution tricks, or step-by-step guidance</p>
+              <p className="font-display font-black text-base text-ink dark:text-dusk-text">Ask Chef AI for Any Recipe</p>
+              <p className="text-xs font-semibold text-ink-muted mt-1">Get instant ingredient steps, smart substitutions, and interactive timers.</p>
             </div>
             <div className="w-full max-w-md space-y-2 pt-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Suggested Prompts:</span>
-              <div className="flex flex-col gap-1.5">
+              <span className="text-[11px] font-black uppercase tracking-wider text-ink-muted">Try a Quick Recipe:</span>
+              <div className="flex flex-col gap-2">
                 {quickPrompts.map((prompt, idx) => (
                   <button
                     key={idx}
                     onClick={() => onSendMessage && onSendMessage(prompt)}
-                    className="p-2.5 rounded-xl text-xs text-left bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 hover:text-emerald-700 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700/60 transition-colors"
+                    className="btn-squish p-2.5 rounded-2xl text-xs font-bold text-left bg-sky-50 dark:bg-dusk-surface hover:bg-sunny/30 text-ink dark:text-dusk-text border-2 border-ink shadow-sticker-xs transition-colors cursor-pointer"
                   >
                     "{prompt}"
                   </button>
@@ -163,54 +165,85 @@ export default function ChatPanel({
                 className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
               >
                 {!isUser && (
-                  <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-9 h-9 rounded-2xl bg-sunny/30 border-2 border-ink text-ink flex items-center justify-center flex-shrink-0 mt-1 shadow-sticker-xs">
                     <ChefHat className="w-4 h-4" />
                   </div>
                 )}
                 <div
-                  className={`max-w-xl p-4 rounded-3xl text-sm ${
+                  className={`max-w-xl p-4 rounded-3xl text-xs sm:text-sm border-2 border-ink shadow-sticker-xs ${
                     isUser
-                      ? 'bg-emerald-600 text-white rounded-br-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-xs border border-slate-200 dark:border-slate-700/60'
+                      ? 'bg-tomato text-white rounded-br-xs'
+                      : 'bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text rounded-bl-xs'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap leading-relaxed">{msg.text}</div>
+                  <div className="font-semibold whitespace-pre-wrap leading-relaxed">{msg.text}</div>
 
-                  {/* Render interactive cooking timer if message contains timer request */}
+                  {/* Render recipe ingredients if present */}
+                  {msg.ingredients && (
+                    <div className="mt-3 pt-3 border-t-2 border-ink/10 space-y-1.5">
+                      <span className="font-display font-black text-xs text-ink dark:text-dusk-text block">
+                        Ingredients:
+                      </span>
+                      <ul className="space-y-1">
+                        {msg.ingredients.map((ing, i) => (
+                          <li key={i} className="text-xs font-medium flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sunny border border-ink flex-shrink-0" />
+                            <span>{ing}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Render recipe instructions if present */}
+                  {msg.instructions && (
+                    <div className="mt-3 pt-3 border-t-2 border-ink/10 space-y-1.5">
+                      <span className="font-display font-black text-xs text-ink dark:text-dusk-text block">
+                        Instructions:
+                      </span>
+                      <ol className="space-y-1.5">
+                        {msg.instructions.map((step, i) => (
+                          <li key={i} className="text-xs font-medium leading-relaxed">
+                            {step}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+
+                  {/* Render interactive cooking timer */}
                   {msg.timerMinutes && (
-                    <div className="mt-3 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                        <Clock className="w-4 h-4 text-emerald-500" />
-                        <span className="font-bold">
-                          Step Timer: {Math.floor((activeTimers[idx]?.secondsLeft ?? msg.timerMinutes * 60) / 60)}:
-                          {String((activeTimers[idx]?.secondsLeft ?? msg.timerMinutes * 60) % 60).padStart(2, '0')}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        {activeTimers[idx]?.isRunning ? (
+                    <div className="mt-3 pt-3 border-t-2 border-ink/10">
+                      <div className="p-3 rounded-2xl bg-sunny/20 border-2 border-ink flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-amber-600" />
+                          <span className="font-black text-xs">
+                            Step Timer ({msg.timerMinutes} min)
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
                           <button
-                            onClick={() => pauseTimer(idx)}
-                            className="p-1.5 rounded-lg bg-amber-500 text-white"
-                            title="Pause Timer"
-                          >
-                            <Pause className="w-3.5 h-3.5" />
-                          </button>
-                        ) : (
-                          <button
+                            type="button"
                             onClick={() => startTimer(idx, msg.timerMinutes)}
-                            className="p-1.5 rounded-lg bg-emerald-600 text-white"
-                            title="Start Timer"
+                            className="p-1 rounded-lg bg-mint border border-ink text-ink font-bold text-xs"
                           >
                             <Play className="w-3.5 h-3.5" />
                           </button>
-                        )}
-                        <button
-                          onClick={() => resetTimer(idx, msg.timerMinutes)}
-                          className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                          title="Reset Timer"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => pauseTimer(idx)}
+                            className="p-1 rounded-lg bg-sunny border border-ink text-ink font-bold text-xs"
+                          >
+                            <Pause className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => resetTimer(idx, msg.timerMinutes)}
+                            className="p-1 rounded-lg bg-white border border-ink text-ink font-bold text-xs"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -219,48 +252,36 @@ export default function ChatPanel({
             );
           })
         )}
-
-        {isLoading && (
-          <div className="flex items-center gap-3 text-slate-400 text-xs py-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center animate-spin">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <span>Chef AI is thinking and preparing your recipe...</span>
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Composer */}
-      <form onSubmit={handleSend} className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2">
+      {/* Input Form */}
+      <form onSubmit={handleSend} className="p-3 border-t-2 border-ink/10 bg-white dark:bg-dusk-card flex items-center gap-2">
         <div className="relative flex-1">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setTextInput(e.target.value)}
-            placeholder="Type your cooking query or recipe request..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-2xl text-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            placeholder="Ask Chef AI anything (e.g. how to make Maggi, pasta, or use spinach)..."
+            className="w-full pl-4 pr-10 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold border-2 border-ink bg-white dark:bg-dusk-surface text-ink dark:text-dusk-text placeholder:text-ink-muted shadow-sticker-xs focus:outline-none focus:border-tomato"
           />
           <button
             type="button"
             onClick={toggleSpeech}
-            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl transition-all ${
-              isRecording
-                ? 'bg-rose-500 text-white animate-pulse'
-                : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl border border-ink transition-all ${
+              isRecording ? 'bg-tomato text-white animate-pulse' : 'bg-sky-100 dark:bg-dusk-surface text-ink'
             }`}
-            title="Speech Input"
           >
-            {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
           </button>
         </div>
         <button
           type="submit"
           disabled={!inputText.trim() || isLoading}
-          className="p-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white shadow-sm transition-all"
-          title="Send message"
+          className="btn-squish inline-flex items-center gap-1 px-5 py-2.5 rounded-2xl bg-tomato hover:bg-tomato/90 disabled:opacity-50 text-white font-display font-black text-xs border-2 border-ink shadow-sticker-xs cursor-pointer"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3.5 h-3.5" />
+          <span>Ask</span>
         </button>
       </form>
     </div>
