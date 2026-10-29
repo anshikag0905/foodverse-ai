@@ -28,6 +28,24 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/v1/facts') || url.pathname.startsWith('/api/v1/foods'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'api-food-facts-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
       }
     })
   ],

@@ -24,7 +24,51 @@ export default function UploadDropzone({
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  const validateAndProcessFile = (file) => {
+  const compressImageIfNeeded = async (file) => {
+    if (!file.type.startsWith("image/") || file.type.includes("svg") || file.size < 1024 * 1024) {
+      return file;
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target.result;
+      };
+      img.onload = () => {
+        const maxDim = 1600;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob && blob.size < file.size) {
+            const compressedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        }, "image/jpeg", 0.85);
+      };
+      img.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const validateAndProcessFile = async (file) => {
     setErrorMessage("");
     if (!file) return;
 
@@ -35,18 +79,20 @@ export default function UploadDropzone({
       return;
     }
 
-    setSelectedFile(file);
+    const processedFile = await compressImageIfNeeded(file);
+
+    setSelectedFile(processedFile);
 
     // Create preview for images and videos
-    if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
-      const url = URL.createObjectURL(file);
+    if (processedFile.type.startsWith("image/") || processedFile.type.startsWith("video/")) {
+      const url = URL.createObjectURL(processedFile);
       setPreviewUrl(url);
     } else {
       setPreviewUrl(null);
     }
 
     if (onFileSelect) {
-      onFileSelect(file);
+      onFileSelect(processedFile);
     }
   };
 
