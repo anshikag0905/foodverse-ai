@@ -230,9 +230,29 @@ export default function PantryTracker() {
     if (!newItem.name.trim()) return;
 
     const shelfLife = parseInt(newItem.days_shelf_life) || 7;
-    const expDate = newItem.expiry_date
-      ? new Date(newItem.expiry_date).toISOString()
-      : new Date(Date.now() + shelfLife * 86400000).toISOString();
+    let expDate = null;
+    let daysRemaining = shelfLife;
+    let itemStatus = 'Fresh';
+
+    if (newItem.expiry_date) {
+      const parsedExp = new Date(newItem.expiry_date);
+      expDate = parsedExp.toISOString();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      parsedExp.setHours(0, 0, 0, 0);
+      daysRemaining = Math.ceil((parsedExp.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysRemaining < 0) {
+        itemStatus = 'Expired';
+      } else if (daysRemaining <= 2) {
+        itemStatus = 'Use Soon';
+      } else {
+        itemStatus = 'Fresh';
+      }
+    } else {
+      expDate = new Date(Date.now() + shelfLife * 86400000).toISOString();
+      daysRemaining = shelfLife;
+      itemStatus = shelfLife <= 2 ? 'Use Soon' : 'Fresh';
+    }
 
     const createdItem = {
       id: Date.now(),
@@ -244,8 +264,8 @@ export default function PantryTracker() {
       days_shelf_life: shelfLife,
       purchase_date: new Date().toISOString(),
       expiry_date: expDate,
-      days_remaining: shelfLife,
-      status: shelfLife <= 2 ? 'Use Soon' : 'Fresh',
+      days_remaining: daysRemaining,
+      status: itemStatus,
       is_active: true
     };
 
@@ -826,7 +846,11 @@ export default function PantryTracker() {
                       </div>
                       <ExpiryBadge
                         expiryDate={item.expiry_date}
-                        daysLeft={item.days_remaining}
+                        daysLeft={
+                          item.expiry_date
+                            ? Math.ceil((new Date(item.expiry_date).getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24))
+                            : item.days_remaining
+                        }
                         status={item.status}
                       />
                     </div>

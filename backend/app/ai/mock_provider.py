@@ -92,11 +92,11 @@ class MockAIProvider(AIProvider):
                 data_source="database"
             )
 
-        # 3. Banana
-        elif "banana" in path_str:
+        # 3. Banana (Accurate USDA: 105 kcal, 1.3g protein, 422mg potassium)
+        elif "banana" in path_str or "kela" in path_str or "banana_ripe" in path_str:
             return FoodItemDetection(
                 name="Ripe Banana",
-                name_hi="केला",
+                name_hi="पका केला",
                 confidence=0.97,
                 category="Fresh Fruit",
                 cuisine="Tropical",
@@ -111,13 +111,188 @@ class MockAIProvider(AIProvider):
                     servingSize="1 medium banana (118g)"
                 ),
                 health_score=89,
-                health_explanation="High bioavailable potassium and vitamin B6 supporting muscular recovery and cardiovascular balance.",
+                health_explanation="High bioavailable potassium (422mg) and vitamin B6 supporting muscular recovery and electrolyte balance.",
                 allergens=[],
                 diet_tags=["Vegan", "Vegetarian", "Jain", "Halal", "Gluten-Free"],
                 cues_detected=[
                     "Elongated curved peel",
                     "Yellow pigment with small sugar freckles",
                     "Fibrous peel end"
+                ],
+                data_source="database"
+            )
+
+        # 4. Aloo Sabzi / Potato Curry (Accurate realistic macros: 138 kcal, 2.4g protein, NOT 16g!)
+        elif any(k in path_str for k in ["potato", "aloo", "sabzi", "jeera aloo", "batata"]):
+            return FoodItemDetection(
+                name="Aloo Sabzi (Potato Curry)",
+                name_hi="आलू की सब्जी",
+                confidence=0.95,
+                category="Indian Sabzi",
+                cuisine="North Indian",
+                macros=MacroNutrients(
+                    calories=138.0,
+                    protein=2.4, # Verified realistic IFCT/USDA protein for potato curry!
+                    carbs=24.5,
+                    fat=3.8,
+                    fiber=2.8,
+                    sugar=1.5,
+                    sodium_mg=380.0,
+                    servingSize="1 bowl (150g)"
+                ),
+                health_score=78,
+                health_explanation="Wholesome potassium and complex resistant starch cooked in turmeric and cumin; low natural protein typical of root vegetables.",
+                allergens=[],
+                diet_tags=["Vegan", "Vegetarian", "Halal", "Gluten-Free"],
+                cues_detected=[
+                    "Diced golden potato cubes in spiced gravy",
+                    "Cumin and mustard seed tempering",
+                    "Turmeric-yellow aromatic reduction"
+                ],
+                data_source="database"
+            )
+
+        # 5. Soya Chunks (Vegetarian high-protein powerhouse: 26g protein per 50g!)
+        elif "soya" in path_str or "nutrela" in path_str:
+            return FoodItemDetection(
+                name="Soya Chunks Curry (Nutrela)",
+                name_hi="सोया चंक्स करी",
+                confidence=0.96,
+                category="Gym Protein",
+                cuisine="Indian",
+                macros=MacroNutrients(
+                    calories=175.0,
+                    protein=26.0,
+                    carbs=16.0,
+                    fat=1.2,
+                    fiber=6.5,
+                    sugar=1.0,
+                    sodium_mg=320.0,
+                    servingSize="1 bowl (180g)"
+                ),
+                health_score=94,
+                health_explanation="Exceptional complete plant protein density with BCAAs supporting muscle hypertrophy.",
+                allergens=["soy"],
+                diet_tags=["Vegan", "Vegetarian", "High-Protein"],
+                cues_detected=[
+                    "Spongy textured defatted soy nuggets",
+                    "Rich spiced tomato-onion curry base"
+                ],
+                data_source="database"
+            )
+
+        # 6. Chicken Breast (Lean bodybuilder staple)
+        elif "chicken" in path_str or "murgh" in path_str:
+            return FoodItemDetection(
+                name="Grilled Chicken Breast",
+                name_hi="ग्रिल्ड चिकन ब्रेस्ट",
+                confidence=0.97,
+                category="Gym Protein",
+                cuisine="Global",
+                macros=MacroNutrients(
+                    calories=247.0,
+                    protein=46.5,
+                    carbs=0.0,
+                    fat=5.4,
+                    fiber=0.0,
+                    sugar=0.0,
+                    sodium_mg=210.0,
+                    servingSize="1 breast portion (150g)"
+                ),
+                health_score=95,
+                health_explanation="Ultra-lean source of complete animal protein rich in niacin, phosphorus, and vitamin B6.",
+                allergens=[],
+                diet_tags=["High-Protein", "Halal", "Keto"],
+                cues_detected=[
+                    "Charred grill cross-hatch marks",
+                    "Fibrous lean white meat striations"
+                ],
+                data_source="database"
+            )
+
+        # 7. Eggs / Omelette
+        elif "egg" in path_str or "anda" in path_str or "bhurji" in path_str:
+            return FoodItemDetection(
+                name="Desi Masala Egg Bhurji",
+                name_hi="मसाला अंडा भुर्जी",
+                confidence=0.96,
+                category="Gym Breakfast",
+                cuisine="Indian",
+                macros=MacroNutrients(
+                    calories=245.0,
+                    protein=19.0,
+                    carbs=5.0,
+                    fat=16.5,
+                    fiber=1.2,
+                    sugar=2.0,
+                    sodium_mg=410.0,
+                    servingSize="3-egg scramble (180g)"
+                ),
+                health_score=88,
+                health_explanation="Complete amino acid profile rich in choline and lutein with sautéed onions and green chilies.",
+                allergens=["egg"],
+                diet_tags=["Vegetarian-friendly (Eggetarian)", "High-Protein", "Keto"],
+                cues_detected=[
+                    "Fluffy yellow scrambled curd clusters",
+                    "Finely chopped green chilies and onions"
+                ],
+                data_source="database"
+            )
+
+        # 8. Ramen Noodles
+        elif "ramen" in path_str or "miso" in path_str:
+            return FoodItemDetection(
+                name="Shoyu Ramen Bowl",
+                name_hi="जापानी शोयु रेमन",
+                confidence=0.94,
+                category="Japanese Noodle",
+                cuisine="Japanese",
+                macros=MacroNutrients(
+                    calories=380.0,
+                    protein=16.5,
+                    carbs=54.0,
+                    fat=11.0,
+                    fiber=3.0,
+                    sugar=4.0,
+                    sodium_mg=920.0,
+                    servingSize="1 ramen bowl (400ml)"
+                ),
+                health_score=75,
+                health_explanation="Savory umami-rich broth with wheat noodles, seasoned egg, and bamboo shoots; monitor sodium.",
+                allergens=["gluten", "soy", "egg"],
+                diet_tags=[],
+                cues_detected=[
+                    "Curled wheat noodles in clear amber dashi broth",
+                    "Soft-boiled marinated ajitsuke tamago half"
+                ],
+                data_source="database"
+            )
+
+        # 9. Edamame
+        elif "edamame" in path_str:
+            return FoodItemDetection(
+                name="Steamed Edamame",
+                name_hi="एदाममे (सोयाबीन फली)",
+                confidence=0.98,
+                category="Japanese Plant Protein",
+                cuisine="Japanese",
+                macros=MacroNutrients(
+                    calories=188.0,
+                    protein=18.4,
+                    carbs=13.8,
+                    fat=8.0,
+                    fiber=8.0,
+                    sugar=2.2,
+                    sodium_mg=15.0,
+                    servingSize="1 cup pods (155g)"
+                ),
+                health_score=96,
+                health_explanation="Wholesome young soybeans delivering high isoflavones, soluble fiber, and complete plant protein.",
+                allergens=["soy"],
+                diet_tags=["Vegan", "Vegetarian", "High-Fiber", "Gluten-Free"],
+                cues_detected=[
+                    "Bright green pods with fuzzy texture",
+                    "Visible seed bulges"
                 ],
                 data_source="database"
             )
@@ -352,7 +527,107 @@ class MockAIProvider(AIProvider):
                 missing_pantry_items=["kasuri methi", "fresh lemon"]
             )
 
-        # 3. Pasta / Macaroni
+        # 3. Potatoes / Aloo Sabzi / What can I make with potatoes
+        elif any(k in q_clean for k in ["potato", "aloo", "batata", "sabzi"]):
+            return CookingChatResult(
+                reply="Potatoes are incredibly versatile! Here is an authentic, comforting Jeera Aloo (Cumin Spiced Potatoes) ready in 8 minutes.",
+                suggested_recipe_title="Homestyle Jeera Aloo (Cumin Potatoes) 🥔✨",
+                ingredients=[
+                    "3 medium potatoes (boiled, peeled, and cubed)",
+                    "1 tbsp mustard oil or ghee",
+                    "1 tsp whole cumin seeds (jeera)",
+                    "1/2 tsp turmeric powder & 1/2 tsp red chili powder",
+                    "1/2 tsp dry mango powder (amchur) or lemon juice",
+                    "Salt to taste and fresh chopped coriander"
+                ],
+                instructions=[
+                    "Step 1: Heat 1 tbsp oil/ghee in a pan over medium heat. Add cumin seeds and let them splutter for 30 seconds.",
+                    "Step 2: Lower the flame, add turmeric and red chili powder; immediately add the boiled potato cubes.",
+                    "Step 3: Toss gently for 4-5 minutes until potato edges develop a crispy golden crust.",
+                    "Step 4: Sprinkle amchur powder and salt; toss for 1 more minute.",
+                    "Step 5: Garnish with fresh coriander and serve hot with rotis or curd!"
+                ],
+                timer_minutes=5,
+                substitutions={
+                    "mustard oil": "ghee or olive oil",
+                    "amchur": "fresh lemon juice"
+                },
+                missing_pantry_items=["amchur powder", "fresh coriander"]
+            )
+
+        # 4. Banana / Smoothie / What can I make with banana
+        elif "banana" in q_clean or "kela" in q_clean or "smoothie" in q_clean:
+            return CookingChatResult(
+                reply="Bananas make the ultimate natural pre/post-workout snack! Here is a high-protein Creamy Banana Oats Power Smoothie ready in 2 minutes.",
+                suggested_recipe_title="Banana Oats Power Fuel Smoothie 🍌🥤",
+                ingredients=[
+                    "1 ripe banana (sliced)",
+                    "1 cup chilled milk (dairy or almond milk)",
+                    "2 tbsp rolled oats",
+                    "1 tbsp natural peanut butter",
+                    "1 scoop Whey protein (optional for 30g+ protein)",
+                    "1/4 tsp cinnamon powder and 2 ice cubes"
+                ],
+                instructions=[
+                    "Step 1: Add rolled oats to blender and pulse for 10 seconds into a coarse powder.",
+                    "Step 2: Add sliced banana, peanut butter, milk, and protein powder.",
+                    "Step 3: Blend on high speed for 45 seconds until silky smooth and creamy.",
+                    "Step 4: Pour into a glass, dust with cinnamon, and drink immediately for instant glycogen recovery!"
+                ],
+                timer_minutes=2,
+                substitutions={
+                    "milk": "almond, oat, or soy milk",
+                    "peanut butter": "almond butter or soaked cashews"
+                },
+                missing_pantry_items=["peanut butter", "cinnamon powder"]
+            )
+
+        # 5. Nutritional Values Q&A
+        elif any(k in q_clean for k in ["nutritional value", "nutrition", "nutrients", "calories in", "protein in", "macros"]):
+            return CookingChatResult(
+                reply="Here is the certified nutritional telemetry breakdown! For a standard medium Banana (118g): 105 kcal, 1.3g Protein, 27g Carbs, 0.4g Fat, 3.1g Dietary Fiber, and 422mg Potassium (vital for muscle contraction). For Aloo Sabzi (150g serving): 138 kcal, 2.4g Protein, 24.5g Carbs, and 3.8g Fat.",
+                suggested_recipe_title="Nutritional Telemetry & Macro Breakdown 📊",
+                ingredients=[
+                    "Banana: 105 kcal | 1.3g Protein | 27g Carbs | 422mg Potassium",
+                    "Aloo Sabzi (150g): 138 kcal | 2.4g Protein | 24.5g Carbs | 3.8g Fat",
+                    "Soya Chunks (50g): 172 kcal | 26g Protein | 16.5g Carbs | 6.5g Fiber",
+                    "Boiled Eggs (2): 144 kcal | 12.6g Protein | 0.8g Carbs | 9.6g Fat",
+                    "Chicken Breast (150g): 247 kcal | 46.5g Protein | 0g Carbs | 5.4g Fat"
+                ],
+                instructions=[
+                    "Step 1: Review your daily targets in Gym Mode (BMR / TDEE tracker).",
+                    "Step 2: Pair carbohydrates (like bananas or potatoes) with lean proteins (like eggs, whey, or soya) for sustained muscle protein synthesis.",
+                    "Step 3: Keep sodium below 2,300mg and drink 35ml of water per kg of body weight."
+                ],
+                timer_minutes=1,
+                substitutions={},
+                missing_pantry_items=[]
+            )
+
+        # 6. Eggs / Omelette
+        elif any(k in q_clean for k in ["egg", "omelette", "anda", "bhurji"]):
+            return CookingChatResult(
+                reply="Eggs are the gold standard of bioavailability (DIAAS score 1.18). Here is a quick 3-minute Masala Egg Omelette!",
+                suggested_recipe_title="Fluffy Masala Herb Omelette 🍳",
+                ingredients=[
+                    "2 whole eggs + 1 egg white (whisked)",
+                    "1/4 small onion & 1/2 tomato (finely chopped)",
+                    "1 green chili and fresh coriander",
+                    "1 tsp butter or olive oil",
+                    "Pinch of turmeric, salt, and black pepper"
+                ],
+                instructions=[
+                    "Step 1: Whisk eggs with onions, chilies, tomatoes, turmeric, and salt for 1 minute until frothy.",
+                    "Step 2: Melt butter in a non-stick pan over medium heat.",
+                    "Step 3: Pour egg mixture and cook undisturbed for 2 minutes until base is golden.",
+                    "Step 4: Flip gently, cook for 1 more minute, fold in half, and serve hot with whole wheat toast!"
+                ],
+                timer_minutes=3,
+                substitutions={"butter": "olive oil"},
+                missing_pantry_items=["fresh coriander"]
+            )
+
+        # 7. Pasta / Macaroni
         elif "pasta" in q_clean or "macaroni" in q_clean:
             return CookingChatResult(
                 reply="Here is a simple, mouthwatering Creamy Garlic & Herb Pasta that comes together in 15 minutes!",

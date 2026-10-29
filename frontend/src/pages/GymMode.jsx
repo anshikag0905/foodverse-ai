@@ -128,22 +128,23 @@ export default function GymMode() {
   }, [searchQuery]);
 
   const fetchProfile = async () => {
+    // 1. Try local storage first
+    const saved = localStorage.getItem('foodverse_gym_profile');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setProfile(parsed);
+        setCalcForm(prev => ({ ...prev, ...parsed }));
+      } catch (e) {}
+    }
     try {
       const res = await axios.get('/api/v1/gym/profile');
-      setProfile(res.data);
-      setCalcForm({
-        age: res.data.age,
-        sex: res.data.sex,
-        height_cm: res.data.height_cm,
-        weight_kg: res.data.weight_kg,
-        activity_level: res.data.activity_level,
-        training_days_per_week: res.data.training_days_per_week,
-        goal: res.data.goal,
-        diet_type: res.data.diet_type,
-        allergies: res.data.allergies || []
-      });
+      if (res.data) {
+        setProfile(res.data);
+        setCalcForm(prev => ({ ...prev, ...res.data }));
+      }
     } catch (err) {
-      console.warn('Backend gym profile fetch failed, using default profile:', err);
+      console.warn('Backend gym profile fetch failed, using local profile');
     }
   };
 
@@ -327,15 +328,63 @@ export default function GymMode() {
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
+
+    // Deterministic Mifflin-St Jeor calculation based on weight, height, age, sex, activity, and goal
+    const age = parseInt(calcForm.age) || 25;
+    const weight = parseFloat(calcForm.weight_kg) || 70;
+    const height = parseFloat(calcForm.height_cm) || 175;
+    const sex = calcForm.sex || 'male';
+    const goal = calcForm.goal || 'maintain';
+
+    const bmr = sex === 'male'
+      ? 10 * weight + 6.25 * height - 5 * age + 5
+      : 10 * weight + 6.25 * height - 5 * age - 161;
+
+    const activityFactors = {
+      sedentary: 1.2,
+      light: 1.375,
+      moderate: 1.55,
+      active: 1.725,
+      very_active: 1.9
+    };
+    const factor = activityFactors[calcForm.activity_level] || 1.55;
+    const tdee = Math.round(bmr * factor);
+
+    let targetCalories = tdee;
+    if (goal === 'cut' || goal === 'fat_loss') targetCalories = Math.round(tdee - 500);
+    else if (goal === 'bulk' || goal === 'muscle_gain') targetCalories = Math.round(tdee + 350);
+    else if (goal === 'recomp') targetCalories = Math.round(tdee - 200);
+
+    const proteinMultiplier = (goal === 'cut' || goal === 'fat_loss') ? 2.2 : 2.0;
+    const targetProtein = Math.round(weight * proteinMultiplier);
+    const targetFat = Math.round(weight * 0.9);
+    const targetCarbs = Math.max(50, Math.round((targetCalories - (targetProtein * 4 + targetFat * 9)) / 4));
+    const targetWater = Math.round(weight * 35);
+
+    const calculatedProfile = {
+      ...calcForm,
+      bmr: Math.round(bmr),
+      tdee: tdee,
+      target_calories: targetCalories,
+      target_protein_g: targetProtein,
+      target_carbs_g: targetCarbs,
+      target_fat_g: targetFat,
+      target_water_ml: targetWater
+    };
+
+    // Save locally
+    localStorage.setItem('foodverse_gym_profile', JSON.stringify(calculatedProfile));
+    setProfile(calculatedProfile);
+    fetchAdherence(selectedDate);
+
     try {
-      const res = await axios.put('/api/v1/gym/profile', calcForm);
-      setProfile(res.data);
-      fetchAdherence(selectedDate);
-      alert('Athletic nutrition targets updated successfully!');
+      await axios.put('/api/v1/gym/profile', calculatedProfile);
     } catch (err) {
-      console.warn('Profile updated locally:', err);
-      alert('Athletic profile saved locally!');
+      console.warn('Profile updated and saved locally');
     }
+
+    setShowCelebration(true);
+    setTimeout(() => setShowCelebration(false), 3000);
   };
 
   const handleSeedDemo = async () => {
@@ -1074,6 +1123,60 @@ export default function GymMode() {
                     <strong className="text-sm text-orange-600 font-black">
                       {profile?.target_fat_g || 70}g
                     </strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Personalized Indian Gym Diet Distribution Plan */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-dusk-surface border-2 border-ink space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-display font-black text-sm text-ink dark:text-dusk-text flex items-center gap-1.5">
+                    <span>🇮🇳 Tailored Indian Gym Meal Timing Plan</span>
+                  </h4>
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-grape text-white">
+                    {profile?.goal || 'Maintain'}
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs font-bold text-ink dark:text-dusk-text">
+                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-tomato block">Meal 1: Pre-Workout (45m before)</span>
+                      <span>🍌 1 Medium Banana + 1 tbsp Peanut Butter</span>
+                    </div>
+                    <span className="text-[11px] font-black text-tomato">190 kcal • 7g P</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-grape block">Meal 2: Post-Workout Window (30m)</span>
+                      <span>🥤 1 Scoop Whey Isolate or 4 Boiled Egg Whites</span>
+                    </div>
+                    <span className="text-[11px] font-black text-grape">115 kcal • 27g P</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-emerald-700 dark:text-mint block">Meal 3: Power Lunch</span>
+                      <span>🧆 Soya Chunks Curry (50g raw) or Chicken Breast + 2 Rotis + Dal</span>
+                    </div>
+                    <span className="text-[11px] font-black text-emerald-700 dark:text-mint">480 kcal • 42g P</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-amber-600 block">Meal 4: Evening Recovery Snack</span>
+                      <span>🥜 1 Cup Roasted Chana or Moong Sprouts Chaat</span>
+                    </div>
+                    <span className="text-[11px] font-black text-amber-600">185 kcal • 11g P</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-dusk-card border border-ink flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-purple-700 block">Meal 5: Anabolic Dinner</span>
+                      <span>🧀 Low-Fat Paneer Bhurji (150g) or Grilled Fish + 1 Cup Brown Rice</span>
+                    </div>
+                    <span className="text-[11px] font-black text-purple-700">420 kcal • 32g P</span>
                   </div>
                 </div>
               </div>

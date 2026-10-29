@@ -13,6 +13,7 @@ import {
   Copy
 } from 'lucide-react';
 import { aboutConfig } from '../config/about';
+import AnimatedGirlFace from '../components/common/AnimatedGirlFace';
 import { DoodleAvocado, DoodlePancakes } from '../assets/doodles';
 
 export default function About() {
@@ -36,15 +37,10 @@ export default function About() {
         </div>
 
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 relative z-10">
-          {/* Avatar Pill */}
+          {/* Animated Girl Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-sunny border-3 border-ink flex flex-col items-center justify-center p-3 shadow-sticker-sm">
-              <span className="font-display font-black text-4xl text-ink">
-                AG
-              </span>
-              <span className="text-[10px] font-black uppercase tracking-wider text-ink/80 mt-1">
-                AI / ML Lead
-              </span>
+            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-pink-100 dark:bg-dusk-surface border-3 border-ink flex flex-col items-center justify-center p-1 shadow-sticker-sm overflow-hidden">
+              <AnimatedGirlFace size={115} />
             </div>
             <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-tomato text-white border-2 border-ink shadow-xs">
               <Sparkles className="w-4 h-4" />

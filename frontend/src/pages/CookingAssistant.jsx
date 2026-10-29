@@ -81,6 +81,68 @@ export default function CookingAssistant() {
           ],
           substitutions: { "butter": "ghee or olive oil", "green chili": "black pepper" }
         };
+      } else if (qLower.includes("potato") || qLower.includes("aloo") || qLower.includes("sabzi")) {
+        fallbackRecipe = {
+          title: "Homestyle Jeera Aloo (Cumin Spiced Potatoes) 🥔✨",
+          reply: "Here is how to make authentic, comforting Jeera Aloo ready in 5 minutes! (Approx 138 kcal, 2.4g protein per serving)",
+          timerMinutes: 5,
+          ingredients: [
+            "3 medium boiled potatoes (peeled and cubed)",
+            "1 tbsp oil or ghee",
+            "1 tsp whole cumin seeds (jeera)",
+            "1/2 tsp turmeric powder & 1/2 tsp red chili powder",
+            "1/2 tsp dry mango powder (amchur) or fresh lemon juice",
+            "Salt to taste and fresh chopped coriander"
+          ],
+          instructions: [
+            "Step 1: Heat oil in a pan over medium flame. Add cumin seeds and let them sizzle for 30 seconds.",
+            "Step 2: Lower flame, add turmeric and red chili powder; immediately add the boiled potato cubes.",
+            "Step 3: Sauté on medium-high flame for 3-4 minutes until the potato edges turn golden and crisp.",
+            "Step 4: Sprinkle amchur powder and salt, toss for 1 minute to coat evenly.",
+            "Step 5: Garnish with fresh chopped coriander and serve hot with rotis or curd!"
+          ],
+          substitutions: { "oil": "ghee or butter", "amchur": "fresh lemon juice" }
+        };
+      } else if (qLower.includes("banana") || qLower.includes("kela") || qLower.includes("smoothie")) {
+        fallbackRecipe = {
+          title: "Banana Oats Power Fuel Smoothie 🍌🥤",
+          reply: "Here is a quick, high-potassium pre-workout Banana Smoothie ready in 2 minutes!",
+          timerMinutes: 2,
+          ingredients: [
+            "1 ripe banana (sliced)",
+            "1 cup chilled milk (dairy or almond)",
+            "2 tbsp rolled oats",
+            "1 tbsp peanut butter",
+            "1 scoop whey protein (optional)",
+            "Pinch of cinnamon powder"
+          ],
+          instructions: [
+            "Step 1: Add rolled oats to blender and pulse for 10 seconds into coarse flour.",
+            "Step 2: Add sliced banana, peanut butter, milk, and protein powder.",
+            "Step 3: Blend on high speed for 45 seconds until thick, creamy, and velvety.",
+            "Step 4: Pour into a tall glass, dust with cinnamon, and enjoy instant clean energy!"
+          ],
+          substitutions: { "milk": "water or soy milk", "peanut butter": "almond butter" }
+        };
+      } else if (qLower.includes("nutritional") || qLower.includes("nutrition") || qLower.includes("values") || qLower.includes("protein")) {
+        fallbackRecipe = {
+          title: "Nutritional Telemetry & Macro Breakdown 📊",
+          reply: "Here is the exact certified nutrition telemetry: Ripe Banana (118g) provides 105 kcal, 1.3g Protein, 27g Carbs, 0.4g Fat, and 422mg Potassium. Aloo Sabzi (150g serving) provides 138 kcal, 2.4g Protein, 24.5g Carbs, and 3.8g Fat. Soya Chunks (50g raw) provides 172 kcal and a massive 26g of plant protein!",
+          timerMinutes: 1,
+          ingredients: [
+            "Ripe Banana: 105 kcal | 1.3g P | 27g C | 422mg Potassium",
+            "Aloo Sabzi: 138 kcal | 2.4g P | 24.5g C | 3.8g F",
+            "Soya Chunks (50g): 172 kcal | 26g P | 16.5g C | 6.5g Fiber",
+            "Boiled Eggs (2): 144 kcal | 12.6g P | 0.8g C | 9.6g F",
+            "Grilled Chicken (150g): 247 kcal | 46.5g P | 0g C | 5.4g F"
+          ],
+          instructions: [
+            "Step 1: Track your daily protein goal in Gym Mode (2.0g per kg of bodyweight).",
+            "Step 2: Pair complex carbs (banana/potatoes) around your workouts for glycogen replenishment.",
+            "Step 3: Hydrate with 35ml water per kg bodyweight."
+          ],
+          substitutions: {}
+        };
       } else if (qLower.includes("paneer")) {
         fallbackRecipe = {
           title: "High-Protein Tawa Paneer Sauté 🧀",
