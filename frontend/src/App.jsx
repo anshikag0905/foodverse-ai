@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import FoodExplorer from './pages/FoodExplorer';
 import { aboutConfig } from './config/about';
 
 // Initial Route Placeholder View
@@ -100,7 +101,7 @@ export default function App() {
             <Route path="/cooking" element={<GenericModulePage title={t('nav.cooking')} description="Contextual Cooking Assistant & Recipe Suggestion" icon={Sparkles} />} />
             <Route path="/meal-planner" element={<GenericModulePage title={t('nav.meal_planner')} description="Personalized Adaptive Meal Regimens" icon={Calendar} />} />
             <Route path="/pantry" element={<GenericModulePage title={t('nav.pantry')} description="Inventory, Expiry Warnings & Food-Waste Tracking" icon={Package} />} />
-            <Route path="/food-explorer" element={<GenericModulePage title={t('nav.food_explorer')} description="FTS5 Full-Text Nutritional Database Explorer" icon={Compass} />} />
+            <Route path="/food-explorer" element={<FoodExplorer />} />
             <Route path="/did-you-know" element={<GenericModulePage title={t('nav.did_you_know')} description="Curated Food Science & Hygiene Fact Directory" icon={Lightbulb} />} />
             <Route path="/gym" element={<GenericModulePage title={t('nav.gym_mode')} description="BMR/TDEE Calculator & Protein Target Progress" icon={Dumbbell} accent="gym" />} />
             <Route path="/history" element={<GenericModulePage title={t('nav.history')} description="Multimodal Scan Archive & Export Center" icon={History} />} />
