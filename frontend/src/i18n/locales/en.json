@@ -1,0 +1,45 @@
+{
+  "app_name": "FoodVerse AI",
+  "tagline": "Multimodal Food Intelligence Agent",
+  "nav": {
+    "dashboard": "Dashboard",
+    "food_scan": "Food Recognition",
+    "freshness": "Freshness Check",
+    "hygiene": "Hygiene Monitor",
+    "cooking": "Cooking Assistant",
+    "meal_planner": "Meal Planner",
+    "pantry": "Pantry & Expiry",
+    "food_explorer": "Food Explorer",
+    "did_you_know": "Did You Know?",
+    "gym_mode": "Gym Mode",
+    "history": "History",
+    "settings": "Settings & Privacy",
+    "about": "About"
+  },
+  "common": {
+    "demo_banner": "Demo Mode Active – Running deterministic offline AI with zero external API keys",
+    "try_sample": "Try a Sample",
+    "analyzing": "Analyzing input with Multimodal AI...",
+    "source_database": "Database Match",
+    "source_ai": "AI Estimation",
+    "confidence": "Confidence",
+    "why_this_result": "Why this result?",
+    "disclaimer_nutrition": "Nutritional values are calculated estimates and may vary by preparation and portion size.",
+    "disclaimer_freshness": "Freshness analysis is visual-only and does not substitute for laboratory microbial safety testing.",
+    "disclaimer_hygiene": "Hygiene scores provide operational guidance and do not replace official regulatory health inspections.",
+    "disclaimer_gym": "Gym guidance and caloric targets are for general educational purposes and not clinical medical advice.",
+    "search": "Search",
+    "filter": "Filter",
+    "save": "Save",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "export": "Export Data",
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "allergen_alert": {
+    "title": "Allergen & Diet Safety Warning",
+    "may_contain": "May contain ingredients conflicting with your profile",
+    "read_labels": "Always inspect physical packaging labels before consuming."
+  }
+}

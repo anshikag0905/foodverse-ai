@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: foodverse-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - DEMO_MODE=true
+      - AI_PROVIDER=mock
+      - DATABASE_URL=sqlite:///./backend/data/foodverse.db
+      - FOOD_DATABASE_PATH=./backend/data/food_database.sqlite
+      - UPLOAD_DIR=./storage/uploads
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+    volumes:
+      - backend-data:/app/backend/data
+      - backend-uploads:/app/storage/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: foodverse-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  backend-data:
+  backend-uploads:
